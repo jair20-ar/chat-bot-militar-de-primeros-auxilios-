@@ -1,4 +1,4 @@
-# Chatbot Militar de Primeros Auxilios 🏥⚕️
+# Chatbot Militar de Primeros Auxilios - v1 🏥⚕️
 
 Sistema inteligente de asistencia médica para contextos militares, basado en inteligencia artificial y procesamiento de lenguaje natural para proporcionar guía de primeros auxilios en tiempo real.
 
