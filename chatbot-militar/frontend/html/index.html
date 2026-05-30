@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA DE ASISTENCIA MÉDICA TÁCTICA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === RESET Y FONDO === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: radial-gradient(circle at 20% 30%, #0a1f29 0%, #050a0f 80%);
+            background-color: #050a0f;
+            background-attachment: fixed;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* === BOTONES DE LAS ESQUINAS === */
+        .top-right-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 45px;
+            height: 45px;
+            background: rgba(10, 20, 30, 0.5);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 100;
+        }
+        
+        .top-right-btn:hover {
+            background: rgba(0, 229, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+        }
+
+        .bottom-right-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #8b9bb4;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 100;
+        }
+
+        /* === CONTENEDOR PRINCIPAL === */
+        .main-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px 100px 20px;
+            margin-top: 40px;
+        }
+
+        /* === ESCUDO SUPERIOR === */
+        .shield-glow-container {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, transparent 70%);
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.15), inset 0 0 20px rgba(0, 229, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 35px;
+        }
+
+        /* === TEXTOS DE CABECERA === */
+        .title-main {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 6px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .separator-glow {
+            width: 120px;
+            height: 2px;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.6) 0%, transparent 100%);
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: #8b9bb4;
+            letter-spacing: 0.5px;
+            margin-bottom: 40px;
+        }
+
+        /* === TARJETAS / BOTONES (El núcleo de tu navegación) === */
+        .action-card {
+            width: 100%;
+            max-width: 420px;
+            background: linear-gradient(160deg, #2a3b4c 0%, #17212b 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+
+        /* Tarjeta 1 (Instrucciones) */
+        .card-primary {
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        
+        .card-primary::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 30%;
+            width: 40%;
+            height: 2px;
+            background: radial-gradient(circle, #00d2ff 0%, transparent 100%);
+            box-shadow: 0 0 15px #00d2ff;
+        }
+
+        /* Íconos dentro de las tarjetas */
+        .card-icon-wrapper {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .icon-primary {
+            background: #113c4a;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+        }
+
+        .icon-secondary {
+            background: #334155;
+        }
+
+        .card-text {
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 3px;
+            line-height: 1.8;
+            color: #ffffff;
+        }
+
+        /* === PUNTOS INFERIORES === */
+        .pagination-dots {
+            display: flex;
+            gap: 8px;
+            margin-top: 40px;
+            margin-bottom: 60px;
+            padding: 20px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background-color: #0088aa;
+            border-radius: 50%;
+        }
+
+        .dot.active {
+            background-color: #00d2ff;
+            box-shadow: 0 0 8px #00d2ff;
+        }
+
+        /* === SECCIÓN DE INFORMACIÓN ADICIONAL === */
+        .info-section {
+            width: 100%;
+            max-width: 500px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .info-card {
+            background: linear-gradient(160deg, rgba(42, 59, 76, 0.5) 0%, rgba(23, 33, 43, 0.5) 100%);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-card h3 {
+            font-size: 1rem;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            color: #00d2ff;
+        }
+
+        .info-card p {
+            font-size: 0.85rem;
+            color: #8b9bb4;
+            line-height: 1.6;
+        }
+
+        .footer-text {
+            font-size: 0.75rem;
+            color: #556b7d;
+            letter-spacing: 1px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Botón Sol (Arriba Derecha) -->
+    <div class="top-right-btn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </div>
+
+    <!-- Contenido Central -->
+    <div class="main-container">
+        
+        <!-- Escudo Principal -->
+        <div class="shield-glow-container">
+            <svg width="55" height="55" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px rgba(0,229,255,0.5));">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="M7 11l2.5 0 1.5 -3 2 6 1.5 -3 2.5 0" stroke="#00d2ff" stroke-width="2"></path>
+            </svg>
+        </div>
+
+        <!-- Títulos -->
+        <h1 class="title-main">
+            FUERZA ARMADA<br>NACIONAL<br>BOLIVARIANA
+        </h1>
+        <div class="separator-glow"></div>
+        <p class="subtitle">Sistema de Asistencia Médica Táctica</p>
+
+        <!-- BOTÓN 1: Instrucciones (Con la ruta exacta que pediste) -->
+        <button class="action-card card-primary" onclick="window.location.href='buscador.html'" style="border:none; outline:none;">
+            <div class="card-icon-wrapper icon-primary">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div class="card-text">
+                INSTRUCCIONES MÉDICAS<br>INMEDIATAS
+            </div>
+        </button>
+
+        <!-- BOTÓN 2: Acceso Médico (Con la ruta exacta que pediste) -->
+        <button class="action-card" onclick="window.location.href='medicos.html'" style="border:none; outline:none; background: linear-gradient(160deg, #374659 0%, #202b38 100%);">
+            <div class="card-icon-wrapper icon-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+            </div>
+            <div class="card-text">
+                ACCESO PERSONAL<br>MÉDICO EXCLUSIVO
+            </div>
+        </button>
+
+    </div>
+
+    <!-- Puntos Inferiores -->
+    <div class="pagination-dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+
+    <!-- SECCIÓN DE INFORMACIÓN ADICIONAL (AHORA VISIBLE AL HACER SCROLL) -->
+    <div class="info-section">
+        
+        <div class="info-card">
+            <h3>MISIÓN</h3>
+            <p>Proporcionar asistencia médica táctica inmediata y eficiente a todo el personal de la Fuerza Armada Nacional Bolivariana, garantizando el acceso rápido a información crítica y procedimientos de emergencia.</p>
+        </div>
+
+        <div class="info-card">
+            <h3>CARACTERÍSTICAS PRINCIPALES</h3>
+            <p>✓ Base de datos de instrucciones médicas<br>✓ Acceso seguro para personal médico<br>✓ Interfaz táctica intuitiva<br>✓ Disponibilidad 24/7</p>
+        </div>
+
+        <div class="info-card">
+            <h3>SEGURIDAD</h3>
+            <p>El sistema cumple con los más altos estándares de seguridad. Solo personal autorizado tiene acceso a la información médica clasificada. Todos los datos están encriptados y protegidos.</p>
+        </div>
+
+        <div class="info-card">
+            <h3>SOPORTE TÉCNICO</h3>
+            <p>Para reportes de problemas técnicos o soporte, contacte al departamento de sistemas. Disponible en horario de oficina.</p>
+        </div>
+
+        <div class="footer-text">
+            © 2026 SISTEMA TACMED FANB | TODOS LOS DERECHOS RESERVADOS
+        </div>
+
+    </div>
+
+    <!-- Botón Ayuda (Abajo Derecha) -->
+    <div class="bottom-right-btn">?</div>
+
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Asistencia médica personalizada</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(115deg, #142a42, #174a73, #102e44 88%);
+            font-family: 'Orbitron', sans-serif;
+        }
+        .container {
+            max-width: 750px;
+            margin: 48px auto;
+            background: #1d3251eb;
+            padding: 38px 30px 28px 30px;
+            border-radius: 18px;
+            box-shadow: 0 5px 30px #0010;
+        }
+        .bienvenida {
+            font-size: 1.2rem;
+            color: #00d2ff;
+            margin-bottom: 22px;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        .form-card, .card {
+            background: rgba(33,58,90,0.90);
+            border-radius: 13px;
+            box-shadow: 0 2px 8px #0003;
+            padding: 24px 18px;
+            margin-bottom: 22px;
+            border-left: 5px solid #00d2ff;
+        }
+        .form-card h3 {
+            margin-bottom: 16px;
+            color: #00d2ff;
+            font-size: 1.15em;
+            text-align: left;
+            letter-spacing: 1.5px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            border-radius: 10px;
+            padding: 10px 11px;
+            background: #0a1929c9;
+            color: #fff;
+            border: 1.3px solid #00d2ff;
+            margin: 0 0 12px 0;
+            font-family: inherit;
+            font-size: 1.02em;
+        }
+        .pasos-wrap {margin-bottom:18px;}
+        .paso-item { 
+            margin-bottom:12px; 
+            display:flex; 
+            align-items: center; 
+            gap:15px;
+            background: #13304bdd;
+            border-radius: 8px;
+            padding: 8px 9px;
+        }
+        .paso-item textarea { flex:3; }
+        .paso-item input[type='file'] { flex:2; }
+        .paso-item img { border-radius:6px; max-height:50px;max-width:90px; }
+        .acciones {margin-top:16px;}
+        .btn, .btn-min {
+            padding: 10px 18px;
+            border-radius: 11px;
+            border: 2px solid #00d2ff;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            background: #213a5a;
+            color: #00d2ff;
+            box-shadow: 0 2px 8px #0023;
+            font-size: 1.005em;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            margin-bottom: 4px;
+        }
+        .btn:hover, .btn-min:hover {
+            background: #00d2ff;
+            color: #213a5a;
+        }
+        .btn-min {
+            padding: 2px 10px;
+            margin-right: 9px;
+            font-size: 0.96em;
+            border-radius: 8px;
+        }
+        .indicacion-card {
+            background: rgba(20, 42, 66, 0.95);
+            padding: 14px 17px;
+            margin-bottom: 15px;
+            border-radius: 11px;
+            box-shadow: 0 2px 8px #0003;
+            border-left: 4px solid #00d2ff;
+        }
+        .indicacion-card .titulo-card {
+            font-weight: bold; color: #00f7cf;
+            font-size: 1.10em;
+            letter-spacing: 1.2px;
+            margin-bottom: 3px; display: inline-block;
+        }
+        .indicacion-card ul {margin-bottom:4px;}
+        .indicacion-card img {max-width:200px; margin:7px 0;}
+        .btn-secondary {
+            border-color: #a0c4e1; background: #254062; color: #a0c4e1;
+        }
+        .btn-secondary:hover {
+            background: #00d2ff; color: #254062;
+        }
+        /* Modal */
+        #modal-ejecucion {
+            display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; 
+            background:#091a26e9; z-index:99; align-items:center; justify-content:center;
+        }
+        #modal-ejecucion > div {
+            background:#254062;
+            box-shadow:0 10px 40px #000a;
+            color:white;max-width:400px;
+            width:95vw;padding:28px 22px 22px 22px;
+            border-radius:13px;
+            text-align:center;
+            border: 3px solid #00d2ff;
+        }
+        @media (max-width: 600px) {
+            .container {padding: 12px 1vw;}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="bienvenida" id="bienvenida"></div>
+        <div class="form-card">
+            <h3>Registrar o editar una instrucción de primeros auxilios</h3>
+            <form id="form-instruccion">
+                <input type="text" id="titulo" placeholder="Título de la instrucción" required><br>
+                <div class="pasos-wrap" id="pasos-wrap">
+                    <label>PASOS (agrega texto e imagen opcional a cada paso):</label>
+                </div>
+                <button type="button" class="btn" onclick="agregarPaso()">+ Añadir paso</button>
+                <div class="acciones">
+                    <button type="submit" class="btn" id="guardar-btn">Guardar instrucción</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()" id="btn-cancelar" style="display:none;">Cancelar edición</button>
+                    <input type="hidden" id="editando_id">
+                </div>
+            </form>
+        </div>
+        <hr>
+        <div class="card">
+            <h3 style="color:#00d2ff;">Instrucciones guardadas</h3>
+            <div id="instrucciones"></div>
+        </div>
+        <button onclick="cerrarSesion()" class="btn btn-secondary" style="margin-top:18px;">Cerrar sesión</button>
+        <div style="height: 36px;"></div>
+    </div>
+    <div id="modal-ejecucion">
+        <div>
+            <h3 id="ejec-titulo"></h3>
+            <div id="ejec-paso"></div>
+            <img id="ejec-img" style="margin:18px auto; max-width:210px;display:none; border-radius:8px;">
+            <div style="margin:18px 0 0 0;">
+                <button class="btn-min" onclick="ejecPasoPrevio()">Anterior</button>
+                <button class="btn-min" onclick="ejecPasoSiguiente()">Siguiente</button>
+                <button class="btn btn-secondary" onclick="cerrarModal()">Salir</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // VALIDACION DE SESIÓN
+        const medico = JSON.parse(localStorage.getItem("medico"));
+        if (!medico) {
+            alert("Debes iniciar sesión.");
+            window.location.href = "medicos.html";
+        }
+        document.getElementById('bienvenida').innerText = `Bienvenido Dr(a). ${medico.nombre}`;
+
+        // FORMULARIO DE PASOS
+        function agregarPaso(texto='', imgUrl='') {
+            const pasosWrap = document.getElementById('pasos-wrap');
+            const div = document.createElement('div');
+            div.className = "paso-item";
+            div.innerHTML = `<textarea placeholder="Descripción del paso" required>${texto}</textarea>
+                <input type="file" accept="image/*" onchange="mostrarPreviewImgPaso(this)">
+                <img src="${imgUrl}" style="max-height:50px;max-width:90px;display:${imgUrl?'inline':'none'};margin-left:4px; border-radius:6px;">
+                <button type="button" class="btn-min" onclick="this.parentElement.remove()">X</button>`;
+            pasosWrap.appendChild(div);
+        }
+        function limpiarPasos(){
+            document.getElementById('pasos-wrap').innerHTML = '<label>PASOS (agrega texto e imagen opcional a cada paso):</label>';
+        }
+        function leerPasos(){
+            // El campo imagen se guarda como base64 para ejemplo demo
+            return Array.from(document.querySelectorAll('.paso-item')).map(nodo => {
+                return {
+                    texto: nodo.querySelector('textarea').value.trim(),
+                    // Si hay archivo subido lo guardamos como base64, si está editando y ya tenía imagen la mantenemos
+                    imagen: (nodo.querySelector("img") && nodo.querySelector("img").src.includes("data:image")) ? nodo.querySelector("img").src : ""
+                }
+            }).filter(p=>p.texto);
+        }
+        function mostrarPreviewImgPaso(input){
+            let img = input.nextElementSibling;
+            if(input.files && input.files[0]){
+                const reader = new FileReader();
+                reader.onload = e => { img.src = e.target.result; img.style.display = "inline"; }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // CRUD INSTRUCCIONES CON EL BACKEND
+        cargarInstrucciones();
+
+        async function cargarInstrucciones(){
+            const zona = document.getElementById('instrucciones');
+            zona.innerHTML = '<em style="color:#8ddcff;">Cargando...</em>';
+            const res = await fetch(`/indicaciones/protocolos/${medico.id_medico}`);
+            const datos = await res.json();
+            zona.innerHTML = '';
+            datos.forEach(ins => {
+                let pasosArr = JSON.parse(ins.pasos || "[]");
+                const div = document.createElement("div");
+                div.className = "indicacion-card";
+                div.innerHTML = `
+                  <span class="titulo-card">${ins.titulo}</span>
+                  <ul style="margin-bottom:4px;">
+                    ${pasosArr.map((p,i)=>`
+                        <li>
+                            <b>Paso ${i+1}:</b> ${p.texto}
+                            ${p.imagen ? `<br><img src="${p.imagen}">` : ''}
+                        </li>`).join("")}
+                  </ul>
+                  <button class="btn-min" onclick='editarInstruccion(${ins.id},${JSON.stringify(ins.titulo)},${encodeURIComponent(ins.pasos)})'>Editar</button>
+                  <button class="btn-min" style="background:#af3131;border-color:#af3131;" onclick="borrarInstruccion(${ins.id})">Eliminar</button>
+                  <button class="btn-min" style="background:#0af084;border-color:#0af084;" onclick="ejecutarInstruccion(${encodeURIComponent(ins.titulo)},${encodeURIComponent(ins.pasos)})">Ver paso a paso</button>
+                `;
+                zona.appendChild(div);
+            });
+        }
+
+        // NUEVA / EDITAR INSTRUCCIÓN
+        document.getElementById("form-instruccion").onsubmit = async function(e){
+            e.preventDefault();
+            const id = document.getElementById('editando_id').value;
+            const titulo = document.getElementById('titulo').value.trim();
+            const pasos = leerPasos();
+            if(!titulo || pasos.length===0){
+                alert("Proporcione título y al menos un paso.");
+                return;
+            }
+            if(id) {
+                // EDITAR
+                const res = await fetch(`/indicaciones/protocolos/${id}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ titulo, pasos, id_medico: medico.id_medico })
+                });
+                if((await res.json()).ok) {
+                    alert("Instrucción actualizada");
+                    cancelarEdicion();
+                    cargarInstrucciones();
+                }
+            } else {
+                // NUEVO
+                const res = await fetch('/indicaciones/protocolos', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ titulo, pasos, id_medico: medico.id_medico })
+                });
+                if((await res.json()).ok) {
+                    alert("Instrucción guardada");
+                    this.reset();
+                    limpiarPasos();
+                    agregarPaso();
+                    cargarInstrucciones();
+                }
+            }
+        };
+        function editarInstruccion(id, titulo, pasosUrlEncoded) {
+            document.getElementById('titulo').value = titulo;
+            limpiarPasos();
+            let pasosArr = JSON.parse(decodeURIComponent(pasosUrlEncoded));
+            pasosArr.forEach(p=>agregarPaso(p.texto, p.imagen));
+            document.getElementById('editando_id').value = id;
+            document.getElementById('btn-cancelar').style.display = '';
+        }
+        function cancelarEdicion() {
+            document.getElementById('form-instruccion').reset();
+            limpiarPasos(); agregarPaso();
+            document.getElementById('editando_id').value = '';
+            document.getElementById('btn-cancelar').style.display = 'none';
+        }
+        async function borrarInstruccion(id) {
+            if(confirm("¿Eliminar esta instrucción?")) {
+                const res = await fetch(`/indicaciones/protocolos/${id}`, { method: 'DELETE' });
+                if((await res.json()).ok) { cargarInstrucciones(); }
+            }
+        }
+        function cerrarSesion() {
+            localStorage.removeItem("medico");
+            window.location.href = "medicos.html";
+        }
+        // Paso a paso visualización (modal)
+        let pasosEjec = [], pasoEjecInd = 0;
+        function ejecutarInstruccion(titulo, pasosJsonEnc) {
+            pasosEjec = JSON.parse(decodeURIComponent(pasosJsonEnc));
+            pasoEjecInd = 0;
+            document.getElementById("ejec-titulo").textContent = decodeURIComponent(titulo);
+            mostrarPasoEjecucion();
+            document.getElementById("modal-ejecucion").style.display = 'flex';
+        }
+        function mostrarPasoEjecucion() {
+            let paso = pasosEjec[pasoEjecInd];
+            document.getElementById("ejec-paso").textContent = `Paso ${pasoEjecInd + 1}: ${paso.texto}`;
+            let img = document.getElementById("ejec-img");
+            if(paso.imagen){
+                img.src = paso.imagen;
+                img.style.display = "";
+            } else {
+                img.style.display = "none";
+            }
+        }
+        function ejecPasoSiguiente(){
+            if(pasoEjecInd < pasosEjec.length-1){
+                pasoEjecInd++;
+                mostrarPasoEjecucion();
+            } else {
+                alert("¡Protocolo terminado!");
+            }
+        }
+        function ejecPasoPrevio(){
+            if(pasoEjecInd > 0){
+                pasoEjecInd--;
+                mostrarPasoEjecucion();
+            }
+        }
+        function cerrarModal(){
+            document.getElementById("modal-ejecucion").style.display = "none";
+        }
+        // Un paso por defecto
+        window.onload = ()=>{ limpiarPasos(); agregarPaso(); };
+    </script>
+</body>
+</html>

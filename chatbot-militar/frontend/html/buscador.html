@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BÚSQUEDA MÉDICA TÁCTICA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === CONFIGURACIÓN GENERAL Y FONDO === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 30%, #0c1a24 0%, #050a0f 80%);
+            background-color: #050a0f;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === ENCABEZADO (Volver, Título, Sol) === */
+        .header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .back-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 5px;
+            text-align: center;
+            color: #ffffff;
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        /* Línea resplandeciente bajo el título de la imagen */
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: #00d2ff;
+            box-shadow: 0 0 10px #00d2ff;
+        }
+
+        .theme-btn {
+            width: 45px;
+            height: 45px;
+            background: rgba(10, 20, 30, 0.4);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.05);
+        }
+
+        /* === PANEL DE PANEL DE BÚSQUEDA (Card Principal) === */
+        .search-card {
+            background: rgba(13, 22, 30, 0.7);
+            border: 1px solid rgba(0, 229, 255, 0.12);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            margin-bottom: 40px;
+        }
+
+        .instruction-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        /* Barra de entrada de texto agrupada con micrófono */
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            height: 54px;
+            background: #222a35;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 0 45px 0 20px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: rgba(0, 229, 255, 0.5);
+        }
+
+        .search-inner-icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        /* Botón de voz integrado (Tu id="voice-card") */
+        .mic-btn {
+            width: 54px;
+            height: 54px;
+            background: #00e5ff;
+            border: none;
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .mic-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+        }
+
+        /* Botón de búsqueda de alta prioridad (Tu id="btn-resultados") */
+        .btn-submit {
+            width: 100%;
+            height: 54px;
+            background: #00e5ff;
+            color: #000000;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #00bcd4;
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+        }
+
+        /* === SECCIÓN BÚSQUEDAS RÁPIDAS === */
+        .quick-searches-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+            letter-spacing: 4px;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .quick-btn {
+            background: rgba(20, 26, 33, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 18px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: rgba(30, 41, 53, 0.8);
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+
+        /* === BOTÓN AYUDA INFERIOR === */
+        .help-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #64748b;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="header-area">
+            <button class="back-btn" onclick="window.history.back()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </button>
+            
+            <h2>BÚSQUEDA MÉDICA</h2>
+            
+            <button class="theme-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="search-card">
+            
+            <div class="instruction-row">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Describe la emergencia o condición médica</span>
+            </div>
+
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <input type="text" id="search" placeholder="Ej: herida de bala, fractura, hemorragia...">
+                    <span class="search-inner-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </span>
+                </div>
+                
+                <button class="mic-btn" id="voice-card" title="Habilitar Chatbot de Voz">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                </button>
+            </div>
+
+            <button class="btn-submit" id="btn-resultados">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                BUSCAR INSTRUCCIONES
+            </button>
+
+        </div>
+
+        <div class="quick-searches-title">Búsquedas Rápidas</div>
+        
+        <div class="quick-grid">
+            <button class="quick-btn" onclick="document.getElementById('search').value='Herida de Bala'">Herida de Bala</button>
+            <button class="quick-btn" onclick="document.getElementById('search').value='Fractura Ósea'">Fractura Ósea</button>
+            <button class="quick-btn" onclick="document.getElementById('search').value='Hemorragia Severa'">Hemorragia Severa</button>
+            <button class="quick-btn" onclick="document.getElementById('search').value='Quemaduras'">Quemaduras</button>
+            <button class="quick-btn" onclick="document.getElementById('search').value='RCP'">RCP</button>
+            <button class="quick-btn" onclick="document.getElementById('search').value='Shock'">Shock</button>
+        </div>
+
+    </div>
+
+    <div class="help-btn">?</div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

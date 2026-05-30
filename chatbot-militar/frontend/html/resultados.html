@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RESULTADOS | MEDIC-BOT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* === CONFIGURACIÓN BASE Y FONDO === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 10%, #0e1e2b 0%, #050a0f 80%);
+            background-color: #050a0f;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 750px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === ENCABEZADO === */
+        .header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Botón de retroceso adaptado a tu lógica */
+        .back-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #fff;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .title-container {
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            letter-spacing: 6px;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
+        .title-container::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 80px;
+            height: 2px;
+            background: #00d2ff;
+            box-shadow: 0 0 10px #00d2ff;
+        }
+
+        .theme-btn {
+            width: 45px;
+            height: 45px;
+            background: rgba(10, 20, 30, 0.4);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+        }
+
+        /* === PÍLDORA DE BÚSQUEDA DINÁMICA === */
+        .search-term-pill {
+            display: inline-block;
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid #0088aa;
+            border-radius: 20px;
+            padding: 8px 20px;
+            color: #00e5ff;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-left: 65px;
+            margin-bottom: 30px;
+            align-self: flex-start;
+        }
+
+        /* === BARRA DE CONTEO === */
+        .results-count {
+            background: #0b151e;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 14px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        .icon-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0, 229, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .highlight-number {
+            color: #00d2ff;
+            font-weight: 700;
+        }
+
+        /* === TARJETAS DE RESULTADOS Y EFECTO HOVER === */
+        .result-card {
+            background: #0e1620;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* El resplandor circular (Oculto por defecto) */
+        .card-glow {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 140px;
+            height: 140px;
+            background: #0a3a45;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        /* ACTIVACIÓN DEL HOVER */
+        .result-card:hover:not(.disabled) {
+            border-color: rgba(0, 229, 255, 0.4);
+            background: #111a26;
+        }
+
+        .result-card:hover:not(.disabled) .card-glow {
+            opacity: 1;
+        }
+
+        .result-card:hover:not(.disabled) .action-btn {
+            background: #00a8cc;
+            border-color: #00a8cc;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        /* Estado deshabilitado (Tu segunda tarjeta) */
+        .result-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Etiquetas internas */
+        .card-badges {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .badge-critical {
+            background: #ff0033;
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
+        }
+
+        .badge-time {
+            background: #1e293b;
+            color: #cbd5e1;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        .card-subtitle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #8b9bb4;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: #00d2ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="header-area">
+            <div class="header-left">
+                <button class="back-btn" onclick="window.location.href='buscador.html'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <div class="title-container">
+                    <h2>RESULTADOS</h2>
+                </div>
+            </div>
+            <button class="theme-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="search-term-pill" id="search-term-display">
+            "Cargando..."
+        </div>
+
+        <div class="results-count">
+            <div class="icon-circle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+            <span>Se encontraron <span class="highlight-number">2</span> protocolos médicos</span>
+        </div>
+
+        <div class="result-card" id="card-instruccion-fuego" onclick="event.stopPropagation(); window.location.href='instrucciones.html';">
+            <div class="card-glow"></div> 
+            
+            <div class="card-content">
+                <div class="card-badges">
+                    <span class="badge-critical">CRÍTICA</span>
+                    <span class="badge-time">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        4 min
+                    </span>
+                </div>
+                <h3 class="card-title">HERIDA POR ARMA DE FUEGO</h3>
+                <div class="card-subtitle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    Trauma Balístico
+                </div>
+            </div>
+
+            <div class="action-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+        </div>
+
+        <div class="result-card disabled">
+            <div class="card-glow"></div>
+            
+            <div class="card-content">
+                <div class="card-badges">
+                    <span class="badge-critical" style="background: #ff8c00; box-shadow: 0 0 10px rgba(255, 140, 0, 0.4);">ALTA</span>
+                </div>
+                <h3 class="card-title">HEMORRAGIA EXTREMIDAD</h3>
+                <div class="card-subtitle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    Control de Sangrado
+                </div>
+            </div>
+
+            <div class="action-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const params = new URLSearchParams(window.location.search);
+            const query = params.get('q');
+            const displayElement = document.getElementById('search-term-display');
+            
+            if (query) {
+                displayElement.textContent = `"${query.toLowerCase()} "`;
+            } else {
+                displayElement.textContent = `"herida de bala "`; 
+            }
+        });
+    </script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

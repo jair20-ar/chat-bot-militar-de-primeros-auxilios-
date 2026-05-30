@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROTOCOLO MÉDICO | MEDIC-BOT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === VARIABLES TÁCTICAS === */
+        :root {
+            --bg-main: #0B111A;
+            --bg-card: #15202E;
+            --bg-button: #1E293B;
+            --cyan: #00E5FF;
+            --cyan-hover: #33eeff;
+            --text-main: #FFFFFF;
+            --text-muted: #8B9BB4;
+            --border-color: rgba(0, 229, 255, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* === CONTENEDOR PRINCIPAL === */
+        .app-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* === CABECERA === */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover {
+            background: rgba(0, 229, 255, 0.1);
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+            color: var(--cyan);
+        }
+
+        .titles span {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .titles h1 {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* === ÁREA VISUAL (AVATAR / 3D) === */
+        .visual-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 20px 0;
+        }
+
+        .avatar-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #1A3644 0%, #0F1D2B 100%);
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.1);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* Switch 3D/Imagen integrado y minimalista */
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .view-toggle button {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 5px 10px;
+        }
+
+        .view-toggle button.active {
+            color: var(--cyan);
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+        }
+
+        /* === BARRA DE PROGRESO === */
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .progress-labels .highlight { color: var(--cyan); }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-button);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 40%; /* Representa el Paso 2 de 5 */
+            height: 100%;
+            background: var(--cyan);
+            box-shadow: 0 0 10px var(--cyan);
+        }
+
+        /* === CONTROLES DE REPRODUCCIÓN === */
+        .playback-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 10px 0;
+        }
+
+        .play-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 16px;
+            background: var(--cyan);
+            border: none;
+            color: var(--bg-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .play-btn:hover {
+            background: var(--cyan-hover);
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
+        }
+
+        /* Botón de voz con efecto cuando habla */
+        .voice-btn.playing {
+            background: #ff4757;
+            border-color: #ff4757;
+            color: white;
+            animation: pulse-red 1.5s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+        }
+
+        /* === TARJETA DE INSTRUCCIÓN === */
+        .instruction-card {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+            background: linear-gradient(180deg, rgba(21, 32, 46, 0.5) 0%, rgba(11, 17, 26, 0.5) 100%);
+        }
+
+        .instruction-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .step-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .instruction-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .instruction-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* === NAVEGACIÓN DE PASOS (BOTONES INFERIORES) === */
+        .step-navigation {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .step-nav-btn {
+            flex: 1;
+            padding: 15px 0;
+            background: var(--bg-card);
+            border: 1px solid transparent;
+            border-radius: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        /* Efecto Hover Sorprendente */
+        .step-nav-btn:hover:not(.active) {
+            border-color: rgba(0, 229, 255, 0.4);
+            transform: translateY(-5px);
+            background: #1A283A;
+            color: var(--text-main);
+            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.1);
+        }
+
+        .step-nav-btn.active {
+            background: var(--cyan);
+            color: var(--bg-main);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+            transform: scale(1.02);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <header class="header">
+            <div class="header-left">
+                <button class="icon-btn" onclick="window.history.back()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <div class="titles">
+                    <span>PROTOCOLO MÉDICO</span>
+                    <h1>Tratamiento de Herida de Bala - Extremidades</h1>
+                </div>
+            </div>
+            <button class="icon-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+        </header>
+
+        <div class="visual-area">
+            <div class="avatar-circle" id="visual-content">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            
+            <div class="view-toggle">
+                <button class="active" onclick="toggleView('3d', this)">Modelo 3D</button>
+                <span style="color:var(--text-muted)">-</span>
+                <button onclick="toggleView('img', this)">Imagen</button>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-labels">
+                <span><span class="highlight">⚡ Paso 2</span> de 5</span>
+                <span class="highlight">0:44</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="playback-controls">
+            <button class="icon-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+            </button>
+            
+            <button class="play-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            </button>
+            
+            <button class="icon-btn voice-btn" onclick="dictarInstruccion()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            </button>
+        </div>
+
+        <div class="instruction-card">
+            <div class="instruction-header">
+                <div class="step-badge">2</div>
+                <h3>Control inmediato de hemorragia</h3>
+            </div>
+            <p id="texto-instruccion">Localice la fuente del sangrado. Aplique presión directa con material estéril o la mano enguantada. Si la hemorragia es severa en extremidad, considere torniquete.</p>
+        </div>
+
+        <div class="step-navigation">
+            <button class="step-nav-btn">1</button>
+            <button class="step-nav-btn active">2</button>
+            <button class="step-nav-btn">3</button>
+            <button class="step-nav-btn">4</button>
+            <button class="step-nav-btn">5</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Lógica de cambio de vista (3D / Imagen)
+        function toggleView(mode, btnElement) {
+            let buttons = btnElement.parentElement.querySelectorAll('button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            const visualContent = document.getElementById('visual-content');
+            
+            if(mode === '3d') {
+                // Restaura el icono SVG del modelo 3D
+                visualContent.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+                visualContent.style.borderColor = "rgba(0, 229, 255, 0.3)";
+                visualContent.style.background = "radial-gradient(circle, #1A3644 0%, #0F1D2B 100%)";
+            } else {
+                // Simula el cambio a imagen real
+                visualContent.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8B9BB4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
+                visualContent.style.borderColor = "var(--text-muted)";
+                visualContent.style.background = "transparent";
+            }
+        }
+
+        // Sistema de Dictado por Voz (TTS) adaptado al texto actual
+        let synth = window.speechSynthesis;
+
+        function dictarInstruccion() {
+            const btnElement = document.querySelector('.voice-btn');
+            const texto = document.getElementById('texto-instruccion').innerText;
+
+            if (synth.speaking) {
+                synth.cancel();
+                resetBotonesVoz(btnElement);
+                return;
+            }
+
+            let utterance = new SpeechSynthesisUtterance(texto);
+            utterance.lang = 'es-ES'; 
+            utterance.rate = 0.9; 
+
+            btnElement.classList.add('playing');
+
+            utterance.onend = function() {
+                resetBotonesVoz(btnElement);
+            };
+
+            synth.speak(utterance);
+        }
+
+        function resetBotonesVoz(btnElement) {
+            btnElement.classList.remove('playing');
+        }
+    </script>
+</body>
+</html>
