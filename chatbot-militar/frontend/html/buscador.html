@@ -173,6 +173,17 @@
             box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
         }
 
+        .mic-btn.recording {
+            background: #ff4757;
+            animation: pulse-recording 1.5s infinite;
+        }
+
+        @keyframes pulse-recording {
+            0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+        }
+
         /* Botón de búsqueda de alta prioridad (Tu id="btn-resultados") */
         .btn-submit {
             width: 100%;
@@ -196,6 +207,12 @@
         .btn-submit:hover {
             background: #00bcd4;
             box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+        }
+
+        .btn-submit:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
         /* === SECCIÓN BÚSQUEDAS RÁPIDAS === */
@@ -251,6 +268,39 @@
             font-size: 14px;
             cursor: pointer;
         }
+
+        /* Toast de notificación */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid #00e5ff;
+            color: #00e5ff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            animation: slideUp 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.error {
+            background: rgba(255, 71, 87, 0.1);
+            border-color: #ff4757;
+            color: #ff4757;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -258,7 +308,7 @@
     <div class="container">
         
         <div class="header-area">
-            <button class="back-btn" onclick="window.history.back()">
+            <button class="back-btn" onclick="window.location.href='http://localhost:3001/'">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             </button>
             
@@ -286,8 +336,8 @@
                     </span>
                 </div>
                 
-                <button class="mic-btn" id="voice-card" title="Habilitar Chatbot de Voz">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                <button class="mic-btn" id="voice-card" title="Buscar por voz">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                 </button>
             </div>
 
@@ -301,18 +351,168 @@
         <div class="quick-searches-title">Búsquedas Rápidas</div>
         
         <div class="quick-grid">
-            <button class="quick-btn" onclick="document.getElementById('search').value='Herida de Bala'">Herida de Bala</button>
-            <button class="quick-btn" onclick="document.getElementById('search').value='Fractura Ósea'">Fractura Ósea</button>
-            <button class="quick-btn" onclick="document.getElementById('search').value='Hemorragia Severa'">Hemorragia Severa</button>
-            <button class="quick-btn" onclick="document.getElementById('search').value='Quemaduras'">Quemaduras</button>
-            <button class="quick-btn" onclick="document.getElementById('search').value='RCP'">RCP</button>
-            <button class="quick-btn" onclick="document.getElementById('search').value='Shock'">Shock</button>
+            <button class="quick-btn" onclick="performSearch('Herida de Bala')">Herida de Bala</button>
+            <button class="quick-btn" onclick="performSearch('Fractura Ósea')">Fractura Ósea</button>
+            <button class="quick-btn" onclick="performSearch('Hemorragia Severa')">Hemorragia Severa</button>
+            <button class="quick-btn" onclick="performSearch('Quemaduras')">Quemaduras</button>
+            <button class="quick-btn" onclick="performSearch('RCP')">RCP</button>
+            <button class="quick-btn" onclick="performSearch('Shock')">Shock</button>
         </div>
 
     </div>
 
     <div class="help-btn">?</div>
 
-    <script src="/js/main.js"></script>
+    <script>
+        const API_URL = 'http://localhost:3001';
+        let isRecording = false;
+
+        // Evento del botón de búsqueda
+        document.getElementById('btn-resultados').addEventListener('click', function() {
+            const searchTerm = document.getElementById('search').value.trim();
+            if (searchTerm) {
+                performSearch(searchTerm);
+            } else {
+                showToast('Por favor ingresa un término de búsqueda', true);
+            }
+        });
+
+        // Permitir búsqueda con Enter
+        document.getElementById('search').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value.trim();
+                if (searchTerm) {
+                    performSearch(searchTerm);
+                }
+            }
+        });
+
+        // Botón de micrófono
+        document.getElementById('voice-card').addEventListener('click', async function(e) {
+            e.preventDefault();
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                showToast('❌ Tu navegador no soporta reconocimiento de voz', true);
+                return;
+            }
+
+            if (isRecording) {
+                isRecording = false;
+                this.classList.remove('recording');
+                showToast('Búsqueda cancelada');
+                return;
+            }
+
+            isRecording = true;
+            this.classList.add('recording');
+            document.getElementById('search').value = '';
+            showToast('🎤 Hablando... (haz clic de nuevo para detener)');
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'es-ES';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            let finalTranscript = '';
+
+            recognition.onstart = () => {
+                console.log('✓ Micrófono activado');
+            };
+
+            recognition.onresult = (event) => {
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                        console.log('Resultado final:', transcript);
+                    }
+                }
+                document.getElementById('search').value = finalTranscript.trim();
+            };
+
+            recognition.onerror = (event) => {
+                console.error('❌ Error de voz:', event.error);
+                let errorMsg = 'Error: ' + event.error;
+                
+                if (event.error === 'permission-denied' || event.error === 'not-allowed') {
+                    errorMsg = 'Permiso de micrófono denegado. Permitir en navegador.';
+                } else if (event.error === 'no-speech') {
+                    errorMsg = 'No se detectó voz. Intenta de nuevo.';
+                } else if (event.error === 'network') {
+                    errorMsg = 'Error de conexión de red.';
+                }
+                
+                showToast('❌ ' + errorMsg, true);
+                isRecording = false;
+                document.getElementById('voice-card').classList.remove('recording');
+            };
+
+            recognition.onend = () => {
+                console.log('Reconocimiento finalizado');
+                isRecording = false;
+                document.getElementById('voice-card').classList.remove('recording');
+                
+                const searchTerm = document.getElementById('search').value.trim();
+                if (searchTerm) {
+                    showToast('✓ Listo para buscar');
+                    setTimeout(() => performSearch(searchTerm), 500);
+                }
+            };
+
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('Error al iniciar:', error);
+                showToast('❌ Error al iniciar micrófono', true);
+                isRecording = false;
+                this.classList.remove('recording');
+            }
+        });
+
+        // Función para realizar la búsqueda
+        function performSearch(searchTerm) {
+            if (!searchTerm) {
+                showToast('❌ Debe escribir algo para buscar', true);
+                return;
+            }
+
+            console.log('Buscando:', searchTerm);
+            sessionStorage.setItem('searchTerm', searchTerm);
+
+            try {
+                window.location.href = `resultados.html?q=${encodeURIComponent(searchTerm)}`;
+            } catch (error) {
+                console.error('Error al redirigir:', error);
+                showToast('❌ Error al realizar búsqueda', true);
+            }
+        }
+
+        // Función para mostrar notificaciones
+        function showToast(message, isError = false) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${isError ? 'error' : ''}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Solicitar permisos al cargar
+        window.addEventListener('load', async () => {
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                showToast('✓ Micrófono listo');
+            } catch (error) {
+                console.warn('Permiso de micrófono pendiente - se pedirá al usar');
+            }
+        });
+    </script>
 </body>
 </html>

@@ -18,6 +18,7 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --danger: #ff4757;
+            --green-accent: #00ff88;
         }
 
         * {
@@ -95,27 +96,6 @@
             background: var(--cyan-accent);
             margin-top: 4px;
             box-shadow: 0 0 10px var(--cyan-accent);
-        }
-
-        .theme-toggle {
-            background: transparent;
-            border: 1px solid rgba(6, 182, 212, 0.3);
-            border-radius: 12px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle svg {
-            width: 18px;
-            height: 18px;
-            stroke: var(--cyan-accent);
-            fill: none;
-            stroke-width: 2;
         }
 
         /* --- MAIN CONTENT --- */
@@ -197,6 +177,7 @@
             font-size: 0.9rem;
             transition: all 0.3s;
             outline: none;
+            font-family: inherit;
         }
 
         input::placeholder,
@@ -218,11 +199,110 @@
             background-repeat: no-repeat;
             background-position: right 1rem center;
             background-size: 1em;
+            padding-right: 2.5rem;
         }
 
         textarea {
             resize: vertical;
             min-height: 100px;
+        }
+
+        /* File Input Styling */
+        .file-input-wrapper {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--input-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            position: relative;
+        }
+
+        .file-input-label:hover {
+            border-color: var(--cyan-accent);
+            background: rgba(0, 229, 255, 0.05);
+            color: var(--cyan-accent);
+        }
+
+        .file-input-label svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .file-input-wrapper input[type="file"]:disabled + .file-input-label {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Image Preview */
+        .image-preview-container {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .image-preview-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 0;
+            display: block;
+        }
+
+        .btn-remove-image {
+            margin-top: 10px;
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-remove-image:hover {
+            background: #ff3333;
+            transform: translateY(-2px);
+        }
+
+        .btn-remove-image svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
         }
 
         /* Steps Section */
@@ -288,25 +368,6 @@
             font-weight: 700;
         }
 
-        .btn-image {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-main);
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-image:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--cyan-accent);
-        }
-
         .btn-remove-step {
             margin-left: auto;
             background: transparent;
@@ -324,9 +385,15 @@
             color: var(--danger);
         }
 
-        /* Submit Button */
-        .btn-save {
-            width: 100%;
+        /* Submit Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-save, .btn-back-panel {
+            flex: 1;
             background: var(--cyan-accent);
             color: #000;
             border: none;
@@ -342,7 +409,6 @@
             cursor: pointer;
             box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
             transition: all 0.3s ease;
-            margin-top: 10px;
         }
 
         .btn-save:hover {
@@ -351,7 +417,56 @@
             transform: translateY(-2px);
         }
 
-        /* Help Floating Button */
+        .btn-save:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-back-panel {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+        }
+
+        .btn-back-panel:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--cyan-accent);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--green-accent);
+            border-radius: 8px;
+            color: var(--green-accent);
+            font-size: 0.9rem;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .toast.error {
+            background: rgba(255, 68, 68, 0.1);
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
         .help-btn {
             position: fixed;
             bottom: 30px;
@@ -380,20 +495,16 @@
 
     <header>
         <div class="header-left">
-            <button class="btn-back" aria-label="Volver">
-                <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            </button>
+            <a href="/panel.html" style="text-decoration: none;">
+                <button class="btn-back" aria-label="Volver">
+                    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+            </a>
             <div class="title-container">
-                <h1>CREAR INSTRUCCIÓN</h1>
+                <h1 id="page-title">CREAR INSTRUCCIÓN</h1>
                 <div class="title-underline"></div>
             </div>
         </div>
-        <button class="theme-toggle" aria-label="Cambiar Tema">
-            <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="5"/>
-                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-            </svg>
-        </button>
     </header>
 
     <main>
@@ -405,27 +516,27 @@
 
             <div class="form-group">
                 <label>Título de la Instrucción *</label>
-                <input type="text" placeholder="Ej: Control de Hemorragia con Torniquete">
+                <input type="text" id="titulo" placeholder="Ej: Control de Hemorragia con Torniquete">
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label>Categoría *</label>
-                    <input type="text" placeholder="Ej: Control de Sangrado">
+                    <input type="text" id="categoria" placeholder="Ej: Control de Sangrado">
                 </div>
                 <div class="form-group">
                     <label>Nivel de Severidad *</label>
-                    <select>
+                    <select id="severidad">
+                        <option value="leve">Leve</option>
                         <option value="moderado">Moderado</option>
                         <option value="critico">Crítico</option>
-                        <option value="leve">Leve</option>
                     </select>
                 </div>
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
                 <label>Tiempo Estimado *</label>
-                <input type="text" placeholder="Ej: 5 min">
+                <input type="text" id="tiempo_estimado" placeholder="Ej: 5 min">
             </div>
         </section>
 
@@ -465,114 +576,382 @@
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label>Imagen de Referencia</label>
-                    <button class="btn-image">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                        Seleccionar Imagen
-                    </button>
+                <div class="form-group">
+                    <label>Imagen del Paso (opcional)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" accept="image/*" class="image-input">
+                        <label class="file-input-label">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            <span>Selecciona una imagen o arrastra aquí</span>
+                        </label>
+                    </div>
+                    <div class="image-preview-container">
+                        <img class="image-preview" src="" alt="Preview">
+                        <button type="button" class="btn-remove-image">
+                            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            REMOVER IMAGEN
+                        </button>
+                    </div>
                 </div>
             </section>
         </div>
 
-        <button class="btn-save">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-            GUARDAR INSTRUCCIÓN
-        </button>
+        <div class="btn-group">
+            <button class="btn-save" id="btn-save" onclick="saveInstruction()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                GUARDAR INSTRUCCIÓN
+            </button>
+            <a href="/panel.html" style="text-decoration: none; flex: 1;">
+                <button class="btn-back-panel" style="width: 100%;">
+                    ← VOLVER AL PANEL
+                </button>
+            </a>
+        </div>
 
     </main>
 
     <button class="help-btn">?</button>
 
     <script>
+        const API_URL = 'http://localhost:3001';
+        let stepCount = 1;
+        let editingId = null;
+
+        // Inicializar
         document.addEventListener('DOMContentLoaded', () => {
-            const addStepBtn = document.getElementById('add-step-btn');
-            const stepsContainer = document.getElementById('steps-container');
-            let stepCount = 1;
+            const urlParams = new URLSearchParams(window.location.search);
+            editingId = urlParams.get('edit');
 
-            addStepBtn.addEventListener('click', () => {
-                stepCount++;
-                
-                const stepHTML = `
-                    <section class="card step-card" id="step-${stepCount}">
-                        <div class="step-header">
-                            <div class="step-number">${stepCount}</div>
-                            <h3>PASO ${stepCount}</h3>
-                            <button class="btn-remove-step" onclick="removeStep('step-${stepCount}')" title="Eliminar paso">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
-                        </div>
+            if (editingId) {
+                loadInstructionToEdit(editingId);
+                document.getElementById('page-title').textContent = 'EDITAR INSTRUCCIÓN';
+                document.getElementById('btn-save').textContent = '✏️ ACTUALIZAR INSTRUCCIÓN';
+            }
 
+            // Eventos
+            document.getElementById('add-step-btn').addEventListener('click', addStep);
+        });
+
+        // Cargar instrucción para editar
+        function loadInstructionToEdit(id) {
+            fetch(`${API_URL}/api/instrucciones/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const inst = data.data;
+                        document.getElementById('titulo').value = inst.titulo;
+                        document.getElementById('categoria').value = inst.categoria || '';
+                        document.getElementById('severidad').value = inst.severidad || 'leve';
+                        document.getElementById('tiempo_estimado').value = inst.tiempo_estimado || '';
+
+                        const pasos = typeof inst.pasos === 'string' ? JSON.parse(inst.pasos) : inst.pasos;
+                        const stepsContainer = document.getElementById('steps-container');
+                        stepsContainer.innerHTML = '';
+                        stepCount = 0;
+
+                        pasos.forEach((paso, index) => {
+                            stepCount = index + 1;
+                            const imagenHTML = paso.imagen ? `
+                                <div class="image-preview-container" style="display: block;">
+                                    <img class="image-preview" src="${paso.imagen}" alt="Preview">
+                                    <button type="button" class="btn-remove-image">
+                                        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                        REMOVER IMAGEN
+                                    </button>
+                                </div>
+                            ` : `<div class="image-preview-container"></div>`;
+
+                            const stepHTML = `
+                                <section class="card step-card" id="step-${stepCount}">
+                                    <div class="step-header">
+                                        <div class="step-number">${stepCount}</div>
+                                        <h3>PASO ${stepCount}</h3>
+                                        ${stepCount > 1 ? `<button class="btn-remove-step" onclick="removeStep('step-${stepCount}')" title="Eliminar paso"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Título del Paso *</label>
+                                        <input type="text" value="${paso.titulo}" placeholder="Ej: Siguiente paso del procedimiento">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Descripción Detallada *</label>
+                                        <textarea placeholder="Descripción detallada del procedimiento...">${paso.descripcion}</textarea>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Duración (segundos)</label>
+                                            <input type="number" value="${paso.duracion || 30}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Texto para Voz</label>
+                                            <input type="text" value="${paso.texto_voz || ''}" placeholder="Texto simplificado para síntesis de voz">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Imagen del Paso (opcional)</label>
+                                        <div class="file-input-wrapper">
+                                            <input type="file" accept="image/*" class="image-input">
+                                            <label class="file-input-label">
+                                                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                                <span>Selecciona una imagen o arrastra aquí</span>
+                                            </label>
+                                        </div>
+                                        ${imagenHTML}
+                                    </div>
+                                </section>
+                            `;
+                            stepsContainer.innerHTML += stepHTML;
+                        });
+
+                        // Agregar event listeners a las nuevas imágenes
+                        addImageEventListeners();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast('❌ Error al cargar instrucción', true);
+                    setTimeout(() => window.location.href = '/panel.html', 2000);
+                });
+        }
+
+        // Agregar paso
+        function addStep() {
+            stepCount++;
+            const stepHTML = `
+                <section class="card step-card" id="step-${stepCount}">
+                    <div class="step-header">
+                        <div class="step-number">${stepCount}</div>
+                        <h3>PASO ${stepCount}</h3>
+                        <button class="btn-remove-step" onclick="removeStep('step-${stepCount}')" title="Eliminar paso">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label>Título del Paso *</label>
+                        <input type="text" placeholder="Ej: Siguiente paso del procedimiento">
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción Detallada *</label>
+                        <textarea placeholder="Descripción detallada del procedimiento..."></textarea>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
-                            <label>Título del Paso *</label>
-                            <input type="text" placeholder="Ej: Siguiente paso del procedimiento">
+                            <label>Duración (segundos)</label>
+                            <input type="number" value="30">
                         </div>
-
                         <div class="form-group">
-                            <label>Descripción Detallada *</label>
-                            <textarea placeholder="Descripción detallada del procedimiento..."></textarea>
+                            <label>Texto para Voz</label>
+                            <input type="text" placeholder="Texto simplificado para síntesis de voz">
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Imagen del Paso (opcional)</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" accept="image/*" class="image-input">
+                            <label class="file-input-label">
+                                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                <span>Selecciona una imagen o arrastra aquí</span>
+                            </label>
+                        </div>
+                        <div class="image-preview-container"></div>
+                    </div>
+                </section>
+            `;
+            document.getElementById('steps-container').insertAdjacentHTML('beforeend', stepHTML);
+            const newStep = document.getElementById(`step-${stepCount}`);
+            newStep.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Duración (segundos)</label>
-                                <input type="number" value="30">
-                            </div>
-                            <div class="form-group">
-                                <label>Texto para Voz</label>
-                                <input type="text" placeholder="Texto simplificado para síntesis de voz">
-                            </div>
-                        </div>
+            // Agregar event listener a la nueva imagen
+            addImageEventListener(newStep.querySelector('.image-input'));
+        }
 
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label>Imagen de Referencia</label>
-                            <button class="btn-image">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                Seleccionar Imagen
-                            </button>
-                        </div>
-                    </section>
-                `;
-                
-                // Agregar el nuevo paso al final del contenedor
-                stepsContainer.insertAdjacentHTML('beforeend', stepHTML);
-                
-                // Hacer scroll automático hacia el nuevo paso
-                const newStep = document.getElementById(`step-${stepCount}`);
-                newStep.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            });
-            
-            // Función para eliminar un paso (se anexa al objeto window para que el onclick del HTML la encuentre)
-            window.removeStep = function(stepId) {
-                const stepElement = document.getElementById(stepId);
-                if(stepElement) {
-                    stepElement.remove();
-                    recalculateSteps();
+        // Eliminar paso
+        window.removeStep = function(stepId) {
+            const stepElement = document.getElementById(stepId);
+            if (stepElement) {
+                stepElement.remove();
+                recalculateSteps();
+            }
+        };
+
+        // Renumerar pasos
+        function recalculateSteps() {
+            const stepCards = document.querySelectorAll('.step-card');
+            stepCount = 0;
+            stepCards.forEach((card, index) => {
+                stepCount = index + 1;
+                card.id = `step-${stepCount}`;
+                card.querySelector('.step-number').textContent = stepCount;
+                card.querySelector('h3').textContent = `PASO ${stepCount}`;
+                const removeBtn = card.querySelector('.btn-remove-step');
+                if (removeBtn) {
+                    removeBtn.setAttribute('onclick', `removeStep('step-${stepCount}')`);
                 }
-            };
-            
-            // Función para renumerar los pasos si se elimina uno del medio
-            function recalculateSteps() {
-                const stepCards = stepsContainer.querySelectorAll('.step-card');
-                stepCount = 0; // Reiniciamos contador global
-                
-                stepCards.forEach((card, index) => {
-                    stepCount = index + 1;
-                    card.id = `step-${stepCount}`;
-                    
-                    const numberCircle = card.querySelector('.step-number');
-                    const titleText = card.querySelector('h3');
-                    const removeBtn = card.querySelector('.btn-remove-step');
-                    
-                    numberCircle.textContent = stepCount;
-                    titleText.textContent = `PASO ${stepCount}`;
-                    
-                    if(removeBtn) {
-                        removeBtn.setAttribute('onclick', `removeStep('step-${stepCount}')`);
+            });
+        }
+
+        // Agregar event listeners de imágenes
+        function addImageEventListeners() {
+            document.querySelectorAll('.image-input').forEach(input => {
+                addImageEventListener(input);
+            });
+        }
+
+        // Evento de imagen individual
+        function addImageEventListener(input) {
+            if (!input) return;
+
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const previewContainer = input.closest('.file-input-wrapper').parentElement.querySelector('.image-preview-container');
+                        previewContainer.innerHTML = `
+                            <img class="image-preview" src="${event.target.result}" alt="Preview">
+                            <button type="button" class="btn-remove-image">
+                                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                REMOVER IMAGEN
+                            </button>
+                        `;
+                        previewContainer.style.display = 'block';
+
+                        previewContainer.querySelector('.btn-remove-image').addEventListener('click', function(e) {
+                            e.preventDefault();
+                            input.value = '';
+                            previewContainer.innerHTML = '';
+                            previewContainer.style.display = 'none';
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Drag and drop
+            const wrapper = input.closest('.file-input-wrapper');
+            if (wrapper) {
+                wrapper.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    wrapper.style.opacity = '0.8';
+                });
+
+                wrapper.addEventListener('dragleave', () => {
+                    wrapper.style.opacity = '1';
+                });
+
+                wrapper.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    wrapper.style.opacity = '1';
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0 && files[0].type.startsWith('image/')) {
+                        input.files = files;
+                        const event = new Event('change', { bubbles: true });
+                        input.dispatchEvent(event);
                     }
                 });
             }
-        });
+        }
+
+        // Guardar instrucción
+        function saveInstruction() {
+            const titulo = document.getElementById('titulo').value;
+            const categoria = document.getElementById('categoria').value;
+            const severidad = document.getElementById('severidad').value;
+            const tiempo_estimado = document.getElementById('tiempo_estimado').value;
+
+            if (!titulo || !categoria || !severidad || !tiempo_estimado) {
+                showToast('❌ Completa todos los campos de información general', true);
+                return;
+            }
+
+            const btnSave = document.getElementById('btn-save');
+            btnSave.disabled = true;
+            btnSave.textContent = 'Guardando...';
+
+            const pasos = [];
+            const stepCards = document.querySelectorAll('.step-card');
+
+            // Procesar todos los pasos y convertir imágenes a base64
+            let processedSteps = 0;
+
+            if (stepCards.length === 0) {
+                showToast('❌ Debes agregar al menos un paso', true);
+                btnSave.disabled = false;
+                btnSave.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>GUARDAR INSTRUCCIÓN';
+                return;
+            }
+
+            stepCards.forEach((card, cardIndex) => {
+                const inputs = card.querySelectorAll('input[type="text"], input[type="number"], textarea');
+                const imagePreview = card.querySelector('.image-preview');
+
+                const paso = {
+                    titulo: inputs[0].value,
+                    descripcion: inputs[1].value,
+                    duracion: parseInt(inputs[2].value),
+                    texto_voz: inputs[3].value,
+                    imagen: imagePreview ? imagePreview.src : ''
+                };
+
+                if (!paso.titulo || !paso.descripcion) {
+                    showToast('❌ Completa todos los pasos', true);
+                    btnSave.disabled = false;
+                    btnSave.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>GUARDAR INSTRUCCIÓN';
+                    throw new Error('Paso incompleto');
+                }
+
+                pasos.push(paso);
+                processedSteps++;
+
+                if (processedSteps === stepCards.length) {
+                    sendInstructionToServer(titulo, categoria, severidad, tiempo_estimado, pasos, btnSave);
+                }
+            });
+
+            if (processedSteps === 0) {
+                sendInstructionToServer(titulo, categoria, severidad, tiempo_estimado, pasos, btnSave);
+            }
+        }
+
+        function sendInstructionToServer(titulo, categoria, severidad, tiempo_estimado, pasos, btnSave) {
+            const method = editingId ? 'PUT' : 'POST';
+            const url = editingId ? `${API_URL}/api/instrucciones/${editingId}` : `${API_URL}/api/instrucciones`;
+
+            fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ titulo, categoria, severidad, tiempo_estimado, pasos })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const msg = editingId ? '✅ Instrucción actualizada correctamente' : '✅ Instrucción guardada correctamente';
+                    showToast(msg);
+                    setTimeout(() => window.location.href = '/panel.html', 1500);
+                } else {
+                    showToast('❌ Error al guardar', true);
+                    btnSave.disabled = false;
+                    btnSave.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>GUARDAR INSTRUCCIÓN';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showToast('❌ Error de conexión', true);
+                btnSave.disabled = false;
+                btnSave.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>GUARDAR INSTRUCCIÓN';
+            });
+        }
+
+        // Notificaciones
+        function showToast(msg, isError = false) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${isError ? 'error' : ''}`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Inicializar event listeners de imágenes al cargar
+        addImageEventListeners();
     </script>
 </body>
 </html>

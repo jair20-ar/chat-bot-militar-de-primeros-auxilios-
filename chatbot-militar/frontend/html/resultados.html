@@ -167,6 +167,7 @@
         .card-content {
             position: relative;
             z-index: 2;
+            flex: 1;
         }
 
         /* El resplandor circular (Oculto por defecto) */
@@ -201,7 +202,7 @@
             box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
         }
 
-        /* Estado deshabilitado (Tu segunda tarjeta) */
+        /* Estado deshabilitado */
         .result-card.disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -223,6 +224,28 @@
             border-radius: 20px;
             letter-spacing: 1px;
             box-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
+        }
+
+        .badge-moderate {
+            background: #ff8c00;
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(255, 140, 0, 0.4);
+        }
+
+        .badge-mild {
+            background: #00aa00;
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(0, 170, 0, 0.4);
         }
 
         .badge-time {
@@ -267,6 +290,48 @@
             position: relative;
             z-index: 2;
             transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 15px;
+        }
+
+        /* Estado sin resultados */
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8b9bb4;
+        }
+
+        .no-results svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .no-results h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #cbd5e1;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8b9bb4;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 229, 255, 0.1);
+            border-top-color: #00e5ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -298,66 +363,126 @@
             <div class="icon-circle">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             </div>
-            <span>Se encontraron <span class="highlight-number">2</span> protocolos médicos</span>
+            <span>Se encontraron <span class="highlight-number" id="results-number">0</span> protocolos médicos</span>
         </div>
 
-        <div class="result-card" id="card-instruccion-fuego" onclick="event.stopPropagation(); window.location.href='instrucciones.html';">
-            <div class="card-glow"></div> 
-            
-            <div class="card-content">
-                <div class="card-badges">
-                    <span class="badge-critical">CRÍTICA</span>
-                    <span class="badge-time">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                        4 min
-                    </span>
-                </div>
-                <h3 class="card-title">HERIDA POR ARMA DE FUEGO</h3>
-                <div class="card-subtitle">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-                    Trauma Balístico
-                </div>
-            </div>
-
-            <div class="action-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
-        </div>
-
-        <div class="result-card disabled">
-            <div class="card-glow"></div>
-            
-            <div class="card-content">
-                <div class="card-badges">
-                    <span class="badge-critical" style="background: #ff8c00; box-shadow: 0 0 10px rgba(255, 140, 0, 0.4);">ALTA</span>
-                </div>
-                <h3 class="card-title">HEMORRAGIA EXTREMIDAD</h3>
-                <div class="card-subtitle">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-                    Control de Sangrado
-                </div>
-            </div>
-
-            <div class="action-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
-        </div>
+        <div id="results-container"></div>
 
     </div>
 
     <script>
+        const API_URL = 'http://localhost:3001';
+
         document.addEventListener("DOMContentLoaded", () => {
             const params = new URLSearchParams(window.location.search);
             const query = params.get('q');
-            const displayElement = document.getElementById('search-term-display');
             
             if (query) {
-                displayElement.textContent = `"${query.toLowerCase()} "`;
+                document.getElementById('search-term-display').textContent = `"${query}"`;
+                searchInstructions(query);
             } else {
-                displayElement.textContent = `"herida de bala "`; 
+                showNoResults("No se especificó término de búsqueda");
             }
         });
+
+        async function searchInstructions(searchTerm) {
+            const container = document.getElementById('results-container');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Buscando instrucciones...</p></div>';
+
+            try {
+                const response = await fetch(`${API_URL}/api/instrucciones`);
+                const data = await response.json();
+
+                if (data.success && Array.isArray(data.data)) {
+                    // Filtrar instrucciones que coincidan con el término de búsqueda
+                    const searchLower = searchTerm.toLowerCase();
+                    const filteredResults = data.data.filter(inst => 
+                        inst.titulo.toLowerCase().includes(searchLower) ||
+                        inst.categoria.toLowerCase().includes(searchLower) ||
+                        inst.severidad.toLowerCase().includes(searchLower)
+                    );
+
+                    if (filteredResults.length > 0) {
+                        displayResults(filteredResults);
+                    } else {
+                        showNoResults(`No se encontraron resultados para "${searchTerm}"`);
+                    }
+                } else {
+                    showNoResults("Error al buscar instrucciones");
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNoResults("Error de conexión con el servidor");
+            }
+        }
+
+        function displayResults(results) {
+            const container = document.getElementById('results-container');
+            const numberElement = document.getElementById('results-number');
+            numberElement.textContent = results.length;
+
+            container.innerHTML = results.map((inst, index) => {
+                const severidadBadge = getSeverityBadge(inst.severidad);
+                const pasos = typeof inst.pasos === 'string' ? JSON.parse(inst.pasos) : inst.pasos;
+                const pasosCount = Array.isArray(pasos) ? pasos.length : 0;
+
+                return `
+                    <div class="result-card" onclick="openInstruction(${inst.id})">
+                        <div class="card-glow"></div>
+                        
+                        <div class="card-content">
+                            <div class="card-badges">
+                                <span class="${severidadBadge.class}">${severidadBadge.text}</span>
+                                <span class="badge-time">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                    ${inst.tiempo_estimado}
+                                </span>
+                            </div>
+                            <h3 class="card-title">${inst.titulo}</h3>
+                            <div class="card-subtitle">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                                ${inst.categoria} • ${pasosCount} pasos
+                            </div>
+                        </div>
+
+                        <div class="action-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getSeverityBadge(severity) {
+            const severityMap = {
+                'critico': { class: 'badge-critical', text: 'CRÍTICA' },
+                'moderado': { class: 'badge-moderate', text: 'MODERADA' },
+                'leve': { class: 'badge-mild', text: 'LEVE' }
+            };
+            return severityMap[severity?.toLowerCase()] || { class: 'badge-mild', text: 'NORMAL' };
+        }
+
+        function openInstruction(id) {
+            // Guardar el ID de la instrucción en sessionStorage
+            sessionStorage.setItem('selectedInstructionId', id);
+            // Redirigir a la página de instrucciones
+            window.location.href = 'instrucciones.html';
+        }
+
+        function showNoResults(message) {
+            const container = document.getElementById('results-container');
+            container.innerHTML = `
+                <div class="no-results">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        <line x1="8" y1="11" x2="14" y2="11"></line>
+                    </svg>
+                    <h3>Sin Resultados</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
     </script>
-    <script src="/js/main.js"></script>
 </body>
 </html>

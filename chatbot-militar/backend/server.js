@@ -7,8 +7,10 @@ const path = require('path');
 const app = express();
 const PORT = 3001;
 
+// Aumentar límite de payload para imágenes en base64
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // =================== Crear tabla medicos si NO existe ===================
 db.run(`
@@ -20,6 +22,20 @@ db.run(`
     especializacion TEXT NOT NULL,
     id_medico TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL
+  )
+`);
+
+// =================== Crear tabla instrucciones (NUEVA) ===================
+db.run(`
+  CREATE TABLE IF NOT EXISTS instrucciones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    titulo TEXT NOT NULL,
+    categoria TEXT,
+    severidad TEXT,
+    tiempo_estimado TEXT,
+    pasos TEXT NOT NULL,
+    fecha TEXT NOT NULL,
+    id_medico TEXT
   )
 `);
 
@@ -77,6 +93,86 @@ app.post('/medicos/login', (req, res) => {
       if (err) return res.status(500).json({ error: err.message });
       if (!row) return res.status(401).json({ error: 'Credenciales incorrectas.' });
       res.json({ ok: true, nombre: row.nombre, id_medico: row.id_medico });
+    }
+  );
+});
+
+// ============ RUTAS PARA INSTRUCCIONES (NUEVO) ===========
+
+// Crear nueva instrucción
+app.post('/api/instrucciones', (req, res) => {
+  const { titulo, categoria, severidad, tiempo_estimado, pasos } = req.body;
+  
+  if (!titulo || !pasos) {
+    return res.status(400).json({ success: false, error: 'Título y pasos son obligatorios.' });
+  }
+
+  const fecha = new Date().toISOString();
+  
+  db.run(
+    `INSERT INTO instrucciones (titulo, categoria, severidad, tiempo_estimado, pasos, fecha) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [titulo, categoria || null, severidad || null, tiempo_estimado || null, JSON.stringify(pasos), fecha],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ success: false, error: err.message });
+      }
+      res.json({ success: true, id: this.lastID });
+    }
+  );
+});
+
+// Obtener todas las instrucciones
+app.get('/api/instrucciones', (req, res) => {
+  db.all(
+    `SELECT * FROM instrucciones ORDER BY fecha DESC`,
+    [],
+    (err, rows) => {
+      if (err) return res.status(500).json({ success: false, error: err.message });
+      res.json({ success: true, data: rows });
+    }
+  );
+});
+
+// Obtener instrucción por ID
+app.get('/api/instrucciones/:id', (req, res) => {
+  db.get(
+    `SELECT * FROM instrucciones WHERE id = ?`,
+    [req.params.id],
+    (err, row) => {
+      if (err) return res.status(500).json({ success: false, error: err.message });
+      if (!row) return res.status(404).json({ success: false, error: 'Instrucción no encontrada.' });
+      res.json({ success: true, data: row });
+    }
+  );
+});
+
+// Actualizar instrucción
+app.put('/api/instrucciones/:id', (req, res) => {
+  const { titulo, categoria, severidad, tiempo_estimado, pasos } = req.body;
+  
+  if (!titulo || !pasos) {
+    return res.status(400).json({ success: false, error: 'Título y pasos son obligatorios.' });
+  }
+
+  db.run(
+    `UPDATE instrucciones SET titulo = ?, categoria = ?, severidad = ?, tiempo_estimado = ?, pasos = ? WHERE id = ?`,
+    [titulo, categoria || null, severidad || null, tiempo_estimado || null, JSON.stringify(pasos), req.params.id],
+    function (err) {
+      if (err) return res.status(500).json({ success: false, error: err.message });
+      res.json({ success: true });
+    }
+  );
+});
+
+// Eliminar instrucción
+app.delete('/api/instrucciones/:id', (req, res) => {
+  db.run(
+    `DELETE FROM instrucciones WHERE id = ?`,
+    [req.params.id],
+    function (err) {
+      if (err) return res.status(500).json({ success: false, error: err.message });
+      res.json({ success: true });
     }
   );
 });
