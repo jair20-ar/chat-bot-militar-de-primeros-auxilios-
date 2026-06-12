@@ -1,13 +1,31 @@
 const express = require('express');
+const multer = require('multer');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const db = require('./db');
 const path = require('path');
+const { Model, Recognizer } = require('vosk');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('ffmpeg-static');
+
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 const app = express();
 const PORT = 3001;
+const upload = multer({ dest: 'uploads/' });
 
-// Aumentar límite de payload para imágenes en base64
+
+const modelpath = path.join(__dirname, 'model', 'vosk-model-small-es-0.42');
+if (!fs.existsSync(modelpath)) {
+  console.error('carpeta no encontrada:', modelpath);
+  process.exit(1);
+}
+
+const model = new Model(modelpath);
+
+
+// =================== MIDDLEWARE ===================
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -59,7 +77,45 @@ app.use('/css', express.static(path.join(__dirname, '../frontend')));
 
 // ======================= API =========================
 
-// ================ Ruta para registro de médicos ================
+app.post('/api/transcribir', upload.single('audio'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'Archivo de audio no recibido' });
+    }
+
+    const inputPath = path.join(__dirname, req.file.path);
+    const outputPath = inputPath + '.wav';
+
+    ffmpeg(inputPath)
+        .toFormat('wav')
+        .audioChannels(1)
+        .audioFrequency(16000)
+        .on('end', () => {
+            const fileStream = fs.createReadStream(outputPath, { highWaterMark: 4096 });
+            const rec = new Recognizer({ model: model, sampleRate: 16000 });
+
+            fileStream.on('data', (chunk) => {
+                rec.acceptWaveform(chunk);
+            });
+
+            fileStream.on('end', () => {
+                const result = rec.finalResult();
+                rec.free();
+
+                if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
+                if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+
+                res.json({ text: result.text });
+            });
+        })
+        .on('error', (err) => {
+            if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
+            if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+            res.status(500).json({ error: 'Error en la conversion de audio' });
+        })
+        .save(outputPath);
+});
+
+// ================ RUTA PARA REGISTRO DE MÉDICOS ================
 app.post('/medicos/registro', (req, res) => {
   const { nombre, email, cedula, especializacion, password } = req.body;
   if (!nombre || !email || !cedula || !especializacion || !password) {
@@ -80,7 +136,7 @@ app.post('/medicos/registro', (req, res) => {
   );
 });
 
-// ============= Ruta para inicio de sesión de médicos =============
+// ============= RUTA PARA INICIO DE SESIÓN DE MÉDICOS =============
 app.post('/medicos/login', (req, res) => {
   const { id_medico, password } = req.body;
   if (!id_medico || !password) {
@@ -97,7 +153,7 @@ app.post('/medicos/login', (req, res) => {
   );
 });
 
-// ============ RUTAS PARA INSTRUCCIONES (NUEVO) ===========
+// ============ RUTAS PARA INSTRUCCIONES ===========
 
 // Crear nueva instrucción
 app.post('/api/instrucciones', (req, res) => {
@@ -206,7 +262,7 @@ app.get('/indicaciones/protocolos/:id_medico', (req, res) => {
   );
 });
 
-// Obtener TODOS los protocolos/instrucciones de TODOS los médicos (para resultados.html)
+// Obtener TODOS los protocolos/instrucciones de TODOS los médicos
 app.get('/indicaciones/protocolos', (req, res) => {
   db.all(
     `SELECT * FROM indicaciones_protocolo ORDER BY fecha DESC`,
@@ -243,7 +299,7 @@ app.delete('/indicaciones/protocolos/:id', (req, res) => {
   );
 });
 
-// =================== Inicia el servidor ====================
+// =================== INICIA EL SERVIDOR ====================
 app.listen(PORT, () => {
-  console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor backend escuchando en http://localhost:${PORT}`);
 });

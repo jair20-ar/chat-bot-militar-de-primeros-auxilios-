@@ -6,7 +6,6 @@
     <title>BÚSQUEDA MÉDICA TÁCTICA</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* === CONFIGURACIÓN GENERAL Y FONDO === */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -33,7 +32,6 @@
             flex-direction: column;
         }
 
-        /* === ENCABEZADO (Volver, Título, Sol) === */
         .header-area {
             display: flex;
             justify-content: space-between;
@@ -70,12 +68,12 @@
             padding-bottom: 8px;
         }
 
-        /* Línea resplandeciente bajo el título de la imagen */
         h2::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 60px;
             height: 2px;
             background: #00d2ff;
@@ -95,7 +93,6 @@
             box-shadow: 0 0 15px rgba(0, 229, 255, 0.05);
         }
 
-        /* === PANEL DE PANEL DE BÚSQUEDA (Card Principal) === */
         .search-card {
             background: rgba(13, 22, 30, 0.7);
             border: 1px solid rgba(0, 229, 255, 0.12);
@@ -115,7 +112,6 @@
             margin-bottom: 20px;
         }
 
-        /* Barra de entrada de texto agrupada con micrófono */
         .input-group {
             display: flex;
             gap: 15px;
@@ -153,7 +149,6 @@
             color: #64748b;
         }
 
-        /* Botón de voz integrado (Tu id="voice-card") */
         .mic-btn {
             width: 54px;
             height: 54px;
@@ -184,7 +179,6 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
         }
 
-        /* Botón de búsqueda de alta prioridad (Tu id="btn-resultados") */
         .btn-submit {
             width: 100%;
             height: 54px;
@@ -209,13 +203,6 @@
             box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
         }
 
-        .btn-submit:disabled {
-            background: #666;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        /* === SECCIÓN BÚSQUEDAS RÁPIDAS === */
         .quick-searches-title {
             font-size: 0.8rem;
             font-weight: 600;
@@ -251,7 +238,6 @@
             border-color: rgba(0, 229, 255, 0.3);
         }
 
-        /* === BOTÓN AYUDA INFERIOR === */
         .help-btn {
             position: fixed;
             bottom: 30px;
@@ -269,7 +255,6 @@
             cursor: pointer;
         }
 
-        /* Toast de notificación */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -325,13 +310,13 @@
             
             <div class="instruction-row">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <span>Describe la emergencia o condición médica</span>
+                <span>Escribe o habla la emergencia médica</span>
             </div>
 
             <div class="input-group">
                 <div class="input-wrapper">
                     <input type="text" id="search" placeholder="Ej: herida de bala, fractura, hemorragia...">
-                    <span class="search-inner-icon">
+                    <span class="search-inner-icon">recognition
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </span>
                 </div>
@@ -363,156 +348,82 @@
 
     <div class="help-btn">?</div>
 
-    <script>
-        const API_URL = 'http://localhost:3001';
-        let isRecording = false;
+<script>
+    let mediaRecorder = null;
+    let audioChunks = [];
 
-        // Evento del botón de búsqueda
-        document.getElementById('btn-resultados').addEventListener('click', function() {
-            const searchTerm = document.getElementById('search').value.trim();
-            if (searchTerm) {
-                performSearch(searchTerm);
-            } else {
-                showToast('Por favor ingresa un término de búsqueda', true);
-            }
-        });
+    const voiceCard = document.getElementById('voice-card');
 
-        // Permitir búsqueda con Enter
-        document.getElementById('search').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const searchTerm = this.value.trim();
-                if (searchTerm) {
-                    performSearch(searchTerm);
-                }
-            }
-        });
-
-        // Botón de micrófono
-        document.getElementById('voice-card').addEventListener('click', async function(e) {
+    if (voiceCard) {
+        voiceCard.addEventListener('click', async function(e) {
             e.preventDefault();
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
-            if (!SpeechRecognition) {
-                showToast('❌ Tu navegador no soporta reconocimiento de voz', true);
-                return;
-            }
-
-            if (isRecording) {
-                isRecording = false;
+            if (this.classList.contains('recording')) {
                 this.classList.remove('recording');
-                showToast('Búsqueda cancelada');
+                mediaRecorder.stop();
                 return;
             }
 
-            isRecording = true;
-            this.classList.add('recording');
-            document.getElementById('search').value = '';
-            showToast('🎤 Hablando... (haz clic de nuevo para detener)');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                this.classList.add('recording');
+                showToast('🎤 Escuchando... Haz clic de nuevo para finalizar');
+                
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
 
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'es-ES';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
 
-            let finalTranscript = '';
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    const formData = new FormData();
+                    formData.append('audio', audioBlob, 'busqueda.webm');
 
-            recognition.onstart = () => {
-                console.log('✓ Micrófono activado');
-            };
-
-            recognition.onresult = (event) => {
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        finalTranscript += transcript + ' ';
-                        console.log('Resultado final:', transcript);
+                    try {
+                        const response = await fetch('http://localhost:3001/api/transcribir', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await response.json();
+                        
+                        if (data.text) {
+                            document.getElementById('search').value = data.text;
+                            performSearch(data.text);
+                        } else {
+                            showToast('❌ No se reconocieron palabras', true);
+                        }
+                    } catch (error) {
+                        showToast('❌ Error al conectar con el motor local', true);
                     }
-                }
-                document.getElementById('search').value = finalTranscript.trim();
-            };
+                };
 
-            recognition.onerror = (event) => {
-                console.error('❌ Error de voz:', event.error);
-                let errorMsg = 'Error: ' + event.error;
-                
-                if (event.error === 'permission-denied' || event.error === 'not-allowed') {
-                    errorMsg = 'Permiso de micrófono denegado. Permitir en navegador.';
-                } else if (event.error === 'no-speech') {
-                    errorMsg = 'No se detectó voz. Intenta de nuevo.';
-                } else if (event.error === 'network') {
-                    errorMsg = 'Error de conexión de red.';
-                }
-                
-                showToast('❌ ' + errorMsg, true);
-                isRecording = false;
-                document.getElementById('voice-card').classList.remove('recording');
-            };
-
-            recognition.onend = () => {
-                console.log('Reconocimiento finalizado');
-                isRecording = false;
-                document.getElementById('voice-card').classList.remove('recording');
-                
-                const searchTerm = document.getElementById('search').value.trim();
-                if (searchTerm) {
-                    showToast('✓ Listo para buscar');
-                    setTimeout(() => performSearch(searchTerm), 500);
-                }
-            };
-
-            try {
-                recognition.start();
-            } catch (error) {
-                console.error('Error al iniciar:', error);
-                showToast('❌ Error al iniciar micrófono', true);
-                isRecording = false;
-                this.classList.remove('recording');
+                mediaRecorder.start();
+            } catch (err) {
+                showToast('❌ Permiso de acceso al microfono denegado', true);
             }
         });
+    }
 
-        // Función para realizar la búsqueda
-        function performSearch(searchTerm) {
-            if (!searchTerm) {
-                showToast('❌ Debe escribir algo para buscar', true);
-                return;
-            }
+    function performSearch(searchTerm) {
+        sessionStorage.setItem('searchTerm', searchTerm);
+        window.location.href = `resultados.html?q=${encodeURIComponent(searchTerm)}`;
+    }
 
-            console.log('Buscando:', searchTerm);
-            sessionStorage.setItem('searchTerm', searchTerm);
-
-            try {
-                window.location.href = `resultados.html?q=${encodeURIComponent(searchTerm)}`;
-            } catch (error) {
-                console.error('Error al redirigir:', error);
-                showToast('❌ Error al realizar búsqueda', true);
-            }
-        }
-
-        // Función para mostrar notificaciones
-        function showToast(message, isError = false) {
-            const toast = document.createElement('div');
-            toast.className = `toast ${isError ? 'error' : ''}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // Solicitar permisos al cargar
-        window.addEventListener('load', async () => {
-            try {
-                await navigator.mediaDevices.getUserMedia({ audio: true });
-                showToast('✓ Micrófono listo');
-            } catch (error) {
-                console.warn('Permiso de micrófono pendiente - se pedirá al usar');
-            }
-        });
-    </script>
+    function showToast(message, isError = false) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${isError ? 'error' : ''}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+</script>
 </body>
 </html>
