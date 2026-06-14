@@ -62,8 +62,8 @@ db.run(`
 // =============== Servir frontend estático ===============
 app.use(express.static(path.join(__dirname, '../frontend/html')));
 app.use('/imagenes', express.static(path.join(__dirname, '../frontend/imagenes')));
-app.use('/js', express.static(path.join(__dirname, '../frontend')));
-app.use('/css', express.static(path.join(__dirname, '../frontend')));
+app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
+app.use('/styles', express.static(path.join(__dirname, '../frontend/styles')));
 
 // ======================= API =========================
 

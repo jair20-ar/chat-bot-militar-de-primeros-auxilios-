@@ -1,0 +1,322 @@
+/* === CONFIGURACIÓN BASE Y FONDO === */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: radial-gradient(circle at 50% 10%, #0e1e2b 0%, #050a0f 80%);
+    background-color: #050a0f;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 750px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* === ENCABEZADO === */
+.header-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.back-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.3s;
+    color: #fff;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.title-container {
+    position: relative;
+    padding-bottom: 5px;
+}
+
+h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 6px;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+.title-container::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background: #00d2ff;
+    box-shadow: 0 0 10px #00d2ff;
+}
+
+.theme-btn {
+    width: 45px;
+    height: 45px;
+    background: rgba(10, 20, 30, 0.4);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+}
+
+/* === PÍLDORA DE BÚSQUEDA DINÁMICA === */
+.search-term-pill {
+    display: inline-block;
+    background: rgba(0, 229, 255, 0.05);
+    border: 1px solid #0088aa;
+    border-radius: 20px;
+    padding: 8px 20px;
+    color: #00e5ff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-left: 65px;
+    margin-bottom: 30px;
+    align-self: flex-start;
+}
+
+/* === BARRA DE CONTEO === */
+.results-count {
+    background: #0b151e;
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    border-radius: 14px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+    color: #cbd5e1;
+}
+
+.icon-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0, 229, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.highlight-number {
+    color: #00d2ff;
+    font-weight: 700;
+}
+
+/* === TARJETAS DE RESULTADOS Y EFECTO HOVER === */
+.result-card {
+    background: #0e1620;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 15px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.card-content {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+}
+
+.card-glow {
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 140px;
+    height: 140px;
+    background: #0a3a45;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.result-card:hover:not(.disabled) {
+    border-color: rgba(0, 229, 255, 0.4);
+    background: #111a26;
+}
+
+.result-card:hover:not(.disabled) .card-glow {
+    opacity: 1;
+}
+
+.result-card:hover:not(.disabled) .action-btn {
+    background: #00a8cc;
+    border-color: #00a8cc;
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+}
+
+.result-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* === BADGES === */
+.card-badges {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.badge-critical {
+    background: #ff0033;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
+}
+
+.badge-moderate {
+    background: #ff8c00;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.4);
+}
+
+.badge-mild {
+    background: #00aa00;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px rgba(0, 170, 0, 0.4);
+}
+
+.badge-time {
+    background: #1e293b;
+    color: #cbd5e1;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 12px;
+}
+
+.card-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #8b9bb4;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    color: #00d2ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    margin-left: 15px;
+}
+
+/* === ESTADOS VACÍO Y CARGA === */
+.no-results {
+    text-align: center;
+    padding: 40px 20px;
+    color: #8b9bb4;
+}
+
+.no-results svg {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.no-results h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #cbd5e1;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #8b9bb4;
+}
+
+.spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(0, 229, 255, 0.1);
+    border-top-color: #00e5ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
