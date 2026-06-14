@@ -527,6 +527,7 @@
                 <div class="form-group">
                     <label>Nivel de Severidad *</label>
                     <select id="severidad">
+                        <option value="">-- Selecciona --</option>
                         <option value="leve">Leve</option>
                         <option value="moderado">Moderado</option>
                         <option value="critico">Crítico</option>
@@ -534,9 +535,24 @@
                 </div>
             </div>
 
-            <div class="form-group" style="margin-bottom: 0;">
-                <label>Tiempo Estimado *</label>
-                <input type="text" id="tiempo_estimado" placeholder="Ej: 5 min">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Parte del Cuerpo *</label>
+                    <select id="parte_cuerpo">
+                        <option value="">-- Selecciona una parte --</option>
+                        <option value="cabeza">Cabeza</option>
+                        <option value="brazos">Brazos</option>
+                        <option value="manos">Manos</option>
+                        <option value="torax">Tórax</option>
+                        <option value="abdomen">Abdomen</option>
+                        <option value="piernas">Piernas</option>
+                        <option value="pies">Pies</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tiempo Estimado *</label>
+                    <input type="text" id="tiempo_estimado" placeholder="Ej: 5 min">
+                </div>
             </div>
         </section>
 
@@ -642,6 +658,7 @@
                         document.getElementById('titulo').value = inst.titulo;
                         document.getElementById('categoria').value = inst.categoria || '';
                         document.getElementById('severidad').value = inst.severidad || 'leve';
+                        document.getElementById('parte_cuerpo').value = inst.parte_cuerpo || '';
                         document.getElementById('tiempo_estimado').value = inst.tiempo_estimado || '';
 
                         const pasos = typeof inst.pasos === 'string' ? JSON.parse(inst.pasos) : inst.pasos;
@@ -853,13 +870,49 @@
 
         // Guardar instrucción
         function saveInstruction() {
-            const titulo = document.getElementById('titulo').value;
-            const categoria = document.getElementById('categoria').value;
-            const severidad = document.getElementById('severidad').value;
-            const tiempo_estimado = document.getElementById('tiempo_estimado').value;
+            const titulo = document.getElementById('titulo').value.trim();
+            const categoria = document.getElementById('categoria').value.trim();
+            const severidad = document.getElementById('severidad').value.trim();
+            const parte_cuerpo = document.getElementById('parte_cuerpo').value.trim();
+            const tiempo_estimado = document.getElementById('tiempo_estimado').value.trim();
+            
+            // ✅ OBTENER id_medico de medicoData (nuevo código)
+            const medicoData = localStorage.getItem('medicoData');
+            let id_medico = null;
 
-            if (!titulo || !categoria || !severidad || !tiempo_estimado) {
-                showToast('❌ Completa todos los campos de información general', true);
+            if (medicoData) {
+                try {
+                    const userData = JSON.parse(medicoData);
+                    id_medico = userData.id_medico;
+                    console.log('✅ ID Médico obtenido:', id_medico);
+                } catch (err) {
+                    console.error('❌ Error al parsear medicoData:', err);
+                }
+            }
+
+            // VALIDACIONES DETALLADAS
+            if (!titulo) {
+                showToast('❌ El título es obligatorio', true);
+                return;
+            }
+            if (!categoria) {
+                showToast('❌ La categoría es obligatoria', true);
+                return;
+            }
+            if (!severidad) {
+                showToast('❌ Debes seleccionar un nivel de severidad', true);
+                return;
+            }
+            if (!parte_cuerpo) {
+                showToast('❌ Debes seleccionar una parte del cuerpo', true);
+                return;
+            }
+            if (!tiempo_estimado) {
+                showToast('❌ El tiempo estimado es obligatorio', true);
+                return;
+            }
+            if (!id_medico) {
+                showToast('❌ Debes iniciar sesión primero', true);
                 return;
             }
 
@@ -870,7 +923,6 @@
             const pasos = [];
             const stepCards = document.querySelectorAll('.step-card');
 
-            // Procesar todos los pasos y convertir imágenes a base64
             let processedSteps = 0;
 
             if (stepCards.length === 0) {
@@ -885,15 +937,15 @@
                 const imagePreview = card.querySelector('.image-preview');
 
                 const paso = {
-                    titulo: inputs[0].value,
-                    descripcion: inputs[1].value,
+                    titulo: inputs[0].value.trim(),
+                    descripcion: inputs[1].value.trim(),
                     duracion: parseInt(inputs[2].value),
-                    texto_voz: inputs[3].value,
+                    texto_voz: inputs[3].value.trim(),
                     imagen: imagePreview ? imagePreview.src : ''
                 };
 
                 if (!paso.titulo || !paso.descripcion) {
-                    showToast('❌ Completa todos los pasos', true);
+                    showToast(`❌ El paso ${cardIndex + 1} está incompleto (falta título o descripción)`, true);
                     btnSave.disabled = false;
                     btnSave.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>GUARDAR INSTRUCCIÓN';
                     throw new Error('Paso incompleto');
@@ -903,23 +955,23 @@
                 processedSteps++;
 
                 if (processedSteps === stepCards.length) {
-                    sendInstructionToServer(titulo, categoria, severidad, tiempo_estimado, pasos, btnSave);
+                    sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, id_medico, btnSave);
                 }
             });
 
             if (processedSteps === 0) {
-                sendInstructionToServer(titulo, categoria, severidad, tiempo_estimado, pasos, btnSave);
+                sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, id_medico, btnSave);
             }
         }
 
-        function sendInstructionToServer(titulo, categoria, severidad, tiempo_estimado, pasos, btnSave) {
+        function sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, id_medico, btnSave) {
             const method = editingId ? 'PUT' : 'POST';
             const url = editingId ? `${API_URL}/api/instrucciones/${editingId}` : `${API_URL}/api/instrucciones`;
 
             fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ titulo, categoria, severidad, tiempo_estimado, pasos })
+                body: JSON.stringify({ titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, id_medico })
             })
             .then(res => res.json())
             .then(data => {
@@ -928,7 +980,7 @@
                     showToast(msg);
                     setTimeout(() => window.location.href = '/panel.html', 1500);
                 } else {
-                    showToast('❌ Error al guardar', true);
+                    showToast('❌ ' + (data.error || 'Error al guardar'), true);
                     btnSave.disabled = false;
                     btnSave.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>GUARDAR INSTRUCCIÓN';
                 }

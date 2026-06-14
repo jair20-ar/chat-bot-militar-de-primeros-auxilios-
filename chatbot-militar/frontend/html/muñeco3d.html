@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SISTEMA TACMED FANB - Visor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #050a0f; font-family: sans-serif; }
+        
+        /* Contenedor del visor */
+        #visor-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+
+        /* Estilo de las etiquetas */
+        .etiqueta {
+            position: absolute;
+            background: rgba(0, 229, 255, 0.2);
+            border: 1px solid #00e5ff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            pointer-events: none; /* Para que no estorben al mouse */
+            z-index: 10;
+        }
+
+        /* Panel inferior tipo App */
+        #panel-inferior {
+            position: absolute;
+            bottom: 20px;
+            left: 5%;
+            width: 90%;
+            background: rgba(12, 26, 36, 0.9);
+            border: 1px solid #00e5ff;
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="visor-3d"></div>
+
+    <div class="etiqueta" style="top: 200px; left: 60%;">Chest Wound</div>
+    <div class="etiqueta" style="top: 400px; left: 30%;">Leg Wound</div>
+
+    <div id="panel-inferior">
+        <h3 style="color: #00e5ff;">STEP 1:</h3>
+        <p>Apply immediate direct pressure to wound.</p>
+    </div>
+
+    <script>
+        // --- AQUÍ VA TU CÓDIGO DE THREE.JS ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('visor-3d').appendChild(renderer.domElement);
+
+        const light = new THREE.AmbientLight(0xffffff, 1.0);
+        scene.add(light);
+        camera.position.z = 4;
+
+        const loader = new THREE.GLTFLoader();
+        // Cargando el soldado que ya sabes que funciona
+        loader.load('soldado_realista.glb', function(gltf) {
+            scene.add(gltf.scene);
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>

@@ -43,25 +43,15 @@ db.run(`
   )
 `);
 
-// =================== Crear tabla instrucciones (NUEVA) ===================
+// =================== Crear tabla instrucciones (ACTUALIZADA) ===================
 db.run(`
   CREATE TABLE IF NOT EXISTS instrucciones (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     titulo TEXT NOT NULL,
     categoria TEXT,
     severidad TEXT,
+    parte_cuerpo TEXT NOT NULL,
     tiempo_estimado TEXT,
-    pasos TEXT NOT NULL,
-    fecha TEXT NOT NULL,
-    id_medico TEXT
-  )
-`);
-
-// =================== Crear tabla protocolos ===================
-db.run(`
-  CREATE TABLE IF NOT EXISTS indicaciones_protocolo (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    titulo TEXT NOT NULL,
     pasos TEXT NOT NULL,
     fecha TEXT NOT NULL,
     id_medico TEXT NOT NULL,
@@ -157,18 +147,18 @@ app.post('/medicos/login', (req, res) => {
 
 // Crear nueva instrucción
 app.post('/api/instrucciones', (req, res) => {
-  const { titulo, categoria, severidad, tiempo_estimado, pasos } = req.body;
+  const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, id_medico } = req.body;
   
-  if (!titulo || !pasos) {
-    return res.status(400).json({ success: false, error: 'Título y pasos son obligatorios.' });
+  if (!titulo || !pasos || !id_medico || !parte_cuerpo) {
+    return res.status(400).json({ success: false, error: 'Título, pasos, parte del cuerpo e id_medico son obligatorios.' });
   }
 
   const fecha = new Date().toISOString();
   
   db.run(
-    `INSERT INTO instrucciones (titulo, categoria, severidad, tiempo_estimado, pasos, fecha) 
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [titulo, categoria || null, severidad || null, tiempo_estimado || null, JSON.stringify(pasos), fecha],
+    `INSERT INTO instrucciones (titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, fecha, id_medico) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [titulo, categoria || null, severidad || null, parte_cuerpo, tiempo_estimado || null, JSON.stringify(pasos), fecha, id_medico],
     function (err) {
       if (err) {
         return res.status(500).json({ success: false, error: err.message });
@@ -203,98 +193,58 @@ app.get('/api/instrucciones/:id', (req, res) => {
   );
 });
 
-// Actualizar instrucción
+// Actualizar instrucción (VALIDAR DUEÑO)
 app.put('/api/instrucciones/:id', (req, res) => {
-  const { titulo, categoria, severidad, tiempo_estimado, pasos } = req.body;
+  const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, id_medico } = req.body;
   
-  if (!titulo || !pasos) {
-    return res.status(400).json({ success: false, error: 'Título y pasos son obligatorios.' });
+  if (!titulo || !pasos || !id_medico || !parte_cuerpo) {
+    return res.status(400).json({ success: false, error: 'Título, pasos, parte del cuerpo e id_medico son obligatorios.' });
   }
 
-  db.run(
-    `UPDATE instrucciones SET titulo = ?, categoria = ?, severidad = ?, tiempo_estimado = ?, pasos = ? WHERE id = ?`,
-    [titulo, categoria || null, severidad || null, tiempo_estimado || null, JSON.stringify(pasos), req.params.id],
-    function (err) {
+  // Verificar que el médico es el dueño
+  db.get(
+    `SELECT * FROM instrucciones WHERE id = ? AND id_medico = ?`,
+    [req.params.id, id_medico],
+    (err, row) => {
       if (err) return res.status(500).json({ success: false, error: err.message });
-      res.json({ success: true });
+      if (!row) return res.status(403).json({ success: false, error: 'No tienes permiso para editar esta instrucción.' });
+      
+      db.run(
+        `UPDATE instrucciones SET titulo = ?, categoria = ?, severidad = ?, parte_cuerpo = ?, tiempo_estimado = ?, pasos = ? WHERE id = ?`,
+        [titulo, categoria || null, severidad || null, parte_cuerpo, tiempo_estimado || null, JSON.stringify(pasos), req.params.id],
+        function (err) {
+          if (err) return res.status(500).json({ success: false, error: err.message });
+          res.json({ success: true });
+        }
+      );
     }
   );
 });
 
-// Eliminar instrucción
+// Eliminar instrucción (VALIDAR DUEÑO)
 app.delete('/api/instrucciones/:id', (req, res) => {
-  db.run(
-    `DELETE FROM instrucciones WHERE id = ?`,
-    [req.params.id],
-    function (err) {
-      if (err) return res.status(500).json({ success: false, error: err.message });
-      res.json({ success: true });
-    }
-  );
-});
-
-// ============ RUTAS PARA GUARDAR/EDITAR/ELIMINAR PROTOCOLOS ===========
-app.post('/indicaciones/protocolos', (req, res) => {
-  const { titulo, pasos, id_medico } = req.body;
-  if (!titulo || !pasos || !id_medico) {
-    return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+  const { id_medico } = req.body;
+  
+  if (!id_medico) {
+    return res.status(400).json({ success: false, error: 'id_medico es obligatorio.' });
   }
-  const fecha = new Date().toISOString();
-  db.run(
-    `INSERT INTO indicaciones_protocolo (titulo, pasos, fecha, id_medico) VALUES (?, ?, ?, ?)`,
-    [titulo, JSON.stringify(pasos), fecha, id_medico],
-    function (err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ ok: true, id: this.lastID });
-    }
-  );
-});
 
-// Obtener todos los protocolos de un médico
-app.get('/indicaciones/protocolos/:id_medico', (req, res) => {
-  db.all(
-    `SELECT * FROM indicaciones_protocolo WHERE id_medico = ? ORDER BY fecha DESC`,
-    [req.params.id_medico],
-    (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows);
-    }
-  );
-});
-
-// Obtener TODOS los protocolos/instrucciones de TODOS los médicos
-app.get('/indicaciones/protocolos', (req, res) => {
-  db.all(
-    `SELECT * FROM indicaciones_protocolo ORDER BY fecha DESC`,
-    [],
-    (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows);
-    }
-  );
-});
-
-// Editar un protocolo
-app.put('/indicaciones/protocolos/:id', (req, res) => {
-  const { titulo, pasos } = req.body;
-  db.run(
-    `UPDATE indicaciones_protocolo SET titulo = ?, pasos = ? WHERE id = ?`,
-    [titulo, JSON.stringify(pasos), req.params.id],
-    function (err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ ok: true });
-    }
-  );
-});
-
-// Eliminar un protocolo
-app.delete('/indicaciones/protocolos/:id', (req, res) => {
-  db.run(
-    `DELETE FROM indicaciones_protocolo WHERE id = ?`,
-    [req.params.id],
-    function (err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ ok: true });
+  // Verificar que el médico es el dueño
+  db.get(
+    `SELECT * FROM instrucciones WHERE id = ? AND id_medico = ?`,
+    [req.params.id, id_medico],
+    (err, row) => {
+      if (err) return res.status(500).json({ success: false, error: err.message });
+      if (!row) return res.status(403).json({ success: false, error: 'No tienes permiso para eliminar esta instrucción.' });
+      
+      db.run(
+        `DELETE FROM instrucciones WHERE id = ?`,
+        [req.params.id],
+        function (err) {
+          if (err) return res.status(500).json({ success: false, error: err.message });
+          res.json({ success: true });
+        }
+      );
     }
   );
 });

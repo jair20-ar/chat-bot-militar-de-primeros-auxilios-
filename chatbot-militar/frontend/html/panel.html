@@ -324,6 +324,10 @@
             font-size: 0.85rem;
             font-weight: 600;
             transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .btn-edit:hover {
@@ -504,8 +508,8 @@
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
                 <div class="stat-info">
-                    <span>Especialización</span>
-                    <h2 class="val-white">Medicina de Emergencia</h2>
+                    <span>Usuario Activo</span>
+                    <h2 class="val-white" id="user-status">No autenticado</h2>
                 </div>
             </div>
         </div>
@@ -534,45 +538,93 @@
 
     <script>
         const API_URL = 'http://localhost:3001';
-        let instructions = [];
+        let currentUserId = null;
+        let currentUserNombre = null;
 
-        // Cargar instrucciones al iniciar
+        // ✅ Verificar si el usuario está autenticado al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
-            loadUserData();
-            loadInstructions();
+            checkAuthentication();
+            loadMyInstructions();
+            updateStats();
         });
 
-        // Datos del usuario
-        function loadUserData() {
+        // ✅ FUNCIÓN MEJORADA: Verificar autenticación desde medicoData
+        function checkAuthentication() {
+            console.log('🔍 Verificando autenticación...');
+            
+            // Obtener datos del localStorage
             const medicoData = localStorage.getItem('medicoData');
-            const userData = medicoData ? JSON.parse(medicoData) : null;
-            const displayElement = document.getElementById('user-name-display');
-            if (userData) {
-                let prefijo = "Dr.";
-                displayElement.textContent = `${prefijo} ${userData.nombre}`;
+            
+            if (!medicoData) {
+                console.error('❌ No hay medicoData en localStorage');
+                showToast('❌ Debes iniciar sesión primero', true);
+                setTimeout(() => window.location.href = '/', 2000);
+                return;
+            }
+
+            try {
+                const userData = JSON.parse(medicoData);
+                console.log('✅ medicoData encontrado:', userData);
+                
+                if (!userData.id_medico || !userData.nombre) {
+                    throw new Error('Datos incompletos en medicoData');
+                }
+
+                // Guardar los datos globales
+                currentUserId = userData.id_medico;
+                currentUserNombre = userData.nombre;
+
+                // Mostrar en el UI
+                document.getElementById('user-name-display').textContent = `Dr. ${userData.nombre}`;
+                document.getElementById('user-status').textContent = userData.nombre;
+                
+                console.log('✅ Usuario autenticado:', currentUserNombre);
+            } catch (err) {
+                console.error('❌ Error al parsear medicoData:', err);
+                showToast('❌ Error de sesión, vuelve a iniciar sesión', true);
+                setTimeout(() => {
+                    localStorage.removeItem('medicoData');
+                    window.location.href = '/';
+                }, 2000);
             }
         }
 
-        // Cargar todas las instrucciones
-        function loadInstructions() {
+        // ✅ Cargar mis instrucciones
+        function loadMyInstructions() {
+            if (!currentUserId) {
+                console.warn('⚠️ No se pudo obtener el ID del médico');
+                return;
+            }
+
+            console.log('📥 Cargando instrucciones para médico:', currentUserId);
+
             fetch(`${API_URL}/api/instrucciones`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        instructions = data.data.map(inst => {
-                            const pasos = typeof inst.pasos === 'string' ? JSON.parse(inst.pasos) : inst.pasos;
-                            return { ...inst, pasos };
+                        console.log('📊 Total instrucciones en BD:', data.data.length);
+                        
+                        // Filtrar solo las instrucciones del médico actual
+                        // Compatibilidad: comparar como string ya que pueden venir diferentes tipos
+                        const myInstructions = data.data.filter(inst => {
+                            return String(inst.id_medico) === String(currentUserId);
                         });
-                        renderInstructions();
-                        updateStats();
+                        
+                        console.log('✅ Instrucciones del médico actual:', myInstructions.length);
+                        displayInstructions(myInstructions);
                     }
                 })
-                .catch(err => console.error('Error:', err));
+                .catch(err => {
+                    console.error('❌ Error al cargar instrucciones:', err);
+                    showToast('❌ Error al cargar instrucciones', true);
+                });
         }
 
-        // Renderizar instrucciones
-        function renderInstructions() {
+        // ✅ Mostrar instrucciones en el grid
+        function displayInstructions(instructions) {
             const container = document.getElementById('instructions-container');
+            container.innerHTML = '';
+
             if (instructions.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
@@ -585,74 +637,98 @@
                 `;
                 return;
             }
-            container.innerHTML = instructions.map(inst => {
-                const severidadBadge = inst.severidad ? `<span class="badge ${inst.severidad === 'critico' ? 'danger' : inst.severidad === 'moderado' ? 'warning' : ''}">${inst.severidad.toUpperCase()}</span>` : '';
-                const tiempoBadge = inst.tiempo_estimado ? `<span class="badge">${inst.tiempo_estimado}</span>` : '';
-                const categoriaBadge = inst.categoria ? `<span class="badge">${inst.categoria}</span>` : '';
-                return `
-                    <div class="instruction-card">
-                        <div class="instruction-title">${inst.titulo}</div>
-                        <div class="instruction-meta">
-                            ${categoriaBadge}
-                            ${severidadBadge}
-                            ${tiempoBadge}
-                        </div>
-                        <div class="instruction-desc">${Array.isArray(inst.pasos) ? inst.pasos.length + ' pasos' : 'Ver detalles'}</div>
-                        <div class="instruction-actions">
-                            <a href="/emergencia.html?edit=${inst.id}" style="text-decoration: none; flex: 1;">
-                                <button class="btn-edit" style="width: 100%;">✏️ Editar</button>
-                            </a>
-                            <button class="btn-delete" onclick="deleteInstruction(${inst.id})">🗑️ Eliminar</button>
-                        </div>
+
+            instructions.forEach(inst => {
+                const badgeClass = inst.severidad === 'critico' ? 'danger' : inst.severidad === 'moderado' ? 'warning' : '';
+                const card = document.createElement('div');
+                card.className = 'instruction-card';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <h3 class="instruction-title">${inst.titulo}</h3>
+                    </div>
+                    <div class="instruction-meta">
+                        <span class="badge ${badgeClass}">${inst.severidad.toUpperCase()}</span>
+                        <span class="badge">${inst.parte_cuerpo || 'General'}</span>
+                        <span class="badge">${inst.tiempo_estimado}</span>
+                    </div>
+                    <div class="instruction-desc">
+                        <strong>Categoría:</strong> ${inst.categoria}
+                    </div>
+                    <div class="instruction-actions">
+                        <a href="/emergencia.html?edit=${inst.id}" class="btn-edit">✏️ Editar</a>
+                        <button onclick="deleteInstruction(${inst.id})" class="btn-delete">🗑️ Eliminar</button>
                     </div>
                 `;
-            }).join('');
+                container.appendChild(card);
+            });
         }
 
-        // Actualizar estadísticas
-        function updateStats() {
-            document.getElementById('total-count').textContent = instructions.length;
-            const critical = instructions.filter(i => i.severidad === 'critico').length;
-            document.getElementById('critical-count').textContent = critical;
-        }
-
-        // Eliminar instrucción
+        // ✅ Eliminar instrucción
         function deleteInstruction(id) {
-            if (confirm('¿Está seguro de que desea eliminar esta instrucción?')) {
-                fetch(`${API_URL}/api/instrucciones/${id}`, { method: 'DELETE' })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            showToast('✅ Instrucción eliminada');
-                            loadInstructions();
-                        } else {
-                            showToast('❌ Error al eliminar', true);
-                        }
-                    })
-                    .catch(err => { console.error(err); showToast('❌ Error de conexión', true); });
+            if (!currentUserId) {
+                showToast('❌ Debes iniciar sesión primero', true);
+                return;
+            }
+
+            if (confirm('¿Estás seguro que deseas eliminar esta instrucción?')) {
+                fetch(`${API_URL}/api/instrucciones/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_medico: currentUserId })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('✅ Instrucción eliminada');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showToast('❌ ' + (data.error || 'Error al eliminar'), true);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast('❌ Error de conexión', true);
+                });
             }
         }
 
-        // Volver a médicos
-        function goBackToMedicos() {
-            // Limpiar datos del usuario
-            localStorage.removeItem('medicoData');
-            // Redirigir a página de médicos
-            window.location.href = 'http://localhost:3001/medicos.html';
+        // ✅ Actualizar estadísticas
+        function updateStats() {
+            if (!currentUserId) return;
+
+            fetch(`${API_URL}/api/instrucciones`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const myInstructions = data.data.filter(
+                            inst => String(inst.id_medico) === String(currentUserId)
+                        );
+                        const criticalCount = myInstructions.filter(inst => inst.severidad === 'critico').length;
+                        
+                        document.getElementById('total-count').textContent = myInstructions.length;
+                        document.getElementById('critical-count').textContent = criticalCount;
+                    }
+                })
+                .catch(err => console.error('❌ Error al actualizar stats:', err));
         }
 
-        // Notificaciones
+        // ✅ Volver a médicos
+        function goBackToMedicos() {
+            window.location.href = '/';
+        }
+
+        // ✅ Mostrar ayuda
+        function showHelp() {
+            alert('📋 PANEL MÉDICO\n\n✅ Ver todas tus instrucciones\n✏️ Editar instrucciones existentes\n🗑️ Eliminar instrucciones\n➕ Crear nuevas instrucciones\n\n¡Mantén tus protocolos actualizados!');
+        }
+
+        // ✅ Mostrar notificaciones
         function showToast(msg, isError = false) {
             const toast = document.createElement('div');
             toast.className = `toast ${isError ? 'error' : ''}`;
             toast.textContent = msg;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
-        }
-
-        // Ayuda
-        function showHelp() {
-            alert('📝 CREAR: Click en "CREAR NUEVA INSTRUCCIÓN MÉDICA"\n✏️ EDITAR: Click en "Editar" en la tarjeta\n🗑️ ELIMINAR: Click en "Eliminar" en la tarjeta\n🔙 VOLVER: Click en el botón de flecha en el header');
         }
     </script>
 </body>
