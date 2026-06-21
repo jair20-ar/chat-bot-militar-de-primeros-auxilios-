@@ -17,6 +17,7 @@ document.getElementById('registro-form').addEventListener('submit', async functi
     const email = this.email.value.trim();
     const cedula = this.cedula.value.trim();
     const especializacion = this.especializacion.value;
+    const codigo_registro = this.codigo_registro.value.trim();
     const password = this.password.value;
     const password2 = document.getElementById('pass-confirm').value;
 
@@ -33,7 +34,7 @@ document.getElementById('registro-form').addEventListener('submit', async functi
         const res = await fetch('/medicos/registro', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, email, cedula, especializacion, password })
+            body: JSON.stringify({ nombre, email, cedula, especializacion, password, codigo_registro })
         });
         const data = await res.json();
 

@@ -44,21 +44,27 @@ function initializeTables() {
       else console.log('✅ Medicos table ready');
     });
 
+    db.run("DROP TABLE IF EXISTS indicaciones_protocolo", (err) => {
+      if (err) console.error('Error dropping table:', err);
+    });
+
+    db.run("DROP TABLE IF EXISTS indicaciones_procolo", (err) => {
+      if (err) console.error('Error dropping table:', err);
+    });
+
     db.run(`
-      CREATE TABLE IF NOT EXISTS indicaciones_protocolo (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        titulo TEXT NOT NULL,
-        pasos TEXT NOT NULL,
-        fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
-        id_medico TEXT NOT NULL,
-        categoria TEXT,
-        tags TEXT,
-        estado TEXT DEFAULT 'activo',
-        FOREIGN KEY(id_medico) REFERENCES medicos(id_medico) ON DELETE CASCADE
+      CREATE TABLE IF NOT EXISTS configuracion (
+        clave TEXT PRIMARY KEY,
+        valor TEXT
       )
     `, (err) => {
-      if (err) console.error('Error creating indicaciones_protocolo table:', err);
-      else console.log('✅ Indicaciones protocolo table ready');
+      if (err) {
+        console.error('Error creating configuracion table:', err);
+      } else {
+        console.log('✅ Configuracion table ready');
+        db.run("INSERT OR IGNORE INTO configuracion (clave, valor) VALUES ('admin_password', 'UNEFA2026')");
+        db.run("INSERT OR IGNORE INTO configuracion (clave, valor) VALUES ('registro_code', '31150106')");
+      }
     });
   });
 }

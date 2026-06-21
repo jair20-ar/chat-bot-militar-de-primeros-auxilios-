@@ -13,16 +13,57 @@ eyeBtn.addEventListener('click', () => {
     eyeBtn.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
 });
 
-// === TOGGLE TEMA CLARO / OSCURO ===
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon   = document.getElementById('themeIcon');
+// === INICIO DE SESIÓN DE ADMINISTRADOR ===
+const submitBtn = document.querySelector('.submit-btn');
+const API_URL = 'http://localhost:3001';
 
-const sunPath  = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>';
-const moonPath = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+async function handleLogin() {
+    const password = pwInput.value.trim();
+    if (!password) {
+        alert('Por favor, ingrese la contraseña.');
+        return;
+    }
 
-themeToggle.addEventListener('click', () => {
-    const body  = document.body;
-    const isDark = body.getAttribute('data-theme') === 'dark';
-    body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-    themeIcon.innerHTML = isDark ? moonPath : sunPath;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Verificando...';
+
+    try {
+        const res = await fetch(`${API_URL}/api/admin/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            localStorage.setItem('adminToken', 'true');
+            localStorage.removeItem('medicoData'); // Limpiar sesión de médico para evitar conflictos
+            window.location.href = 'admin.html';
+        } else {
+            alert(data.error || 'Acceso denegado.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Ingresar al Panel';
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Error de conexión con el servidor.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Ingresar al Panel';
+    }
+}
+
+submitBtn.addEventListener('click', handleLogin);
+
+pwInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        handleLogin();
+    }
 });
+
+// Botón Volver
+const backBtn = document.querySelector('.icon-btn[aria-label="Volver"]') || document.querySelector('.icon-btn');
+if (backBtn) {
+    backBtn.addEventListener('click', () => {
+        window.location.href = '/';
+    });
+}

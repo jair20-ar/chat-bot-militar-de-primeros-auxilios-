@@ -1,0 +1,1042 @@
+/* ==========================================================================
+   TEMA CLARO TÁCTICO MILITAR DIURNO - CRUZ ROJA Y RESCATE (FANB)
+   Este archivo redefine variables globales y aplica overrides específicos
+   para lograr una interfaz de alta visibilidad diurna con temática de rescate.
+   ========================================================================== */
+
+/* === VARIABLES DE TEMA CLARO === */
+body[data-theme="light"],
+[data-theme="light"] {
+    /* --- Colores Base --- */
+    --bg-color: #dbe2e8;       /* Gris acero militar base */
+    --bg-dark: #d0d9e0;
+    --bg-main: #dbe2e8;
+    
+    /* --- Gradiente de Fondo con Difuminados Tácticos Gris y Rojo --- */
+    --bg-gradient: radial-gradient(circle at 90% 10%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+                   radial-gradient(circle at 10% 80%, rgba(71, 85, 105, 0.12) 0%, transparent 50%),
+                   radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.02) 0%, transparent 70%);
+
+    /* --- Textos (Máximo contraste para exteriores) --- */
+    --text-white: #0f172a;     /* Azul marino muy oscuro/slate */
+    --text-main: #1e293b;      /* Slate oscuro */
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #475569;
+    --text-dark: #64748b;
+
+    /* --- Acentos Tácticos (Rojo Cruz Roja / Rescate) --- */
+    --primary-cyan: #dc2626;   /* Rojo Cruz Roja diurno */
+    --cyan: #dc2626;
+    --cyan-accent: #dc2626;
+    --primary-cyan-glow: rgba(220, 38, 38, 0.12);
+    --cyan-dim: rgba(220, 38, 38, 0.05);
+    --cyan-soft: rgba(220, 38, 38, 0.03);
+    --cyan-border: rgba(220, 38, 38, 0.22);
+    --cyan-hover: #b91c1c;
+
+    --secondary-green: #b91c1c; /* Rojo carmesí para botones primarios coherentes */
+    --green-accent: #b91c1c;
+    --green: #b91c1c;
+    --green-border: rgba(185, 28, 28, 0.25);
+
+    --danger: #dc2626;
+    --red: #dc2626;
+    --red-strong: #b91c1c;
+    --red-soft: rgba(220, 38, 38, 0.08);
+    --red-border: rgba(220, 38, 38, 0.25);
+
+    --yellow: #d97706;
+    --yellow-soft: rgba(217, 119, 6, 0.08);
+    --yellow-border: rgba(217, 119, 6, 0.25);
+
+    /* --- Paneles y Elementos de Tarjetas --- */
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --panel-bg: rgba(255, 255, 255, 0.9);
+    --bg-card: rgba(255, 255, 255, 0.9);
+    --bg-button: rgba(226, 232, 240, 0.9);
+    --input-bg: #f1f5f9;
+    --card-border: rgba(220, 38, 38, 0.15);
+    --border-color: rgba(15, 23, 42, 0.12);
+    --border-focus: #dc2626;
+}
+
+/* === ESTILO DE FONDO GLOBAL CON REJILLA MILITAR Y COORDENADAS === */
+body[data-theme="light"] {
+    background-color: #dbe2e8 !important;
+    background-image: 
+        /* Coordenadas y HUD militar en el fondo (SVG inline codificado para compatibilidad) */
+        url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ESYS: TACMED_FANB_RSC%3C/text%3E%3Ctext x='30' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELAT: 10.4806° N%3C/text%3E%3Ctext x='30' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELON: 66.9036° W%3C/text%3E%3Ctext x='90%25' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESTATUS: ACTIVE%3C/text%3E%3Ctext x='90%25' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 500KM%3C/text%3E%3Ctext x='90%25' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EALT: 852M%3C/text%3E%3C/svg%3E"),
+        /* Múltiples luces de fondo rojas y grises */
+        radial-gradient(circle at 90% 10%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 10% 80%, rgba(71, 85, 105, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.02) 0%, transparent 70%),
+        /* Rejilla militar */
+        linear-gradient(rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 30px 30px, 30px 30px !important;
+    background-attachment: fixed !important;
+    color: #0f172a !important;
+}
+
+/* --- Simbología Cruz Médica en el Centro (HTML pseudo-elementos codificados para Chrome/Edge) --- */
+html[data-theme="light"]::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    height: 280px;
+    background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23dc2626'%3E%3Cpath d='M9 3h6v6h6v6h-6v6H9v-6H3V9h6V3z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.035; /* Muy sutil para no interferir con la lectura */
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* --- Círculos de Radar Animados Concéntricos --- */
+html[data-theme="light"]::after {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    height: 320px;
+    border: 1px solid rgba(220, 38, 38, 0.07);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -2;
+    animation: tactical-radar-pulse 8s infinite linear;
+    opacity: 0;
+}
+
+@keyframes tactical-radar-pulse {
+    0% {
+        width: 100px;
+        height: 100px;
+        opacity: 0;
+        border-color: rgba(220, 38, 38, 0.12);
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.03);
+    }
+    10% {
+        opacity: 0.7;
+    }
+    80% {
+        opacity: 0.2;
+    }
+    100% {
+        width: 600px;
+        height: 600px;
+        opacity: 0;
+        border-color: rgba(220, 38, 38, 0);
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0);
+    }
+}
+
+/* Ajustar los adornos HUD decorativos de esquinas */
+body[data-theme="light"]::before,
+body[data-theme="light"]::after {
+    border-color: rgba(220, 38, 38, 0.35) !important;
+}
+
+/* === OVERRIDES: index.html (HUD de Inicio) === */
+body[data-theme="light"] .top-status-bar,
+body[data-theme="light"] .bottom-status-bar {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+}
+
+body[data-theme="light"] .status-text {
+    color: #1e293b !important;
+    opacity: 0.9 !important;
+}
+
+body[data-theme="light"] .status-brand {
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .status-brand svg {
+    fill: #dc2626 !important;
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .brand-text {
+    color: #dc2626 !important;
+    opacity: 0.95 !important;
+}
+
+body[data-theme="light"] .status-dot {
+    background-color: #dc2626 !important;
+    box-shadow: 0 0 8px #dc2626 !important;
+}
+
+body[data-theme="light"] .top-right-btn,
+body[data-theme="light"] .bottom-right-btn {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+body[data-theme="light"] .top-right-btn:hover,
+body[data-theme="light"] .bottom-right-btn:hover {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 12px rgba(220, 38, 38, 0.2) !important;
+}
+
+body[data-theme="light"] .top-right-btn svg {
+    stroke: #dc2626 !important;
+    filter: drop-shadow(0 0 2px rgba(220, 38, 38, 0.2)) !important;
+}
+
+body[data-theme="light"] .shield-glow-container {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(219, 226, 232, 0.95) 100%) !important;
+    border: 1px solid rgba(220, 38, 38, 0.3) !important;
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.12), inset 0 0 15px rgba(220, 38, 38, 0.08) !important;
+}
+
+body[data-theme="light"] .radar-sweep {
+    background: conic-gradient(from 0deg, rgba(220, 38, 38, 0.45), transparent 55%) !important; /* Rojo de mayor opacidad para combinar */
+}
+
+body[data-theme="light"] .radar-ring {
+    border-color: rgba(220, 38, 38, 0.25) !important;
+}
+
+/* Forzar línea ECG del escudo de inicio a rojo */
+body[data-theme="light"] .shield-core svg path:last-child {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .action-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(226, 232, 240, 0.9) 100%) !important;
+    border: 1px solid rgba(220, 38, 38, 0.18) !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.03) !important;
+}
+
+body[data-theme="light"] .action-card:hover {
+    border-color: #dc2626 !important;
+    box-shadow: 0 15px 30px rgba(220, 38, 38, 0.15) !important;
+}
+
+body[data-theme="light"] .action-card .card-text {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .action-card .card-subtext {
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .stat-card {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid rgba(220, 38, 38, 0.18) !important;
+}
+
+body[data-theme="light"] .stat-card:hover {
+    border-color: #dc2626 !important;
+    box-shadow: 0 5px 15px rgba(220, 38, 38, 0.08) !important;
+}
+
+/* === OVERRIDES: buscador.html (Búsqueda Táctica) === */
+body[data-theme="light"] .back-btn {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid rgba(220, 38, 38, 0.2) !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .back-btn svg {
+    stroke: #0f172a !important;
+}
+
+body[data-theme="light"] .back-btn:hover {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.2) !important;
+}
+
+body[data-theme="light"] .back-btn:hover svg {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .theme-btn {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1.5px solid rgba(220, 38, 38, 0.3) !important;
+}
+
+body[data-theme="light"] .theme-btn svg {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .search-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(220, 38, 38, 0.15) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04) !important;
+}
+
+body[data-theme="light"] .search-card::before {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.4) !important;
+}
+
+body[data-theme="light"] .search-card::after {
+    background-color: #dc2626 !important;
+    box-shadow: 0 0 8px #dc2626 !important;
+}
+
+body[data-theme="light"] input[type="text"] {
+    background: #f1f5f9 !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] input[type="text"]:focus {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.1) !important;
+    background: #ffffff !important;
+}
+
+body[data-theme="light"] .quick-searches-title {
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .quick-btn {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .quick-btn:hover {
+    background: #ffffff !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 5px 15px rgba(220, 38, 38, 0.08) !important;
+}
+
+body[data-theme="light"] .quick-btn .quick-icon-wrapper {
+    background: rgba(220, 38, 38, 0.05) !important;
+    border: 1px solid rgba(220, 38, 38, 0.18) !important;
+}
+
+body[data-theme="light"] .quick-btn:hover .quick-icon-wrapper {
+    background: rgba(220, 38, 38, 0.1) !important;
+    border-color: #dc2626 !important;
+}
+
+body[data-theme="light"] .quick-btn .quick-icon-wrapper svg {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .instruction-row {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .btn-submit {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important; /* Rojo puro */
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.2) !important;
+}
+
+body[data-theme="light"] .btn-submit:hover {
+    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
+    box-shadow: 0 4px 20px rgba(220, 38, 38, 0.35) !important;
+}
+
+body[data-theme="light"] .btn-submit svg {
+    stroke: #ffffff !important;
+    fill: #ffffff !important;
+}
+
+body[data-theme="light"] .mic-btn {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.2) !important;
+}
+
+body[data-theme="light"] .mic-btn:hover {
+    background: #b91c1c !important;
+}
+
+body[data-theme="light"] .mic-btn svg {
+    stroke: #ffffff !important;
+}
+
+/* === OVERRIDES: medicos.html & registro.html (Accesos y Formularios) === */
+body[data-theme="light"] .auth-container,
+body[data-theme="light"] .medicos-container,
+body[data-theme="light"] .form-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(220, 38, 38, 0.18) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05) !important;
+}
+
+body[data-theme="light"] .form-group label {
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .input-wrapper input {
+    background: #f1f5f9 !important;
+    border: 1px solid rgba(15, 23, 42, 0.15) !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .input-wrapper input:focus {
+    border-color: #dc2626 !important;
+    background: #ffffff !important;
+}
+
+body[data-theme="light"] .btn-login,
+body[data-theme="light"] .btn-register {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important; /* Rojo puro */
+    color: #ffffff !important;
+}
+
+body[data-theme="light"] .btn-login:hover,
+body[data-theme="light"] .btn-register:hover {
+    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
+}
+
+body[data-theme="light"] .medico-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02) !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .medico-card:hover {
+    border-color: #dc2626 !important;
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.1) !important;
+}
+
+body[data-theme="light"] .medico-name {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .medico-spec {
+    color: #dc2626 !important; /* Cambiado a rojo */
+}
+
+/* === OVERRIDES: panel.html (Panel Médico) === */
+body[data-theme="light"] header {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8)) !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+body[data-theme="light"] .header-title h1,
+body[data-theme="light"] .title-container h1 {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .btn-back,
+body[data-theme="light"] .theme-toggle {
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+}
+
+body[data-theme="light"] .btn-back:hover,
+body[data-theme="light"] .theme-toggle:hover {
+    background: rgba(220, 38, 38, 0.06) !important;
+    border-color: #dc2626 !important;
+}
+
+body[data-theme="light"] .theme-toggle svg {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .btn-create {
+    color: #ffffff !important;
+    background: #b91c1c !important; /* Rojo carmesí profesional */
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.25) !important;
+}
+
+body[data-theme="light"] .btn-create:hover {
+    background: #991b1b !important;
+    box-shadow: 0 6px 20px rgba(185, 28, 28, 0.4) !important;
+}
+
+body[data-theme="light"] .section-title {
+    color: #1e293b !important;
+}
+
+body[data-theme="light"] .stat-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+body[data-theme="light"] .stat-icon {
+    background: rgba(220, 38, 38, 0.06) !important;
+    border: 1px solid rgba(220, 38, 38, 0.15) !important;
+}
+
+body[data-theme="light"] .stat-info span {
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .val-cyan {
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .val-green {
+    color: #b91c1c !important; /* Rojo para unificación */
+}
+
+body[data-theme="light"] .val-white {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .instruction-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+body[data-theme="light"] .instruction-card:hover {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.15) !important;
+}
+
+body[data-theme="light"] .instruction-title {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .instruction-desc {
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .btn-edit {
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    color: #dc2626 !important;
+    background: transparent !important;
+}
+
+body[data-theme="light"] .btn-edit:hover {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .btn-delete {
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    color: #dc2626 !important;
+    background: transparent !important;
+}
+
+body[data-theme="light"] .btn-delete:hover {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .empty-state {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+}
+
+body[data-theme="light"] .empty-state h3 {
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .empty-state p {
+    color: #64748b !important;
+}
+
+body[data-theme="light"] .empty-icon svg {
+    stroke: #64748b !important;
+}
+
+body[data-theme="light"] .help-btn {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.15) !important;
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .help-btn:hover {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+
+/* === OVERRIDES: resultados.html (Resultados de Búsqueda) === */
+body[data-theme="light"] h2 {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .title-container::after {
+    background: #dc2626 !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.5) !important;
+}
+
+body[data-theme="light"] .search-term-pill {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .results-count {
+    background: #ffffff !important;
+    border: 1px solid rgba(220, 38, 38, 0.2) !important;
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .highlight-number {
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .result-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .result-card:hover:not(.disabled) {
+    border-color: #dc2626 !important;
+    background: #f8fafc !important;
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.12) !important;
+}
+
+body[data-theme="light"] .card-glow {
+    background: rgba(220, 38, 38, 0.08) !important;
+}
+
+body[data-theme="light"] .card-title {
+    color: #0f172a !important;   /* Corrección crítica */
+}
+
+body[data-theme="light"] .card-subtitle {
+    color: #475569 !important;   /* Corrección crítica */
+}
+
+body[data-theme="light"] .card-subtitle svg {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .badge-time {
+    background: rgba(15, 23, 42, 0.05) !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .action-btn {
+    color: #dc2626 !important;
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    background: transparent !important;
+}
+
+body[data-theme="light"] .result-card:hover:not(.disabled) .action-btn {
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.3) !important;
+}
+
+body[data-theme="light"] .no-results {
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .no-results h3 {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .no-results svg {
+    stroke: #475569 !important;
+}
+
+
+/* === OVERRIDES: instrucciones.html (Detalle de Protocolo) === */
+body[data-theme="light"] .header {
+    border-bottom: 1px solid rgba(15, 23, 42, 0.1) !important;
+}
+
+body[data-theme="light"] .header .icon-btn {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .header .icon-btn:hover {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+    box-shadow: 0 0 12px rgba(220, 38, 38, 0.15) !important;
+}
+
+body[data-theme="light"] .header .icon-btn:last-child {
+    border: 1.5px solid rgba(220, 38, 38, 0.25) !important;
+}
+
+body[data-theme="light"] .header .icon-btn:last-child svg {
+    stroke: #dc2626 !important;
+    filter: none !important;
+}
+
+body[data-theme="light"] .titles span {
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .titles h1 {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .titles::after {
+    background: #dc2626 !important;
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.5) !important;
+}
+
+body[data-theme="light"] .avatar-circle {
+    background: radial-gradient(circle at 50% 50%, rgba(226, 232, 240, 0.9) 0%, rgba(203, 213, 225, 0.95) 100%) !important;
+    border: 2px solid rgba(220, 38, 38, 0.35) !important;
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.1), inset 0 0 15px rgba(220, 38, 38, 0.1) !important;
+}
+
+body[data-theme="light"] .scanner-ring-outer {
+    border: 1.5px dashed rgba(220, 38, 38, 0.35) !important;
+    box-shadow: none !important;
+}
+
+body[data-theme="light"] .scanner-ring-inner {
+    border: 1px solid rgba(220, 38, 38, 0.15) !important;
+}
+
+body[data-theme="light"] .view-toggle button {
+    color: #475569 !important;
+    opacity: 0.7 !important;
+}
+
+body[data-theme="light"] .view-toggle button.active {
+    color: #0f172a !important;
+    opacity: 1 !important;
+}
+
+body[data-theme="light"] .view-toggle .step-suffix {
+    color: #dc2626 !important;
+    filter: none !important;
+}
+
+body[data-theme="light"] .view-toggle .separator {
+    color: #cbd5e1 !important;
+}
+
+body[data-theme="light"] .progress-labels {
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .progress-labels .highlight {
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .progress-bar-bg {
+    background: #cbd5e1 !important;
+}
+
+body[data-theme="light"] .progress-fill {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important; /* Rojo puro */
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.4) !important;
+}
+
+body[data-theme="light"] .playback-controls .icon-btn {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .playback-controls .icon-btn:hover {
+    border-color: rgba(220, 38, 38, 0.45) !important;
+    background: #f8fafc !important;
+    color: #dc2626 !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.1) !important;
+}
+
+body[data-theme="light"] .play-btn {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important; /* Rojo puro */
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.3) !important;
+    color: #ffffff !important;
+}
+
+body[data-theme="light"] .play-btn:hover {
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.5) !important;
+}
+
+body[data-theme="light"] .play-btn svg {
+    stroke: #ffffff !important;
+    fill: #ffffff !important;
+}
+
+body[data-theme="light"] .play-btn.paused {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.3) !important;
+}
+
+body[data-theme="light"] .play-btn.paused:hover {
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.5) !important;
+}
+
+body[data-theme="light"] .play-btn.paused svg {
+    stroke: #ffffff !important;
+    fill: #ffffff !important;
+}
+
+body[data-theme="light"] .voice-btn.muted {
+    border-color: rgba(220, 38, 38, 0.4) !important;
+    color: #dc2626 !important;
+    background: rgba(220, 38, 38, 0.08) !important;
+}
+
+body[data-theme="light"] .instruction-card {
+    background: #ffffff !important;           /* Corrección crítica */
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+}
+
+body[data-theme="light"] .step-badge {
+    background: rgba(220, 38, 38, 0.08) !important; /* Corrección crítica */
+    border: 2px solid #dc2626 !important;
+    color: #dc2626 !important;
+    box-shadow: none !important;
+}
+
+body[data-theme="light"] .instruction-card h3 {
+    color: #0f172a !important;                 /* Corrección crítica */
+}
+
+body[data-theme="light"] .instruction-card p {
+    color: #1e293b !important;                 /* Corrección crítica */
+}
+
+body[data-theme="light"] .step-image {
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+body[data-theme="light"] .step-nav-btn {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .step-nav-btn:hover:not(.active) {
+    background: #f8fafc !important;
+    border-color: rgba(220, 38, 38, 0.35) !important;
+    color: #dc2626 !important;
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.06) !important;
+}
+
+body[data-theme="light"] .step-nav-btn.active {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important; /* Rojo puro */
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.3) !important;
+}
+
+body[data-theme="light"] .btn-finish {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important; /* Rojo puro */
+    color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.25) !important;
+}
+
+body[data-theme="light"] .btn-finish:hover {
+    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.4) !important;
+}
+
+body[data-theme="light"] .btn-finish svg {
+    stroke: #ffffff !important;
+}
+
+body[data-theme="light"] .tactical-modal-overlay {
+    background: rgba(15, 23, 42, 0.6) !important;
+}
+
+body[data-theme="light"] .tactical-modal {
+    background: #ffffff !important;
+    border: 2px solid rgba(220, 38, 38, 0.3) !important;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15), inset 0 0 25px rgba(220, 38, 38, 0.03) !important;
+}
+
+body[data-theme="light"] .tactical-modal .modal-corner {
+    border-color: #dc2626 !important;
+}
+
+body[data-theme="light"] .tactical-modal .modal-header h2 {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .tactical-modal .modal-body p {
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .tactical-modal .btn-restart {
+    background: #f1f5f9 !important;
+    border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .tactical-modal .btn-restart:hover {
+    background: #e2e8f0 !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .tactical-modal .btn-exit {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important; /* Rojo puro */
+    color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.2) !important;
+}
+
+body[data-theme="light"] .tactical-modal .btn-exit:hover {
+    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.4) !important;
+}
+
+
+/* === OVERRIDES: emergencia.html (Creación de Protocolos) === */
+body[data-theme="light"] .card {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+}
+
+body[data-theme="light"] .card-general {
+    border-top: 1px solid rgba(220, 38, 38, 0.3) !important;
+}
+
+body[data-theme="light"] .section-header {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .section-header svg {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] label {
+    color: #334155 !important;
+}
+
+body[data-theme="light"] label span {
+    color: #64748b !important;
+}
+
+body[data-theme="light"] input[type="text"],
+body[data-theme="light"] input[type="number"],
+body[data-theme="light"] select,
+body[data-theme="light"] textarea {
+    background: #f1f5f9 !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] input[type="text"]:focus,
+body[data-theme="light"] input[type="number"]:focus,
+body[data-theme="light"] select:focus,
+body[data-theme="light"] textarea:focus {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1) !important;
+    background: #ffffff !important;
+}
+
+body[data-theme="light"] .steps-title {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .btn-add-step {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border: 1px solid rgba(220, 38, 38, 0.3) !important;
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .btn-add-step:hover {
+    background: rgba(220, 38, 38, 0.15) !important;
+    border-color: #dc2626 !important;
+}
+
+body[data-theme="light"] .step-number {
+    background: rgba(220, 38, 38, 0.08) !important;
+    color: #dc2626 !important;
+    border: 1px solid rgba(220, 38, 38, 0.2) !important;
+}
+
+body[data-theme="light"] .step-card {
+    border-left: 3px solid #dc2626 !important;
+}
+
+body[data-theme="light"] .file-input-label {
+    background: #f8fafc !important;
+    border: 1px dashed rgba(15, 23, 42, 0.15) !important;
+    color: #64748b !important;
+}
+
+body[data-theme="light"] .file-input-label:hover {
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .file-input-label svg {
+    stroke: #64748b !important;
+}
+
+body[data-theme="light"] .file-input-label:hover svg {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .btn-save {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important; /* Rojo puro */
+    color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.25) !important;
+}
+
+body[data-theme="light"] .btn-save:hover {
+    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+body[data-theme="light"] .btn-back-panel {
+    background: #f1f5f9 !important;
+    border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .btn-back-panel:hover {
+    background: #e2e8f0 !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+
+/* ==========================================================================
+   INTERFAZ DE GESTOS Y MENÚ CONTEXTUAL TÁCTICO PARA TEMA CLARO
+   ========================================================================== */
+body[data-theme="light"] #tactical-context-menu {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid rgba(220, 38, 38, 0.3) !important;
+    box-shadow: 
+        0 10px 30px rgba(220, 38, 38, 0.12), 
+        inset 0 0 10px rgba(220, 38, 38, 0.04) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+body[data-theme="light"] .context-menu-item {
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .context-menu-item:hover {
+    color: #dc2626 !important;
+    background: rgba(220, 38, 38, 0.06) !important;
+    border-left: 3px solid #dc2626 !important;
+}
+
+body[data-theme="light"] .context-menu-divider {
+    background: rgba(220, 38, 38, 0.12) !important;
+}
+
+body[data-theme="light"] .gesture-toast {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid #15803d !important;
+    box-shadow: 0 8px 25px rgba(21, 128, 61, 0.15) !important;
+    color: #15803d !important;
+}

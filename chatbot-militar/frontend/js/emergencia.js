@@ -96,7 +96,8 @@ function loadInstructionToEdit(id) {
         .catch(err => {
             console.error(err);
             showToast('❌ Error al cargar instrucción', true);
-            setTimeout(() => window.location.href = '/panel.html', 2000);
+            const redirectUrl = (localStorage.getItem('adminToken') === 'true') ? '/admin.html' : '/panel.html';
+            setTimeout(() => window.location.href = redirectUrl, 2000);
         });
 }
 
@@ -245,6 +246,7 @@ function saveInstruction() {
     const tiempo_estimado = document.getElementById('tiempo_estimado').value.trim();
 
     const medicoData = localStorage.getItem('medicoData');
+    const isAdmin = localStorage.getItem('adminToken') === 'true';
     let id_medico = null;
 
     if (medicoData) {
@@ -255,6 +257,9 @@ function saveInstruction() {
         } catch (err) {
             console.error('❌ Error al parsear medicoData:', err);
         }
+    } else if (isAdmin) {
+        id_medico = 'admin';
+        console.log('✅ Modo Administrador detectado para edición de instrucciones');
     }
 
     if (!titulo) { showToast('❌ El título es obligatorio', true); return; }
@@ -328,7 +333,8 @@ function sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tie
         if (data.success) {
             const msg = editingId ? '✅ Instrucción actualizada correctamente' : '✅ Instrucción guardada correctamente';
             showToast(msg);
-            setTimeout(() => window.location.href = '/panel.html', 1500);
+            const redirectUrl = (localStorage.getItem('adminToken') === 'true') ? '/admin.html' : '/panel.html';
+            setTimeout(() => window.location.href = redirectUrl, 1500);
         } else {
             showToast('❌ ' + (data.error || 'Error al guardar'), true);
             resetSaveBtn(btnSave);

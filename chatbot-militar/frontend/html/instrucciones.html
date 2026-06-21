@@ -6,6 +6,7 @@
     <title>PROTOCOLO MÉDICO | MEDIC-BOT</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles/instrucciones.css">
+    <link rel="stylesheet" href="../styles/themes.css">
 </head>
 <body>
 
@@ -22,18 +23,23 @@
                 </div>
             </div>
             <button class="icon-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
             </button>
         </header>
 
         <div class="visual-area">
-            <div class="avatar-circle" id="visual-content">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <div class="hud-scanner-container">
+                <div class="scanner-ring scanner-ring-outer"></div>
+                <div class="scanner-ring scanner-ring-inner"></div>
+                <div class="avatar-circle" id="visual-content">
+                    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.97/build/spline-viewer.js"></script>
+                    <spline-viewer url="https://prod.spline.design/y4qP8PeEqQ3hrY-D/scene.splinecode"></spline-viewer>
+                </div>
             </div>
             
             <div class="view-toggle">
                 <button class="active" id="btn-vista-3d" onclick="toggleView('3d', this)">Modelo 3D</button>
-                <span style="color:var(--text-muted)">-</span>
+                <span class="separator">-</span>
                 <button id="btn-vista-img" onclick="toggleView('img', this)">Imagen</button>
             </div>
         </div>
@@ -71,6 +77,55 @@
 
     </div>
 
+    <!-- Modal de Finalización Táctica -->
+    <div class="tactical-modal-overlay" id="end-protocol-modal">
+        <div class="tactical-modal">
+            <div class="modal-corner top-left"></div>
+            <div class="modal-corner top-right"></div>
+            <div class="modal-corner bottom-left"></div>
+            <div class="modal-corner bottom-right"></div>
+            
+            <div class="modal-header">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <h2>¡ATENCIÓN SOLDADO!</h2>
+            </div>
+            
+            <div class="modal-body">
+                <p>El protocolo de asistencia médica ha finalizado. ¿Cuáles son sus órdenes a continuación?</p>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="modal-btn btn-restart" onclick="restartProtocol()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                    REPETIR INSTRUCCIÓN
+                </button>
+                <button class="modal-btn btn-exit" onclick="exitProtocol()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    TERMINAR INSTRUCCIÓN
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="help-btn">?</div>
+
     <script src="../js/instrucciones.js"></script>
+    <script src="../js/gestures.js"></script>
+    <script>
+        const eliminarLogoSpline = setInterval(() => {
+            const viewer = document.querySelector('spline-viewer');
+            
+            if (viewer && viewer.shadowRoot) {
+                const logo = viewer.shadowRoot.querySelector('#logo');
+                
+                if (logo) {
+                    logo.remove();
+                    clearInterval(eliminarLogoSpline);
+                }
+            }
+        }, 100);
+
+        setTimeout(() => clearInterval(eliminarLogoSpline), 10000);
+    </script>
 </body>
 </html>

@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel de Administración</title>
 <link rel="stylesheet" href="../styles/admin.css">
+<link rel="stylesheet" href="../styles/themes.css">
+<script>
+  if (localStorage.getItem('adminToken') !== 'true') {
+    window.location.href = 'login_admin.html';
+  }
+</script>
 </head>
 <body data-theme="dark">
   <div class="page">
@@ -19,7 +25,7 @@
           <span class="icon-circle">
             <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </span>
-          <h1>Panel de Administración</h1>
+          <h1>PANEL DE ADMINISTRACIÓN</h1>
         </div>
       </div>
       <button class="icon-btn theme-btn" id="themeToggle" aria-label="Cambiar tema">
@@ -31,7 +37,7 @@
     </header>
 
     <!-- Tabs -->
-    <nav class="tabs">
+    <nav class="tabs drag-scroll">
       <button class="tab active" data-target="instrucciones">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8M8 9h2"/></svg>
         Instrucciones
@@ -50,34 +56,38 @@
     <section class="tab-panel active" id="instrucciones">
       <div class="stats-grid">
         <div class="stat-card cyan">
-          <div class="stat-value">0</div>
+          <div class="stat-value" id="statTotalInstrucciones">0</div>
           <div class="stat-label">Total</div>
         </div>
         <div class="stat-card red">
-          <div class="stat-value">0</div>
+          <div class="stat-value" id="statCriticos">0</div>
           <div class="stat-label">Críticos</div>
         </div>
         <div class="stat-card green">
-          <div class="stat-value">0</div>
+          <div class="stat-value" id="statMedicos">0</div>
           <div class="stat-label">Médicos</div>
         </div>
       </div>
 
-      <input type="text" class="search-input" placeholder="Buscar por título o autor...">
+      <input type="text" id="searchInstrucciones" class="search-input" placeholder="Buscar por título o autor...">
 
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8M8 9h2"/></svg>
+      <div id="instruccionesList" class="data-list drag-scroll"></div>
+
+      <div class="empty-state" id="emptyInstrucciones">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8M8 9h2"/></svg>
         <p>No se encontraron instrucciones.</p>
       </div>
     </section>
 
     <!-- Usuarios -->
     <section class="tab-panel" id="usuarios">
-      <input type="text" class="search-input" placeholder="Buscar usuario...">
+      <input type="text" id="searchMedicos" class="search-input" placeholder="Buscar médico por nombre o cédula...">
 
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        <p>No se encontraron usuarios registrados.</p>
+      <div id="medicosList" class="data-list drag-scroll"></div>
+
+      <div class="empty-state" id="emptyMedicos">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <p>No se encontraron médicos registrados.</p>
       </div>
     </section>
 
@@ -95,13 +105,13 @@
         </div>
 
         <label class="field-label">Código actual</label>
-        <div class="code-display">31150106</div>
+        <div class="code-display" id="codeDisplay">31150106</div>
 
         <label class="field-label strong">Nuevo código de registro</label>
-        <input type="text" class="text-input" placeholder="Ingrese nuevo código...">
+        <input type="text" class="text-input" id="newRegCode" placeholder="Ingrese nuevo código...">
 
-        <button class="btn btn-cyan">
-          <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+        <button class="btn btn-cyan" id="btnSaveRegCode">
+          <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
           Guardar Código
         </button>
       </div>
@@ -117,17 +127,17 @@
           </div>
         </div>
 
-        <input type="password" class="text-input" placeholder="Nueva contraseña (mín. 6 caracteres)">
-        <input type="password" class="text-input" placeholder="Confirmar nueva contraseña" style="margin-bottom:4px;">
+        <input type="password" class="text-input" id="newAdminPass" placeholder="Nueva contraseña (mín. 6 caracteres)">
+        <input type="password" class="text-input" id="confirmAdminPass" placeholder="Confirmar nueva contraseña" style="margin-bottom:4px;">
 
-        <button class="btn btn-red">
-          <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+        <button class="btn btn-red" id="btnUpdateAdminPass">
+          <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
           Actualizar Contraseña Admin
         </button>
 
         <div class="warning-box">
-          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <span>Contraseña por defecto: <code>FANB2026ADMIN</code></span>
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Contraseña por defecto: <code>UNEFA2026</code></span>
         </div>
       </div>
     </section>
@@ -137,5 +147,6 @@
   <button class="help-btn" aria-label="Ayuda">?</button>
 
   <script src="../js/admin.js"></script>
+  <script src="../js/gestures.js"></script>
 </body>
 </html>

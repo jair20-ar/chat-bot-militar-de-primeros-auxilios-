@@ -6,20 +6,22 @@
     <title>BÚSQUEDA MÉDICA TÁCTICA</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles/buscador.css">
+    <link rel="stylesheet" href="../styles/themes.css">
 </head>
 <body>
 
     <div class="container">
         
         <div class="header-area">
-            <button class="back-btn" onclick="window.location.href='http://localhost:3001/'">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            </button>
-            
-            <h2>BÚSQUEDA MÉDICA</h2>
+            <div class="header-left">
+                <button class="back-btn" onclick="window.location.href='http://localhost:3001/'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <h2>BÚSQUEDA MÉDICA</h2>
+            </div>
             
             <button class="theme-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                 </svg>
             </button>
@@ -28,8 +30,10 @@
         <div class="search-card">
             
             <div class="instruction-row">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <span>Escribe o habla la emergencia médica</span>
+                <div class="search-title-icon-wrapper">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+                <span>Describe la emergencia o condición médica</span>
             </div>
 
             <div class="input-group">
@@ -54,13 +58,64 @@
 
         <div class="quick-searches-title">Búsquedas Rápidas</div>
         
-        <div class="quick-grid">
-            <button class="quick-btn" onclick="performSearch('Herida de Bala')">Herida de Bala</button>
-            <button class="quick-btn" onclick="performSearch('Fractura Ósea')">Fractura Ósea</button>
-            <button class="quick-btn" onclick="performSearch('Hemorragia Severa')">Hemorragia Severa</button>
-            <button class="quick-btn" onclick="performSearch('Quemaduras')">Quemaduras</button>
-            <button class="quick-btn" onclick="performSearch('RCP')">RCP</button>
-            <button class="quick-btn" onclick="performSearch('Shock')">Shock</button>
+        <div class="quick-grid drag-scroll">
+            <button class="quick-btn" onclick="performSearch('Herida de Bala')">
+                <div class="quick-icon-wrapper">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="22" y1="12" x2="18" y2="12"></line>
+                        <line x1="6" y1="12" x2="2" y2="12"></line>
+                        <line x1="12" y1="6" x2="12" y2="2"></line>
+                        <line x1="12" y1="22" x2="12" y2="18"></line>
+                    </svg>
+                </div>
+                <span>Herida de Bala</span>
+            </button>
+            
+            <button class="quick-btn" onclick="performSearch('Fractura Ósea')">
+                <div class="quick-icon-wrapper">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                </div>
+                <span>Fractura Ósea</span>
+            </button>
+            
+            <button class="quick-btn" onclick="performSearch('Hemorragia Severa')">
+                <div class="quick-icon-wrapper">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 11 5 15a7 7 0 0 0 7 7z"></path>
+                    </svg>
+                </div>
+                <span>Hemorragia Severa</span>
+            </button>
+            
+            <button class="quick-btn" onclick="performSearch('Quemaduras')">
+                <div class="quick-icon-wrapper">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+                    </svg>
+                </div>
+                <span>Quemaduras</span>
+            </button>
+            
+            <button class="quick-btn" onclick="performSearch('RCP')">
+                <div class="quick-icon-wrapper">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </div>
+                <span>RCP</span>
+            </button>
+            
+            <button class="quick-btn" onclick="performSearch('Shock')">
+                <div class="quick-icon-wrapper">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                </div>
+                <span>Shock</span>
+            </button>
         </div>
 
     </div>
@@ -68,5 +123,6 @@
     <div class="help-btn">?</div>
 
 <script src="../js/buscador.js"></script>
+<script src="../js/gestures.js"></script>
 </body>
 </html>

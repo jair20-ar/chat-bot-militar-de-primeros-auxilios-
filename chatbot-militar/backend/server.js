@@ -107,23 +107,33 @@ app.post('/api/transcribir', upload.single('audio'), (req, res) => {
 
 // ================ RUTA PARA REGISTRO DE MÉDICOS ================
 app.post('/medicos/registro', (req, res) => {
-  const { nombre, email, cedula, especializacion, password } = req.body;
-  if (!nombre || !email || !cedula || !especializacion || !password) {
-    return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+  const { nombre, email, cedula, especializacion, password, codigo_registro } = req.body;
+  if (!nombre || !email || !cedula || !especializacion || !password || !codigo_registro) {
+    return res.status(400).json({ error: 'Todos los campos, incluyendo el código de registro, son obligatorios.' });
   }
-  db.run(
-    'INSERT INTO medicos (nombre, email, cedula, especializacion, id_medico, password) VALUES (?, ?, ?, ?, ?, ?)',
-    [nombre, email, cedula, especializacion, cedula, password],
-    function (err) {
-      if (err) {
-        if (err.message && err.message.includes('UNIQUE constraint failed')) {
-          return res.status(409).json({ error: 'El usuario/cédula ya está registrado.' });
-        }
-        return res.status(500).json({ error: err.message });
-      }
-      res.json({ ok: true, id: this.lastID });
+
+  // Verificar código de registro
+  db.get("SELECT valor FROM configuracion WHERE clave = 'registro_code'", [], (err, row) => {
+    if (err) return res.status(500).json({ error: 'Error al verificar el código de registro.' });
+    const correctCode = row ? row.valor : 'FANB2026';
+    if (codigo_registro !== correctCode) {
+      return res.status(403).json({ error: 'Código de registro inválido o no autorizado.' });
     }
-  );
+
+    db.run(
+      'INSERT INTO medicos (nombre, email, cedula, especializacion, id_medico, password) VALUES (?, ?, ?, ?, ?, ?)',
+      [nombre, email, cedula, especializacion, cedula, password],
+      function (err) {
+        if (err) {
+          if (err.message && err.message.includes('UNIQUE constraint failed')) {
+            return res.status(409).json({ error: 'El usuario/cédula ya está registrado.' });
+          }
+          return res.status(500).json({ error: err.message });
+        }
+        res.json({ ok: true, id: this.lastID });
+      }
+    );
+  });
 });
 
 // ============= RUTA PARA INICIO DE SESIÓN DE MÉDICOS =============
@@ -201,24 +211,31 @@ app.put('/api/instrucciones/:id', (req, res) => {
     return res.status(400).json({ success: false, error: 'Título, pasos, parte del cuerpo e id_medico son obligatorios.' });
   }
 
-  // Verificar que el médico es el dueño
-  db.get(
-    `SELECT * FROM instrucciones WHERE id = ? AND id_medico = ?`,
-    [req.params.id, id_medico],
-    (err, row) => {
-      if (err) return res.status(500).json({ success: false, error: err.message });
-      if (!row) return res.status(403).json({ success: false, error: 'No tienes permiso para editar esta instrucción.' });
-      
-      db.run(
-        `UPDATE instrucciones SET titulo = ?, categoria = ?, severidad = ?, parte_cuerpo = ?, tiempo_estimado = ?, pasos = ? WHERE id = ?`,
-        [titulo, categoria || null, severidad || null, parte_cuerpo, tiempo_estimado || null, JSON.stringify(pasos), req.params.id],
-        function (err) {
-          if (err) return res.status(500).json({ success: false, error: err.message });
-          res.json({ success: true });
-        }
-      );
-    }
-  );
+  const updateFn = () => {
+    db.run(
+      `UPDATE instrucciones SET titulo = ?, categoria = ?, severidad = ?, parte_cuerpo = ?, tiempo_estimado = ?, pasos = ? WHERE id = ?`,
+      [titulo, categoria || null, severidad || null, parte_cuerpo, tiempo_estimado || null, JSON.stringify(pasos), req.params.id],
+      function (err) {
+        if (err) return res.status(500).json({ success: false, error: err.message });
+        res.json({ success: true });
+      }
+    );
+  };
+
+  if (id_medico === 'admin') {
+    updateFn();
+  } else {
+    // Verificar que el médico es el dueño
+    db.get(
+      `SELECT * FROM instrucciones WHERE id = ? AND id_medico = ?`,
+      [req.params.id, id_medico],
+      (err, row) => {
+        if (err) return res.status(500).json({ success: false, error: err.message });
+        if (!row) return res.status(403).json({ success: false, error: 'No tienes permiso para editar esta instrucción.' });
+        updateFn();
+      }
+    );
+  }
 });
 
 // Eliminar instrucción (VALIDAR DUEÑO)
@@ -229,24 +246,130 @@ app.delete('/api/instrucciones/:id', (req, res) => {
     return res.status(400).json({ success: false, error: 'id_medico es obligatorio.' });
   }
 
-  // Verificar que el médico es el dueño
-  db.get(
-    `SELECT * FROM instrucciones WHERE id = ? AND id_medico = ?`,
-    [req.params.id, id_medico],
-    (err, row) => {
-      if (err) return res.status(500).json({ success: false, error: err.message });
-      if (!row) return res.status(403).json({ success: false, error: 'No tienes permiso para eliminar esta instrucción.' });
-      
-      db.run(
-        `DELETE FROM instrucciones WHERE id = ?`,
-        [req.params.id],
-        function (err) {
-          if (err) return res.status(500).json({ success: false, error: err.message });
-          res.json({ success: true });
-        }
-      );
+  const deleteFn = () => {
+    db.run(
+      `DELETE FROM instrucciones WHERE id = ?`,
+      [req.params.id],
+      function (err) {
+        if (err) return res.status(500).json({ success: false, error: err.message });
+        res.json({ success: true });
+      }
+    );
+  };
+
+  if (id_medico === 'admin') {
+    deleteFn();
+  } else {
+    // Verificar que el médico es el dueño
+    db.get(
+      `SELECT * FROM instrucciones WHERE id = ? AND id_medico = ?`,
+      [req.params.id, id_medico],
+      (err, row) => {
+        if (err) return res.status(500).json({ success: false, error: err.message });
+        if (!row) return res.status(403).json({ success: false, error: 'No tienes permiso para eliminar esta instrucción.' });
+        deleteFn();
+      }
+    );
+  }
+});
+
+// ======================= RUTAS DE ADMINISTRACIÓN =========================
+
+// Login del Administrador
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ success: false, error: 'Contraseña requerida.' });
+  }
+  db.get("SELECT valor FROM configuracion WHERE clave = 'admin_password'", [], (err, row) => {
+    if (err) return res.status(500).json({ success: false, error: 'Error de base de datos.' });
+    const correctPassword = row ? row.valor : 'UNEFA2026';
+    if (password === correctPassword) {
+      res.json({ success: true, token: 'admin-session-token' });
+    } else {
+      res.status(401).json({ success: false, error: 'Contraseña incorrecta.' });
     }
-  );
+  });
+});
+
+// Listar médicos registrados
+app.get('/api/admin/medicos', (req, res) => {
+  db.all('SELECT nombre, email, cedula, especializacion, id_medico FROM medicos ORDER BY nombre ASC', [], (err, rows) => {
+    if (err) return res.status(500).json({ success: false, error: err.message });
+    res.json({ success: true, data: rows });
+  });
+});
+
+// Eliminar médico y sus instrucciones
+app.delete('/api/admin/medicos/:id_medico', (req, res) => {
+  const { id_medico } = req.params;
+  
+  db.serialize(() => {
+    db.run('DELETE FROM instrucciones WHERE id_medico = ?', [id_medico]);
+    db.run('DELETE FROM medicos WHERE id_medico = ?', [id_medico], function (err) {
+      if (err) return res.status(500).json({ success: false, error: 'Error al eliminar al médico.' });
+      res.json({ success: true });
+    });
+  });
+});
+
+// Obtener códigos de configuración e info de administración
+app.get('/api/admin/config', (req, res) => {
+  db.get("SELECT valor FROM configuracion WHERE clave = 'registro_code'", [], (err, codeRow) => {
+    if (err) return res.status(500).json({ success: false, error: 'Error de base de datos.' });
+    
+    const regCode = codeRow ? codeRow.valor : 'FANB2026';
+
+    db.get('SELECT COUNT(*) as count FROM medicos', [], (err, medicosRow) => {
+      if (err) return res.status(500).json({ success: false, error: err.message });
+      
+      db.get('SELECT COUNT(*) as count FROM instrucciones', [], (err, instRow) => {
+        if (err) return res.status(500).json({ success: false, error: err.message });
+        
+        db.get("SELECT COUNT(*) as count FROM instrucciones WHERE severidad = 'critico'", [], (err, critRow) => {
+          if (err) return res.status(500).json({ success: false, error: err.message });
+          
+          res.json({
+            success: true,
+            config: { registro_code: regCode },
+            stats: {
+              medicos: medicosRow ? medicosRow.count : 0,
+              instrucciones: instRow ? instRow.count : 0,
+              criticos: critRow ? critRow.count : 0
+            }
+          });
+        });
+      });
+    });
+  });
+});
+
+// Actualizar configuración
+app.post('/api/admin/config', (req, res) => {
+  const { registro_code, admin_password } = req.body;
+  
+  db.serialize(() => {
+    let errOccurred = false;
+    
+    if (registro_code !== undefined) {
+      db.run("INSERT OR REPLACE INTO configuracion (clave, valor) VALUES ('registro_code', ?)", [registro_code], (err) => {
+        if (err) errOccurred = true;
+      });
+    }
+    
+    if (admin_password !== undefined) {
+      db.run("INSERT OR REPLACE INTO configuracion (clave, valor) VALUES ('admin_password', ?)", [admin_password], (err) => {
+        if (err) errOccurred = true;
+      });
+    }
+    
+    db.get("SELECT 1", (err) => {
+      if (errOccurred || err) {
+        return res.status(500).json({ success: false, error: 'Error al actualizar configuraciones.' });
+      }
+      res.json({ success: true });
+    });
+  });
 });
 
 // =================== INICIA EL SERVIDOR ====================
