@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function cargarProtocolos() {
-        fetch(BASE_URL + '/instructions')
+        fetch(BASE_URL + '/api/instrucciones')
             .then(res => res.json())
             .then(data => {
                 todosLosProtocolos = data.map(item => ({
