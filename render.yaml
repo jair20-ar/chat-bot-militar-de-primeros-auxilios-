@@ -3,7 +3,7 @@ services:
     name: chatbot-militar
     runtime: node
     rootDir: chatbot-militar/backend
-    buildCommand: npm install
+    buildCommand: npm install --ignore-scripts && npm rebuild
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
