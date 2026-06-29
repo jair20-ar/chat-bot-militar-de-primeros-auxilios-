@@ -33,49 +33,17 @@ if (voiceCard) {
                 formData.append('audio', audioBlob, 'busqueda.webm');
 
                 try {
-                    let socketId = null;
-                    if (window.socket && window.socket.connected) {
-                        socketId = window.socket.id;
-                    }
-                    if (socketId) {
-                        formData.append('socketId', socketId);
-                    }
-
                     const response = await fetch('http://localhost:3001/api/transcribir', {
                         method: 'POST',
                         body: formData
                     });
-                    
-                    if (response.status === 202) {
-                        const data = await response.json();
-                        showToast('⌛ Audio encolado para transcripción...');
-                        
-                        let socketReceived = false;
-                        if (window.socket) {
-                            const onResult = (resData) => {
-                                if (resData.requestId === data.requestId) {
-                                    socketReceived = true;
-                                    window.socket.off('result', onResult);
-                                    if (resData.text) {
-                                        document.getElementById('search').value = resData.text;
-                                        performSearch(resData.text);
-                                    } else {
-                                        showToast('❌ No se reconocieron palabras', true);
-                                    }
-                                }
-                            };
-                            window.socket.on('result', onResult);
-                        }
+                    const data = await response.json();
 
-                        pollStatus(data.requestId, () => socketReceived);
+                    if (data.text) {
+                        document.getElementById('search').value = data.text;
+                        performSearch(data.text);
                     } else {
-                        const data = await response.json();
-                        if (data.text) {
-                            document.getElementById('search').value = data.text;
-                            performSearch(data.text);
-                        } else {
-                            showToast('❌ No se reconocieron palabras', true);
-                        }
+                        showToast('❌ No se reconocieron palabras', true);
                     }
                 } catch (error) {
                     showToast('❌ Error al conectar con el motor local', true);
@@ -123,34 +91,4 @@ function showToast(message, isError = false) {
         toast.style.transition = 'opacity 0.3s ease';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
-}
-
-function pollStatus(requestId, isDoneCheck) {
-    const interval = setInterval(async () => {
-        if (isDoneCheck && isDoneCheck()) {
-            clearInterval(interval);
-            return;
-        }
-
-        try {
-            const res = await fetch(`http://localhost:3001/api/transcribir/status/${requestId}`);
-            if (res.status === 200) {
-                const data = await res.json();
-                if (data.status === 'done') {
-                    clearInterval(interval);
-                    if (data.result) {
-                        document.getElementById('search').value = data.result;
-                        performSearch(data.result);
-                    } else {
-                        showToast('❌ No se reconocieron palabras', true);
-                    }
-                } else if (data.status === 'error') {
-                    clearInterval(interval);
-                    showToast('❌ Error en transcripción: ' + data.result, true);
-                }
-            }
-        } catch (err) {
-            console.error('Error polling status:', err);
-        }
-    }, 1000);
 }

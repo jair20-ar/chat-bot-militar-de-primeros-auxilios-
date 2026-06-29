@@ -8,11 +8,6 @@ const path = require('path');
 const { Model, Recognizer } = require('vosk');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('ffmpeg-static');
-const bcrypt = require('bcrypt');
-const { Queue } = require('bullmq');
-const { v4: uuidv4 } = require('uuid');
-const http = require('http');
-const { Server } = require('socket.io');
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
@@ -20,20 +15,6 @@ const app = express();
 const PORT = 3001;
 const upload = multer({ dest: 'uploads/' });
 
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
-
-io.on('connection', (socket) => {
-  console.log(`🔌 Client connected: ${socket.id}`);
-  socket.on('disconnect', () => {
-    console.log(`🔌 Client disconnected: ${socket.id}`);
-  });
-});
 
 const modelpath = path.join(__dirname, 'model', 'vosk-model-small-es-0.42');
 if (!fs.existsSync(modelpath)) {
@@ -42,49 +23,6 @@ if (!fs.existsSync(modelpath)) {
 }
 
 const model = new Model(modelpath);
-
-const Redis = require('ioredis');
-
-// Configure Redis with connection recovery and error silencing
-const redisConfig = {
-  host: '127.0.0.1',
-  port: 6379,
-  maxRetriesPerRequest: null,
-  retryStrategy(times) {
-    if (times === 1) {
-      console.warn('⚠️ Servidor Redis offline (127.0.0.1:6379). La cola de transcripción se ejecutará en modo síncrono de respaldo.');
-    }
-    // Reintentar conexión cada 15 segundos en segundo plano, evitando inundar la consola
-    return 15000;
-  }
-};
-
-let redisClient;
-try {
-  redisClient = new Redis(redisConfig);
-  redisClient.on('error', () => {
-    // Silenciar errores repetitivos de conexión para no inundar el log de la consola
-  });
-} catch (err) {
-  console.error('Error al instanciar el cliente Redis:', err.message);
-}
-
-// Import background worker
-const { initWorker } = require('./worker');
-initWorker(model, io);
-
-// Initialize BullMQ Queue for transcription
-let chatQueue;
-if (redisClient) {
-  try {
-    chatQueue = new Queue('chat', { 
-      connection: redisClient,
-      defaultJobOptions: { removeOnComplete: true, removeOnFail: true }
-    });
-  } catch (err) {
-    console.error('Failed to initialize Queue:', err.message);
-  }
-}
 
 
 // =================== MIDDLEWARE ===================
@@ -129,41 +67,11 @@ app.use('/styles', express.static(path.join(__dirname, '../frontend/styles')));
 
 // ======================= API =========================
 
-app.post('/api/transcribir', upload.single('audio'), async (req, res) => {
+app.post('/api/transcribir', upload.single('audio'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Archivo de audio no recibido' });
     }
 
-    const requestId = uuidv4();
-    const socketId = req.body.socketId;
-
-    // Attempt to queue the job
-    let queued = false;
-    if (chatQueue) {
-      try {
-        await chatQueue.add('process', { requestId, filePath: req.file.path, socketId });
-        queued = true;
-      } catch (err) {
-        console.warn('Queue addition failed (Redis might be offline). Falling back to sync transcription...', err.message);
-      }
-    }
-
-    if (queued) {
-      db.run(
-        'INSERT INTO requests (id, status, created_at) VALUES (?,?,datetime("now"))',
-        [requestId, 'queued'],
-        (err) => {
-          if (err) console.error('Error inserting request into DB:', err.message);
-        }
-      );
-      return res.status(202).json({ 
-        requestId, 
-        message: 'Procesando, recibirás notificación cuando esté listo.' 
-      });
-    }
-
-    // Fallback: Synchronous processing (if Redis is not running)
-    console.log('🔄 Executing transcription synchronously...');
     const inputPath = path.join(__dirname, req.file.path);
     const outputPath = inputPath + '.wav';
 
@@ -197,114 +105,6 @@ app.post('/api/transcribir', upload.single('audio'), async (req, res) => {
         .save(outputPath);
 });
 
-// Get status of a transcription request (for polling fallback)
-app.get('/api/transcribir/status/:requestId', (req, res) => {
-  db.get('SELECT * FROM requests WHERE id = ?', [req.params.requestId], (err, row) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (!row) return res.status(404).json({ error: 'Petición no encontrada.' });
-    res.json({ id: row.id, status: row.status, result: row.result });
-  });
-});
-
-// ================ RUTAS DIAGNÓSTICO (SNAPSHOTS & TRANSACCIONES) ================
-app.post('/api/diagnostico', (req, res) => {
-  const { query, medicoId } = req.body;
-  const requestId = uuidv4();
-  
-  if (!query) {
-    return res.status(400).json({ error: 'La consulta es requerida.' });
-  }
-
-  // 1. Insert query into consultas table
-  db.run('INSERT INTO consultas (texto, medico_id) VALUES (?, ?)', [query, medicoId || null], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    const consultaId = this.lastID;
-
-    // 2. Search instructions table for matching protocols
-    db.all(
-      `SELECT * FROM instrucciones WHERE titulo LIKE ? OR categoria LIKE ? OR severidad LIKE ?`,
-      [`%${query}%`, `%${query}%`, `%${query}%`],
-      (errSearch, rows) => {
-        if (errSearch) return res.status(500).json({ error: errSearch.message });
-
-        let matchingProtocolId = null;
-        let responseText = `No se encontraron protocolos específicos para "${query}". Por favor, mantenga la calma y espere asistencia médica.`;
-
-        if (rows && rows.length > 0) {
-          const matched = rows[0];
-          matchingProtocolId = matched.id;
-          responseText = `Protocolo encontrado: ${matched.titulo}. Categoría: ${matched.categoria}. Pasos: ${matched.pasos}`;
-        }
-
-        // Get the latest protocol version ID if found
-        const getVersionId = (callback) => {
-          if (!matchingProtocolId) return callback(null, null);
-          db.get(
-            `SELECT id FROM protocol_versions WHERE protocol_id = ? ORDER BY version DESC LIMIT 1`,
-            [matchingProtocolId],
-            (errVer, rowVer) => {
-              if (errVer || !rowVer) callback(null, null);
-              else callback(null, rowVer.id);
-            }
-          );
-        };
-
-        getVersionId((_, versionId) => {
-          // 3. Create response and interaction in an atomic transaction
-          db.serialize(() => {
-            db.run('BEGIN TRANSACTION');
-            db.run(
-              'INSERT INTO respuestas (request_id, medico_id, protocol_version_id, content_snapshot) VALUES (?,?,?,?)',
-              [requestId, medicoId || null, versionId, responseText],
-              function(errResp) {
-                if (errResp) {
-                  db.run('ROLLBACK');
-                  return res.status(500).json({ error: errResp.message });
-                }
-                const respuestaId = this.lastID;
-                
-                db.run(
-                  'INSERT INTO interacciones (consulta_id, respuesta_id) VALUES (?,?)',
-                  [consultaId, respuestaId],
-                  function(err2) {
-                    if (err2) {
-                      db.run('ROLLBACK');
-                      return res.status(500).json({ error: err2.message });
-                    }
-                    db.run('COMMIT');
-                    
-                    // Create audit event
-                    db.run(
-                      'INSERT INTO audit_events (event_type, payload) VALUES (?, ?)',
-                      ['DIAGNOSTICO_GENERADO', JSON.stringify({ requestId, consultaId, respuestaId, protocolId: matchingProtocolId })],
-                      (errAudit) => {
-                        if (errAudit) console.error('Error creating audit event:', errAudit.message);
-                      }
-                    );
-
-                    res.json({
-                      success: true,
-                      requestId,
-                      respuestaId,
-                      responseText,
-                      protocol: rows && rows.length > 0 ? rows[0] : null
-                    });
-                  }
-                );
-              }
-            );
-          });
-        });
-      }
-    );
-  });
-});
-
-// Alias route
-app.post('/chat/message', (req, res) => {
-  res.redirect(307, '/api/diagnostico');
-});
-
 // ================ RUTA PARA REGISTRO DE MÉDICOS ================
 app.post('/medicos/registro', (req, res) => {
   const { nombre, email, cedula, especializacion, password, codigo_registro } = req.body;
@@ -320,22 +120,19 @@ app.post('/medicos/registro', (req, res) => {
       return res.status(403).json({ error: 'Código de registro inválido o no autorizado.' });
     }
 
-        bcrypt.hash(password, 10, (errHash, hash) => {
-          if (errHash) return res.status(500).json({ error: 'Error al hashear password' });
-          db.run(
-            'INSERT INTO medicos (nombre, email, cedula, especializacion, id_medico, password) VALUES (?, ?, ?, ?, ?, ?)',
-            [nombre, email, cedula, especializacion, cedula, hash],
-            function (err) {
-              if (err) {
-                if (err.message && err.message.includes('UNIQUE constraint failed')) {
-                  return res.status(409).json({ error: 'El usuario/cédula ya está registrado.' });
-                }
-                return res.status(500).json({ error: err.message });
-              }
-              res.json({ ok: true, id: this.lastID });
-            }
-          );
-        });
+    db.run(
+      'INSERT INTO medicos (nombre, email, cedula, especializacion, id_medico, password) VALUES (?, ?, ?, ?, ?, ?)',
+      [nombre, email, cedula, especializacion, cedula, password],
+      function (err) {
+        if (err) {
+          if (err.message && err.message.includes('UNIQUE constraint failed')) {
+            return res.status(409).json({ error: 'El usuario/cédula ya está registrado.' });
+          }
+          return res.status(500).json({ error: err.message });
+        }
+        res.json({ ok: true, id: this.lastID });
+      }
+    );
   });
 });
 
@@ -346,17 +143,12 @@ app.post('/medicos/login', (req, res) => {
     return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
   }
   db.get(
-    'SELECT * FROM medicos WHERE id_medico = ?',
-    [id_medico],
+    'SELECT * FROM medicos WHERE id_medico = ? AND password = ?',
+    [id_medico, password],
     (err, row) => {
       if (err) return res.status(500).json({ error: err.message });
       if (!row) return res.status(401).json({ error: 'Credenciales incorrectas.' });
-      
-      bcrypt.compare(password, row.password, (errCmp, same) => {
-        if (errCmp) return res.status(500).json({ error: errCmp.message });
-        if (!same) return res.status(401).json({ error: 'Credenciales incorrectas.' });
-        res.json({ ok: true, nombre: row.nombre, id_medico: row.id_medico });
-      });
+      res.json({ ok: true, nombre: row.nombre, id_medico: row.id_medico });
     }
   );
 });
@@ -381,18 +173,7 @@ app.post('/api/instrucciones', (req, res) => {
       if (err) {
         return res.status(500).json({ success: false, error: err.message });
       }
-      const protocolId = this.lastID;
-
-      // Guardar versión inicial en protocol_versions
-      db.run(
-        `INSERT INTO protocol_versions (protocol_id, version, content, author_id) VALUES (?, 1, ?, ?)`,
-        [protocolId, JSON.stringify(pasos), id_medico],
-        (errVer) => {
-          if (errVer) console.error('Error saving initial protocol version:', errVer.message);
-        }
-      );
-
-      res.json({ success: true, id: protocolId });
+      res.json({ success: true, id: this.lastID });
     }
   );
 });
@@ -436,23 +217,6 @@ app.put('/api/instrucciones/:id', (req, res) => {
       [titulo, categoria || null, severidad || null, parte_cuerpo, tiempo_estimado || null, JSON.stringify(pasos), req.params.id],
       function (err) {
         if (err) return res.status(500).json({ success: false, error: err.message });
-        
-        // Incrementar versión en protocol_versions
-        db.get(
-          `SELECT MAX(version) as max_ver FROM protocol_versions WHERE protocol_id = ?`,
-          [req.params.id],
-          (errVer, rowVer) => {
-            const nextVer = (rowVer && rowVer.max_ver) ? rowVer.max_ver + 1 : 1;
-            db.run(
-              `INSERT INTO protocol_versions (protocol_id, version, content, author_id) VALUES (?, ?, ?, ?)`,
-              [req.params.id, nextVer, JSON.stringify(pasos), id_medico],
-              (errIns) => {
-                if (errIns) console.error('Error saving updated protocol version:', errIns.message);
-              }
-            );
-          }
-        );
-
         res.json({ success: true });
       }
     );
@@ -609,6 +373,6 @@ app.post('/api/admin/config', (req, res) => {
 });
 
 // =================== INICIA EL SERVIDOR ====================
-server.listen(PORT, () => {
-  console.log(`🚀 Servidor backend con WebSockets escuchando en http://localhost:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor backend escuchando en http://localhost:${PORT}`);
 });

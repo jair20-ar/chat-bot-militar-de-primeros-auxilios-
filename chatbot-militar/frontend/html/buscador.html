@@ -122,15 +122,6 @@
 
     <div class="help-btn">?</div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-  if (typeof io !== 'undefined') {
-    window.socket = io('http://localhost:3001');
-    window.socket.on('connect', () => {
-      console.log('⚡ Connected to WebSockets server');
-    });
-  }
-</script>
 <script src="../js/buscador.js"></script>
 <script src="../js/gestures.js"></script>
 </body>
