@@ -7,6 +7,9 @@
     "postinstall": "cd chatbot-militar/backend && npm install --ignore-scripts && npm rebuild",
     "dev": "cd chatbot-militar/backend && npm run dev"
   },
+  "engines": {
+    "node": "20.x"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC"
