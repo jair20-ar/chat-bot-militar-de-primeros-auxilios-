@@ -24,7 +24,7 @@ function showWelcomeModal(nombre) {
 
     // Redirigir después de 3 segundos
     setTimeout(() => {
-        window.location.href = 'http://localhost:3001/panel.html';
+        window.location.href = '/panel.html';
     }, 3000);
 }
 
@@ -40,7 +40,7 @@ document.getElementById('login-form').addEventListener('submit', async function(
     submitBtn.textContent = 'Verificando...';
 
     try {
-        const response = await fetch('http://localhost:3001/medicos/login', {
+        const response = await fetch('/medicos/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

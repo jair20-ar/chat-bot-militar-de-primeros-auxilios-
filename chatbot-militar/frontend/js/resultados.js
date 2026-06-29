@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001';
+const API_URL = '';
 
 document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);

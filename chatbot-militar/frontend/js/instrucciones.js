@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001';
+const API_URL = '';
 let instructionData = null;
 let currentStep = 0;
 let synth = window.speechSynthesis;

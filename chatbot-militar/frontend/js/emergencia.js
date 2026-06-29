@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001';
+const API_URL = '';
 let stepCount = 1;
 let editingId = null;
 

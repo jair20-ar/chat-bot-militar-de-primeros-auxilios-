@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001';
+const API_URL = '';
 
 // Verificar sesión
 if (localStorage.getItem('adminToken') !== 'true') {

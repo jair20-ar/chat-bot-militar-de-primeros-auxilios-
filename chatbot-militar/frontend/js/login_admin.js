@@ -15,7 +15,7 @@ eyeBtn.addEventListener('click', () => {
 
 // === INICIO DE SESIÓN DE ADMINISTRADOR ===
 const submitBtn = document.querySelector('.submit-btn');
-const API_URL = 'http://localhost:3001';
+const API_URL = '';
 
 async function handleLogin() {
     const password = pwInput.value.trim();

@@ -33,7 +33,7 @@ if (voiceCard) {
                 formData.append('audio', audioBlob, 'busqueda.webm');
 
                 try {
-                    const response = await fetch('http://localhost:3001/api/transcribir', {
+                    const response = await fetch('/api/transcribir', {
                         method: 'POST',
                         body: formData
                     });
