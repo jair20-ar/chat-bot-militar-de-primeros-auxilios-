@@ -1,0 +1,13 @@
+{
+  "name": "chatbot-militar-primeros-auxilios",
+  "version": "1.0.0",
+  "description": "Chatbot militar de primeros auxilios",
+  "scripts": {
+    "start": "node chatbot-militar/backend/server.js",
+    "postinstall": "cd chatbot-militar/backend && npm install",
+    "dev": "cd chatbot-militar/backend && npm run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
