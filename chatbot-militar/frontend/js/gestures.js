@@ -1,5 +1,3 @@
-const API_URL = 'http://localhost:3001';
-
 let gesturePoints = [];
 let isDrawing = false;
 let canvas = null;
@@ -281,6 +279,30 @@ function ensureMenu() {
       from { opacity: 1; transform: translate(-50%, 0) scale(1); }
       to { opacity: 0; transform: translate(-50%, -15px) scale(0.95); }
     }
+
+    /* === LIGHT THEME OVERRIDES FOR CONTEXT MENU & TOAST === */
+    body[data-theme="light"] #tactical-context-menu {
+      background: rgba(255, 255, 255, 0.98) !important;
+      border: 1px solid rgba(220, 38, 38, 0.3) !important;
+      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.12), inset 0 0 10px rgba(220, 38, 38, 0.04) !important;
+    }
+    body[data-theme="light"] .context-menu-item {
+      color: #475569 !important;
+    }
+    body[data-theme="light"] .context-menu-item:hover {
+      color: #dc2626 !important;
+      background: rgba(220, 38, 38, 0.06) !important;
+      border-left: 3px solid #dc2626 !important;
+    }
+    body[data-theme="light"] .context-menu-divider {
+      background: rgba(220, 38, 38, 0.12) !important;
+    }
+    body[data-theme="light"] .gesture-toast {
+      background: rgba(255, 255, 255, 0.98) !important;
+      border: 1px solid #15803d !important;
+      box-shadow: 0 8px 25px rgba(21, 128, 61, 0.15) !important;
+      color: #15803d !important;
+    }
   `;
   document.head.appendChild(style);
   
@@ -387,9 +409,11 @@ function updateThemeIcons(theme) {
 
 function toggleTheme() {
   const body = document.body;
+  const html = document.documentElement;
   const currentTheme = body.getAttribute('data-theme') || 'dark';
   const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
   body.setAttribute('data-theme', nextTheme);
+  html.setAttribute('data-theme', nextTheme);
   localStorage.setItem('theme', nextTheme);
   
   updateThemeIcons(nextTheme);
@@ -454,15 +478,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- INICIALIZACIÓN DE TEMA ---
   const savedTheme = localStorage.getItem('theme') || 'dark';
   document.body.setAttribute('data-theme', savedTheme);
+  document.documentElement.setAttribute('data-theme', savedTheme);
   updateThemeIcons(savedTheme);
 
   // Vincular eventos click a todos los botones físicos de cambio de tema
   const themeSelectors = '.theme-btn, .theme-toggle, #themeToggle, .top-right-btn';
   document.querySelectorAll(themeSelectors).forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      toggleTheme();
-    });
+    if (!btn.getAttribute('data-theme-bound')) {
+      btn.setAttribute('data-theme-bound', 'true');
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleTheme();
+      });
+    }
   });
 
   // Buscar botones con clase icon-btn que contengan el SVG de themeIcon
@@ -529,6 +557,64 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('contextmenu', (e) => {
     e.preventDefault();
   });
+});
+
+// Inyección dinámica de la línea de electrocardiograma (ECG) roja en todas las páginas excepto index
+document.addEventListener('DOMContentLoaded', () => {
+  const path = window.location.pathname.toLowerCase();
+  const isIndex = path.endsWith('index.html') || path.endsWith('/') || path === '' || document.querySelector('.scanline') !== null;
+  
+  if (!isIndex) {
+    const style = document.createElement('style');
+    style.textContent = `
+      .ecg-container {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 80px;
+        transform: translateY(-50%);
+        background: transparent;
+        z-index: 99999;
+        pointer-events: none;
+        overflow: hidden;
+        opacity: 0.3;
+      }
+      body[data-theme="light"] .ecg-container {
+        display: flex;
+      }
+      .ecg-svg {
+        width: 100%;
+        height: 100%;
+      }
+      .ecg-path {
+        stroke: #dc2626;
+        stroke-width: 2.8;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 300 900;
+        stroke-dashoffset: 1200;
+        animation: ecg-sweep 8s linear infinite;
+        filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.75));
+      }
+      @keyframes ecg-sweep {
+        0% { stroke-dashoffset: 1200; }
+        100% { stroke-dashoffset: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    const container = document.createElement('div');
+    container.className = 'ecg-container';
+    container.innerHTML = `
+      <svg class="ecg-svg" viewBox="0 0 1000 40" preserveAspectRatio="none">
+        <path class="ecg-path" d="M 0 20 L 80 20 L 90 20 L 95 10 L 100 30 L 105 5 L 110 35 L 115 18 L 120 22 L 130 20 L 280 20 L 290 20 L 295 10 L 300 30 L 305 5 L 310 35 L 315 18 L 320 22 L 330 20 L 480 20 L 490 20 L 495 10 L 500 30 L 505 5 L 510 35 L 515 18 L 520 22 L 530 20 L 680 20 L 690 20 L 695 10 L 700 30 L 705 5 L 710 35 L 715 18 L 720 22 L 730 20 L 880 20 L 890 20 L 895 10 L 900 30 L 905 5 L 910 35 L 915 18 L 920 22 L 930 20 L 1000 20"></path>
+      </svg>
+    `;
+    document.body.appendChild(container);
+  }
 });
 
 // Registrar en el espacio de nombres global

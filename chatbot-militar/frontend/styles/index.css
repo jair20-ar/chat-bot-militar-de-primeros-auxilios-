@@ -701,3 +701,238 @@ body {
         padding: 18px 15px 15px 15px;
     }
 }
+
+/* ==========================================================================
+   TEMA CLARO TÁCTICO MILITAR DIURNO - OVERRIDES Y VARIABLES PARA INDEX
+   ========================================================================== */
+body[data-theme="light"] {
+    --bg-color: #dbe2e8;
+    --primary-cyan: #dc2626;
+    --primary-cyan-glow: rgba(220, 38, 38, 0.12);
+    --secondary-green: #b91c1c;
+    --text-white: #0f172a;
+    --text-muted: #475569;
+    --text-dark: #64748b;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --card-border: rgba(220, 38, 38, 0.15);
+
+    background-color: #dbe2e8 !important;
+    background-image: 
+        url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ESYS: TACMED_FANB_RSC%3C/text%3E%3Ctext x='30' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELAT: 10.4806° N%3C/text%3E%3Ctext x='30' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELON: 66.9036° W%3C/text%3E%3Ctext x='90%25' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESTATUS: ACTIVE%3C/text%3E%3Ctext x='90%25' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 500KM%3C/text%3E%3Ctext x='90%25' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EALT: 852M%3C/text%3E%3C/svg%3E"),
+        radial-gradient(circle at 90% 10%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 10% 80%, rgba(71, 85, 105, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.02) 0%, transparent 70%),
+        linear-gradient(rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 30px 30px, 30px 30px !important;
+    background-attachment: fixed !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"]::before,
+body[data-theme="light"]::after {
+    border-color: rgba(220, 38, 38, 0.35) !important;
+}
+
+html[data-theme="light"]::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    height: 280px;
+    background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23dc2626'%3E%3Cpath d='M9 3h6v6h6v6h-6v6H9v-6H3V9h6V3z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: -1;
+}
+
+html[data-theme="light"]::after {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    height: 320px;
+    border: 1px solid rgba(220, 38, 38, 0.07);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -2;
+    animation: tactical-radar-pulse 8s infinite linear;
+    opacity: 0;
+}
+
+@keyframes tactical-radar-pulse {
+    0% {
+        width: 100px;
+        height: 100px;
+        opacity: 0;
+        border-color: rgba(220, 38, 38, 0.12);
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.03);
+    }
+    10% {
+        opacity: 0.7;
+    }
+    80% {
+        opacity: 0.2;
+    }
+    100% {
+        width: 600px;
+        height: 600px;
+        opacity: 0;
+        border-color: rgba(220, 38, 38, 0);
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0);
+    }
+}
+
+body[data-theme="light"] .top-status-bar,
+body[data-theme="light"] .bottom-status-bar {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+}
+
+body[data-theme="light"] .status-text {
+    color: #1e293b !important;
+    opacity: 0.9 !important;
+}
+
+body[data-theme="light"] .status-brand {
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .status-brand svg {
+    fill: #dc2626 !important;
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .brand-text {
+    color: #dc2626 !important;
+    opacity: 0.95 !important;
+}
+
+body[data-theme="light"] .status-dot {
+    background-color: #dc2626 !important;
+    box-shadow: 0 0 8px #dc2626 !important;
+}
+
+body[data-theme="light"] .top-right-btn,
+body[data-theme="light"] .bottom-right-btn {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+body[data-theme="light"] .top-right-btn:hover,
+body[data-theme="light"] .bottom-right-btn:hover {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 12px rgba(220, 38, 38, 0.2) !important;
+}
+
+body[data-theme="light"] .top-right-btn svg {
+    stroke: #dc2626 !important;
+    filter: drop-shadow(0 0 2px rgba(220, 38, 38, 0.2)) !important;
+}
+
+body[data-theme="light"] .shield-glow-container {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(219, 226, 232, 0.95) 100%) !important;
+    border: 1px solid rgba(220, 38, 38, 0.3) !important;
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.12), inset 0 0 15px rgba(220, 38, 38, 0.08) !important;
+}
+
+body[data-theme="light"] .radar-sweep {
+    background: conic-gradient(from 0deg, rgba(220, 38, 38, 0.45), transparent 55%) !important;
+}
+
+body[data-theme="light"] .radar-ring {
+    border-color: rgba(220, 38, 38, 0.25) !important;
+}
+
+body[data-theme="light"] .shield-core svg path:last-child {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .action-card {
+    background: linear-gradient(135deg, rgba(240, 243, 246, 0.55) 0%, rgba(215, 220, 225, 0.7) 40%, rgba(190, 195, 205, 0.45) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.8),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.05),
+        0 12px 30px rgba(15, 23, 42, 0.08) !important;
+}
+
+body[data-theme="light"] .action-card:hover {
+    background: linear-gradient(135deg, rgba(245, 248, 250, 0.65) 0%, rgba(220, 225, 230, 0.8) 40%, rgba(200, 205, 215, 0.55) 100%) !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 
+        inset 0 1px 3px rgba(255, 255, 255, 0.9),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.05),
+        0 15px 35px rgba(220, 38, 38, 0.12),
+        0 10px 20px rgba(15, 23, 42, 0.08) !important;
+}
+
+body[data-theme="light"] .action-card .card-text {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .action-card .card-subtext {
+    color: #475569 !important;
+}
+
+/* Iconos de las tarjetas en el tema claro con efecto de vidrio metálico */
+body[data-theme="light"] .action-card.card-primary .card-icon-wrapper {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: rgba(220, 38, 38, 0.25) !important;
+}
+
+body[data-theme="light"] .action-card.card-primary:hover .card-icon-wrapper {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.25) !important;
+}
+
+body[data-theme="light"] .action-card.card-primary .card-icon-wrapper svg {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .action-card.card-secondary .card-icon-wrapper {
+    background: rgba(15, 23, 42, 0.06) !important;
+    border-color: rgba(15, 23, 42, 0.15) !important;
+}
+
+body[data-theme="light"] .action-card.card-secondary:hover .card-icon-wrapper {
+    border-color: #0f172a !important;
+    box-shadow: 0 0 15px rgba(15, 23, 42, 0.15) !important;
+}
+
+body[data-theme="light"] .action-card.card-secondary .card-icon-wrapper svg {
+    stroke: #0f172a !important;
+}
+
+body[data-theme="light"] .stat-card {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid rgba(220, 38, 38, 0.18) !important;
+}
+
+body[data-theme="light"] .stat-card:hover {
+    border-color: #dc2626 !important;
+    box-shadow: 0 5px 15px rgba(220, 38, 38, 0.08) !important;
+}
+
+/* Línea de escaneo (scanline) en color rojo para el tema claro */
+body[data-theme="light"] .scanline {
+    background: linear-gradient(
+        90deg,
+        rgba(220, 38, 38, 0) 0%,
+        rgba(220, 38, 38, 0.8) 50%,
+        rgba(220, 38, 38, 0) 100%
+    ) !important;
+    box-shadow: 0 0 12px rgba(220, 38, 38, 0.7) !important;
+}

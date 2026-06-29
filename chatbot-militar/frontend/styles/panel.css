@@ -443,3 +443,173 @@ main {
         padding: 15px 20px;
     }
 }
+
+/* ==========================================================================
+   TEMA CLARO TÁCTICO MILITAR DIURNO - OVERRIDES PARA PANEL
+   ========================================================================== */
+body[data-theme="light"] {
+    --bg-dark: #d0d9e0;
+    --panel-bg: rgba(255, 255, 255, 0.9);
+    --border-color: rgba(15, 23, 42, 0.12);
+    --cyan-accent: #dc2626;
+    --green-accent: #b91c1c;
+    --text-main: #1e293b;
+    --text-muted: #475569;
+
+    background-color: #dbe2e8 !important;
+    background-image: 
+        url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ESYS: TACMED_FANB_RSC%3C/text%3E%3Ctext x='30' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELAT: 10.4806° N%3C/text%3E%3Ctext x='30' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELON: 66.9036° W%3C/text%3E%3Ctext x='90%25' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESTATUS: ACTIVE%3C/text%3E%3Ctext x='90%25' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 500KM%3C/text%3E%3Ctext x='90%25' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EALT: 852M%3C/text%3E%3C/svg%3E"),
+        radial-gradient(circle at 90% 10%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 10% 80%, rgba(71, 85, 105, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.02) 0%, transparent 70%),
+        linear-gradient(rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 30px 30px, 30px 30px !important;
+    background-attachment: fixed !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"]::before,
+body[data-theme="light"]::after {
+    border-color: rgba(220, 38, 38, 0.35) !important;
+}
+
+body[data-theme="light"] header {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8)) !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+body[data-theme="light"] .header-title h1,
+body[data-theme="light"] .title-container h1 {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .btn-back,
+body[data-theme="light"] .theme-toggle {
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+}
+
+body[data-theme="light"] .btn-back:hover,
+body[data-theme="light"] .theme-toggle:hover {
+    background: rgba(220, 38, 38, 0.06) !important;
+    border-color: #dc2626 !important;
+}
+
+body[data-theme="light"] .theme-toggle svg {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .btn-create {
+    color: #ffffff !important;
+    background: #b91c1c !important;
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.25) !important;
+}
+
+body[data-theme="light"] .btn-create:hover {
+    background: #991b1b !important;
+    box-shadow: 0 6px 20px rgba(185, 28, 28, 0.4) !important;
+}
+
+body[data-theme="light"] .section-title {
+    color: #1e293b !important;
+}
+
+body[data-theme="light"] .stat-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+body[data-theme="light"] .stat-icon {
+    background: rgba(220, 38, 38, 0.06) !important;
+    border: 1px solid rgba(220, 38, 38, 0.15) !important;
+}
+
+body[data-theme="light"] .stat-info span {
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .val-cyan {
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .val-green {
+    color: #b91c1c !important;
+}
+
+body[data-theme="light"] .val-white {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .instruction-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+body[data-theme="light"] .instruction-card:hover {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.15) !important;
+}
+
+body[data-theme="light"] .instruction-title {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .instruction-desc {
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .btn-edit {
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    color: #dc2626 !important;
+    background: transparent !important;
+}
+
+body[data-theme="light"] .btn-edit:hover {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .btn-delete {
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    color: #dc2626 !important;
+    background: transparent !important;
+}
+
+body[data-theme="light"] .btn-delete:hover {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .empty-state {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+}
+
+body[data-theme="light"] .empty-state h3 {
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .empty-state p {
+    color: #64748b !important;
+}
+
+body[data-theme="light"] .empty-icon svg {
+    stroke: #64748b !important;
+}
+
+body[data-theme="light"] .help-btn {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.15) !important;
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .help-btn:hover {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}

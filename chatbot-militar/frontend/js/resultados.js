@@ -49,8 +49,6 @@ function displayResults(results) {
 
     container.innerHTML = results.map((inst) => {
         const severidadBadge = getSeverityBadge(inst.severidad);
-        const pasos = typeof inst.pasos === 'string' ? JSON.parse(inst.pasos) : inst.pasos;
-        const pasosCount = Array.isArray(pasos) ? pasos.length : 0;
 
         return `
             <div class="result-card" onclick="openInstruction(${inst.id})">
@@ -67,7 +65,7 @@ function displayResults(results) {
                     <h3 class="card-title">${inst.titulo}</h3>
                     <div class="card-subtitle">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-                        ${inst.categoria} • ${pasosCount} pasos
+                        ${inst.categoria}
                     </div>
                 </div>
 
@@ -81,8 +79,8 @@ function displayResults(results) {
 
 function getSeverityBadge(severity) {
     const severityMap = {
-        'critico':  { class: 'badge-critical', text: 'CRÍTICA' },
-        'moderado': { class: 'badge-moderate', text: 'MODERADA' },
+        'critico':  { class: 'badge-critical', text: 'CRÍTICO' },
+        'moderado': { class: 'badge-moderate', text: 'MODERADO' },
         'leve':     { class: 'badge-mild',     text: 'LEVE' }
     };
     return severityMap[severity?.toLowerCase()] || { class: 'badge-mild', text: 'NORMAL' };

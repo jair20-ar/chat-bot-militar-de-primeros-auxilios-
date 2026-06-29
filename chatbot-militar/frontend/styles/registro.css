@@ -243,3 +243,74 @@ body {
     stroke: currentColor;
     stroke-width: 2;
 }
+
+/* ==========================================================================
+   TEMA CLARO TÁCTICO MILITAR DIURNO - OVERRIDES PARA REGISTRO
+   ========================================================================== */
+body[data-theme="light"] {
+    --bg-dark: #d0d9e0;
+    --bg-card: rgba(255, 255, 255, 0.9);
+    --bg-input: #f1f5f9;
+    --border-input: rgba(15, 23, 42, 0.12);
+    --accent-green: #dc2626;
+    --accent-green-hover: #b91c1c;
+    --text-main: #1e293b;
+    --text-muted: #475569;
+    --card-border: rgba(220, 38, 38, 0.15);
+    --glow-color: rgba(220, 38, 38, 0.05);
+
+    background-color: #dbe2e8 !important;
+    background-image: 
+        url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ESYS: TACMED_FANB_RSC%3C/text%3E%3Ctext x='30' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELAT: 10.4806° N%3C/text%3E%3Ctext x='30' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELON: 66.9036° W%3C/text%3E%3Ctext x='90%25' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESTATUS: ACTIVE%3C/text%3E%3Ctext x='90%25' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 500KM%3C/text%3E%3Ctext x='90%25' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EALT: 852M%3C/text%3E%3C/svg%3E"),
+        radial-gradient(circle at 90% 10%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 10% 80%, rgba(71, 85, 105, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.02) 0%, transparent 70%),
+        linear-gradient(rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 30px 30px, 30px 30px !important;
+    background-attachment: fixed !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"]::before,
+body[data-theme="light"]::after {
+    border-color: rgba(220, 38, 38, 0.35) !important;
+}
+
+body[data-theme="light"] .form-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(220, 38, 38, 0.18) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05) !important;
+}
+
+body[data-theme="light"] .form-group label,
+body[data-theme="light"] .form-label {
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .form-control,
+body[data-theme="light"] input,
+body[data-theme="light"] select,
+body[data-theme="light"] textarea {
+    background: #f1f5f9 !important;
+    border: 1px solid rgba(15, 23, 42, 0.15) !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .form-control:focus,
+body[data-theme="light"] input:focus,
+body[data-theme="light"] select:focus,
+body[data-theme="light"] textarea:focus {
+    border-color: #dc2626 !important;
+    background: #ffffff !important;
+}
+
+body[data-theme="light"] .submit-btn {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
+    color: #ffffff !important;
+}
+
+body[data-theme="light"] .submit-btn:hover {
+    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35) !important;
+}

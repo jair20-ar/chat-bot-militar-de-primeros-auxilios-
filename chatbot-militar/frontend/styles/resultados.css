@@ -6,8 +6,15 @@
 }
 
 body {
-    background: radial-gradient(circle at 50% 10%, #0e1e2b 0%, #050a0f 80%);
-    background-color: #050a0f;
+    background-color: #060d13;
+    /* Rejilla táctica HUD y gradientes radiales de fondo para profundidad */
+    background-image: 
+        radial-gradient(circle at 50% 20%, rgba(0, 229, 255, 0.08) 0%, rgba(5, 10, 15, 0.98) 75%),
+        linear-gradient(rgba(0, 229, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 30px 30px, 30px 30px;
+    background-position: center top;
+    background-attachment: fixed;
     color: #ffffff;
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
@@ -15,6 +22,33 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 40px 20px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Adornos tácticos en las esquinas de la pantalla (HUD militar) */
+body::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    width: 14px;
+    height: 14px;
+    border-left: 2px solid rgba(0, 229, 255, 0.4);
+    border-top: 2px solid rgba(0, 229, 255, 0.4);
+    pointer-events: none;
+}
+
+body::after {
+    content: '';
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    width: 14px;
+    height: 14px;
+    border-right: 2px solid rgba(0, 229, 255, 0.4);
+    border-top: 2px solid rgba(0, 229, 255, 0.4);
+    pointer-events: none;
 }
 
 .container {
@@ -22,6 +56,7 @@ body {
     max-width: 750px;
     display: flex;
     flex-direction: column;
+    animation: fadeIn 0.8s ease-out;
 }
 
 /* === ENCABEZADO === */
@@ -184,10 +219,10 @@ h2 {
 }
 
 .result-card:hover:not(.disabled) .action-btn {
-    background: #00a8cc;
-    border-color: #00a8cc;
-    color: #000;
-    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+    background: #00e5ff;
+    border-color: #00e5ff;
+    color: #050b11;
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
 }
 
 .result-card.disabled {
@@ -268,9 +303,9 @@ h2 {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: transparent;
-    border: 1px solid rgba(0, 229, 255, 0.3);
-    color: #00d2ff;
+    background: #007a99;
+    border: 1px solid #00e5ff;
+    color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -279,6 +314,7 @@ h2 {
     transition: all 0.3s ease;
     flex-shrink: 0;
     margin-left: 15px;
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
 }
 
 /* === ESTADOS VACÍO Y CARGA === */
@@ -319,4 +355,146 @@ h2 {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* --- HELP FLOATING BUTTON --- */
+.help-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 38px;
+    height: 38px;
+    background: rgba(8, 18, 28, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #64748b;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+}
+
+.help-btn:hover {
+    background: rgba(0, 229, 255, 0.1);
+    border-color: rgba(0, 229, 255, 0.4);
+    color: #00e5ff;
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+    transform: scale(1.08);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   TEMA CLARO TÁCTICO MILITAR DIURNO - OVERRIDES PARA RESULTADOS
+   ========================================================================== */
+body[data-theme="light"] {
+    background-color: #dbe2e8 !important;
+    background-image: 
+        url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ESYS: TACMED_FANB_RSC%3C/text%3E%3Ctext x='30' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELAT: 10.4806° N%3C/text%3E%3Ctext x='30' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELON: 66.9036° W%3C/text%3E%3Ctext x='90%25' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESTATUS: ACTIVE%3C/text%3E%3Ctext x='90%25' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 500KM%3C/text%3E%3Ctext x='90%25' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EALT: 852M%3C/text%3E%3C/svg%3E"),
+        radial-gradient(circle at 90% 10%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 10% 80%, rgba(71, 85, 105, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.02) 0%, transparent 70%),
+        linear-gradient(rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 30px 30px, 30px 30px !important;
+    background-attachment: fixed !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"]::before,
+body[data-theme="light"]::after {
+    border-color: rgba(220, 38, 38, 0.35) !important;
+}
+
+body[data-theme="light"] h2 {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .title-container::after {
+    background: #dc2626 !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.5) !important;
+}
+
+body[data-theme="light"] .search-term-pill {
+    background: rgba(220, 38, 38, 0.08) !important;
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .results-count {
+    background: #ffffff !important;
+    border: 1px solid rgba(220, 38, 38, 0.2) !important;
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .highlight-number {
+    color: #dc2626 !important;
+}
+
+body[data-theme="light"] .result-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .result-card:hover:not(.disabled) {
+    border-color: #dc2626 !important;
+    background: #f8fafc !important;
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.12) !important;
+}
+
+body[data-theme="light"] .card-glow {
+    background: rgba(220, 38, 38, 0.08) !important;
+}
+
+body[data-theme="light"] .card-title {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .card-subtitle {
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .card-subtitle svg {
+    stroke: #dc2626 !important;
+}
+
+body[data-theme="light"] .badge-time {
+    background: rgba(15, 23, 42, 0.05) !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    color: #334155 !important;
+}
+
+body[data-theme="light"] .action-btn {
+    color: #dc2626 !important;
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    background: transparent !important;
+}
+
+body[data-theme="light"] .result-card:hover:not(.disabled) .action-btn {
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.3) !important;
+}
+
+body[data-theme="light"] .no-results {
+    color: #475569 !important;
+}
+
+body[data-theme="light"] .no-results h3 {
+    color: #0f172a !important;
+}
+
+body[data-theme="light"] .no-results svg {
+    stroke: #475569 !important;
 }
