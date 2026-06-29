@@ -13,7 +13,11 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const upload = multer({ dest: 'uploads/' });
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+const upload = multer({ dest: uploadsDir });
 
 
 const modelpath = path.join(__dirname, 'model', 'vosk-model-small-es-0.42');
@@ -72,7 +76,7 @@ app.post('/api/transcribir', upload.single('audio'), (req, res) => {
         return res.status(400).json({ error: 'Archivo de audio no recibido' });
     }
 
-    const inputPath = path.join(__dirname, req.file.path);
+    const inputPath = req.file.path;
     const outputPath = inputPath + '.wav';
 
     ffmpeg(inputPath)
