@@ -17,12 +17,15 @@ jobs:
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 18.19.0
           cache: 'npm'
           cache-dependency-path: 'chatbot-militar/backend/package-lock.json'
 
       - name: 📚 Install Project Dependencies
         working-directory: ./chatbot-militar/backend
+        env:
+          CXXFLAGS: -DNODE_API_EXPERIMENTAL_NOGC_ENV_OPT_OUT
+          CFLAGS: -DNODE_API_EXPERIMENTAL_NOGC_ENV_OPT_OUT
         run: npm install
 
       - name: 🔍 Run ESLint (Code Quality)
