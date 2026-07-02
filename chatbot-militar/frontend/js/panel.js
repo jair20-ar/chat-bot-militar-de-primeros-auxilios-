@@ -168,8 +168,20 @@ function updateStats() {
         .catch(err => console.error('❌ Error al actualizar stats:', err));
 }
 
-// Volver a médicos
-function goBackToMedicos() {
+// Mostrar modal de cierre de sesión
+function showLogoutModal() {
+    document.getElementById('logoutModal').classList.add('show');
+}
+
+// Ocultar modal
+function hideLogoutModal() {
+    document.getElementById('logoutModal').classList.remove('show');
+}
+
+// Confirmar cierre de sesión
+function confirmLogout() {
+    localStorage.removeItem('medicoData');
+    hideLogoutModal();
     window.location.href = '/';
 }
 
