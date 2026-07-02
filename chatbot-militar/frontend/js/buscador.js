@@ -1,14 +1,23 @@
 let mediaRecorder = null;
 let audioChunks = [];
 
-const voiceCard = document.getElementById('voice-card');
+document.addEventListener('DOMContentLoaded', () => {
+    const voiceCard = document.getElementById('voice-card');
+    const voiceHint = document.createElement('div');
+    voiceHint.className = 'voice-hint';
+    voiceHint.innerHTML = `
+        <span class="voice-hint-dot"></span>
+        <span class="voice-hint-text">Presiona de nuevo para buscar</span>
+    `;
+    document.body.appendChild(voiceHint);
 
-if (voiceCard) {
-    voiceCard.addEventListener('click', async function(e) {
+    if (voiceCard) {
+        voiceCard.addEventListener('click', async function(e) {
         e.preventDefault();
 
         if (this.classList.contains('recording')) {
             this.classList.remove('recording');
+            voiceHint.classList.remove('visible');
             mediaRecorder.stop();
             return;
         }
@@ -16,7 +25,7 @@ if (voiceCard) {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             this.classList.add('recording');
-            showToast('🎤 Escuchando... Haz clic de nuevo para finalizar');
+            voiceHint.classList.add('visible');
 
             mediaRecorder = new MediaRecorder(stream);
             audioChunks = [];
@@ -55,7 +64,8 @@ if (voiceCard) {
             showToast('❌ Permiso de acceso al microfono denegado', true);
         }
     });
-}
+    }
+});
 
 function handleSearch() {
     const searchTerm = document.getElementById('search').value.trim();

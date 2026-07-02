@@ -45,6 +45,10 @@
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
         Usuarios
       </button>
+      <button class="tab" data-target="busquedas">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M8 11h6"/></svg>
+        Búsquedas
+      </button>
       <button class="tab" data-target="configuracion">
         <svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5L18 10M12.5 10.5L15 13"/></svg>
         Configuración
@@ -87,6 +91,24 @@
       <div class="empty-state" id="emptyMedicos">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <p>No se encontraron médicos registrados.</p>
+      </div>
+    </section>
+
+    <!-- Búsquedas -->
+    <section class="tab-panel" id="busquedas">
+      <div class="filter-bar">
+        <button class="filter-btn active" data-periodo="dia">Día</button>
+        <button class="filter-btn" data-periodo="semana">Semana</button>
+        <button class="filter-btn" data-periodo="mes">Mes</button>
+      </div>
+
+      <input type="text" id="searchBusquedas" class="search-input" placeholder="Buscar por título de instrucción...">
+
+      <div id="busquedasList" class="data-list drag-scroll"></div>
+
+      <div class="empty-state" id="emptyBusquedas">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M8 11h6"/></svg>
+        <p>No se encontraron búsquedas en este período.</p>
       </div>
     </section>
 

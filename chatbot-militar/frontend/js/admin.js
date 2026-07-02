@@ -8,6 +8,8 @@ if (localStorage.getItem('adminToken') !== 'true') {
 // Variables de estado
 let allMedicos = [];
 let allInstrucciones = [];
+let allBusquedas = [];
+let currentPeriodo = 'dia';
 
 // Elementos del DOM
 const tabs = document.querySelectorAll('.tab');
@@ -24,6 +26,11 @@ const searchMedicosInput = document.getElementById('searchMedicos');
 const instruccionesList = document.getElementById('instruccionesList');
 const emptyInstrucciones = document.getElementById('emptyInstrucciones');
 const searchInstruccionesInput = document.getElementById('searchInstrucciones');
+
+const busquedasList = document.getElementById('busquedasList');
+const emptyBusquedas = document.getElementById('emptyBusquedas');
+const searchBusquedasInput = document.getElementById('searchBusquedas');
+const filterBtns = document.querySelectorAll('.filter-btn');
 
 const codeDisplay = document.getElementById('codeDisplay');
 const newRegCodeInput = document.getElementById('newRegCode');
@@ -53,11 +60,12 @@ function initTabs() {
   });
 }
 
-// Cargar todos los datos (Estadísticas, Médicos, Instrucciones, Config)
+// Cargar todos los datos (Estadísticas, Médicos, Instrucciones, Config, Búsquedas)
 async function loadData() {
   await loadStatsAndConfig();
   await loadMedicos();
   await loadInstrucciones();
+  loadBusquedas();
 }
 
 // Cargar estadísticas y configuraciones generales
@@ -220,6 +228,52 @@ async function deleteInstruccion(id) {
   }
 }
 
+// Cargar búsquedas registradas
+function loadBusquedas() {
+  const search = searchBusquedasInput.value.trim();
+  const url = `${API_URL}/api/admin/busquedas?periodo=${currentPeriodo}${search ? '&search=' + encodeURIComponent(search) : ''}`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        allBusquedas = data.data;
+        renderBusquedas(allBusquedas);
+      }
+    })
+    .catch(err => console.error('Error al cargar búsquedas:', err));
+}
+
+// Renderizar lista de búsquedas
+function renderBusquedas(busquedas) {
+  busquedasList.innerHTML = '';
+  if (busquedas.length === 0) {
+    emptyBusquedas.style.display = 'flex';
+    return;
+  }
+  emptyBusquedas.style.display = 'none';
+
+  busquedas.forEach(b => {
+    const dateFormatted = new Date(b.fecha).toLocaleString('es-VE', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+
+    const item = document.createElement('div');
+    item.className = 'data-item';
+    item.innerHTML = `
+      <div class="data-info">
+        <div class="data-title">${b.titulo}</div>
+        <div class="data-meta">
+          <span class="badge-item green">${b.nombre_medico_creador}</span>
+          <span class="badge-item">${dateFormatted}</span>
+        </div>
+      </div>
+    `;
+    busquedasList.appendChild(item);
+  });
+}
+
 // Configurar Event Listeners para formularios y búsquedas
 function setupEventListeners() {
   // Buscador de médicos
@@ -307,6 +361,21 @@ function setupEventListeners() {
       console.error(err);
       alert('Error al conectar con el servidor.');
     }
+  });
+
+  // Filtros de período para búsquedas
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPeriodo = btn.dataset.periodo;
+      loadBusquedas();
+    });
+  });
+
+  // Buscador de búsquedas
+  searchBusquedasInput.addEventListener('input', () => {
+    loadBusquedas();
   });
 
   // Botón Volver (Cerrar sesión táctico)

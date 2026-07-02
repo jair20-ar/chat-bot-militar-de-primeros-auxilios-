@@ -86,6 +86,12 @@ function loadInstruction() {
             if (data.success) {
                 instructionData = data.data;
                 displayInstruction();
+                // Registrar la búsqueda/visualización del soldado
+                fetch('/api/log-busqueda', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ instruccion_id: instructionId })
+                }).catch(() => {});
             } else {
                 showError('No se encontró la instrucción');
             }

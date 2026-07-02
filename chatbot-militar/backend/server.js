@@ -376,6 +376,90 @@ app.post('/api/admin/config', (req, res) => {
   });
 });
 
+// =================== Crear tabla busquedas_log ===================
+db.run(`
+  CREATE TABLE IF NOT EXISTS busquedas_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    instruccion_id INTEGER NOT NULL,
+    titulo TEXT NOT NULL,
+    id_medico_creador TEXT NOT NULL,
+    nombre_medico_creador TEXT NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(instruccion_id) REFERENCES instrucciones(id)
+  )
+`);
+
+// ============ REGISTRO DE BÚSQUEDAS (SOLDIER VIEWS) ============
+
+// Log cuando un soldado ve una instrucción
+app.post('/api/log-busqueda', (req, res) => {
+  const { instruccion_id } = req.body;
+  if (!instruccion_id) {
+    return res.status(400).json({ success: false, error: 'instruccion_id es obligatorio.' });
+  }
+
+  db.get(`SELECT titulo, id_medico FROM instrucciones WHERE id = ?`, [instruccion_id], (err, inst) => {
+    if (err || !inst) return res.status(404).json({ success: false, error: 'Instrucción no encontrada.' });
+
+    db.get(`SELECT nombre FROM medicos WHERE id_medico = ?`, [inst.id_medico], (err, med) => {
+      const nombreMedico = med ? med.nombre : 'Desconocido';
+      db.run(
+        `INSERT INTO busquedas_log (instruccion_id, titulo, id_medico_creador, nombre_medico_creador) VALUES (?, ?, ?, ?)`,
+        [instruccion_id, inst.titulo, inst.id_medico, nombreMedico],
+        (err) => {
+          if (err) return res.status(500).json({ success: false, error: err.message });
+          res.json({ success: true });
+        }
+      );
+    });
+  });
+});
+
+// Obtener logs de búsquedas (admin)
+app.get('/api/admin/busquedas', (req, res) => {
+  const { periodo, search } = req.query;
+  let fechaLimite = '';
+  const now = new Date();
+
+  if (periodo === 'dia') {
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    fechaLimite = start.toISOString();
+  } else if (periodo === 'semana') {
+    const start = new Date(now);
+    start.setDate(start.getDate() - 7);
+    fechaLimite = start.toISOString();
+  } else if (periodo === 'mes') {
+    const start = new Date(now);
+    start.setMonth(start.getMonth() - 1);
+    fechaLimite = start.toISOString();
+  }
+
+  let query = 'SELECT * FROM busquedas_log';
+  const params = [];
+  const conditions = [];
+
+  if (fechaLimite) {
+    conditions.push('fecha >= ?');
+    params.push(fechaLimite);
+  }
+
+  if (search && search.trim()) {
+    conditions.push('titulo LIKE ?');
+    params.push(`%${search.trim()}%`);
+  }
+
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
+  }
+
+  query += ' ORDER BY fecha DESC';
+
+  db.all(query, params, (err, rows) => {
+    if (err) return res.status(500).json({ success: false, error: err.message });
+    res.json({ success: true, data: rows });
+  });
+});
+
 // =================== INICIA EL SERVIDOR ====================
 app.listen(PORT, () => {
   console.log(`🚀 Servidor backend escuchando en http://localhost:${PORT}`);
