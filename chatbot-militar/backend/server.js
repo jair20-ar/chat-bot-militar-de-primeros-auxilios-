@@ -8,6 +8,7 @@ const path = require('path');
 const { Model, Recognizer } = require('vosk');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('ffmpeg-static');
+const bcrypt = require('bcryptjs');
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
@@ -33,35 +34,6 @@ const model = new Model(modelpath);
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-
-// =================== Crear tabla medicos si NO existe ===================
-db.run(`
-  CREATE TABLE IF NOT EXISTS medicos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT NOT NULL,
-    email TEXT NOT NULL,
-    cedula TEXT NOT NULL,
-    especializacion TEXT NOT NULL,
-    id_medico TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL
-  )
-`);
-
-// =================== Crear tabla instrucciones (ACTUALIZADA) ===================
-db.run(`
-  CREATE TABLE IF NOT EXISTS instrucciones (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    titulo TEXT NOT NULL,
-    categoria TEXT,
-    severidad TEXT,
-    parte_cuerpo TEXT NOT NULL,
-    tiempo_estimado TEXT,
-    pasos TEXT NOT NULL,
-    fecha TEXT NOT NULL,
-    id_medico TEXT NOT NULL,
-    FOREIGN KEY(id_medico) REFERENCES medicos(id_medico)
-  )
-`);
 
 // =============== Servir frontend estático ===============
 app.use(express.static(path.join(__dirname, '../frontend/html')));
@@ -110,48 +82,55 @@ app.post('/api/transcribir', upload.single('audio'), (req, res) => {
 });
 
 // ================ RUTA PARA REGISTRO DE MÉDICOS ================
-app.post('/medicos/registro', (req, res) => {
+app.post('/medicos/registro', async (req, res) => {
   const { nombre, email, cedula, especializacion, password, codigo_registro } = req.body;
   if (!nombre || !email || !cedula || !especializacion || !password || !codigo_registro) {
     return res.status(400).json({ error: 'Todos los campos, incluyendo el código de registro, son obligatorios.' });
   }
 
   // Verificar código de registro
-  db.get("SELECT valor FROM configuracion WHERE clave = 'registro_code'", [], (err, row) => {
+  db.get("SELECT valor FROM configuracion WHERE clave = 'registro_code'", [], async (err, row) => {
     if (err) return res.status(500).json({ error: 'Error al verificar el código de registro.' });
     const correctCode = row ? row.valor : 'FANB2026';
     if (codigo_registro !== correctCode) {
       return res.status(403).json({ error: 'Código de registro inválido o no autorizado.' });
     }
 
-    db.run(
-      'INSERT INTO medicos (nombre, email, cedula, especializacion, id_medico, password) VALUES (?, ?, ?, ?, ?, ?)',
-      [nombre, email, cedula, especializacion, cedula, password],
-      function (err) {
-        if (err) {
-          if (err.message && err.message.includes('UNIQUE constraint failed')) {
-            return res.status(409).json({ error: 'El usuario/cédula ya está registrado.' });
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      db.run(
+        'INSERT INTO medicos (nombre, email, cedula, especializacion, id_medico, password) VALUES (?, ?, ?, ?, ?, ?)',
+        [nombre, email, cedula, especializacion, cedula, hashedPassword],
+        function (err) {
+          if (err) {
+            if (err.message && err.message.includes('UNIQUE constraint failed')) {
+              return res.status(409).json({ error: 'El usuario/cédula ya está registrado.' });
+            }
+            return res.status(500).json({ error: err.message });
           }
-          return res.status(500).json({ error: err.message });
+          res.json({ ok: true, id: this.lastID });
         }
-        res.json({ ok: true, id: this.lastID });
-      }
-    );
+      );
+    } catch (err) {
+      return res.status(500).json({ error: 'Error al procesar la contraseña.' });
+    }
   });
 });
 
 // ============= RUTA PARA INICIO DE SESIÓN DE MÉDICOS =============
-app.post('/medicos/login', (req, res) => {
+app.post('/medicos/login', async (req, res) => {
   const { id_medico, password } = req.body;
   if (!id_medico || !password) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
   }
   db.get(
-    'SELECT * FROM medicos WHERE id_medico = ? AND password = ?',
-    [id_medico, password],
-    (err, row) => {
+    'SELECT * FROM medicos WHERE id_medico = ?',
+    [id_medico],
+    async (err, row) => {
       if (err) return res.status(500).json({ error: err.message });
       if (!row) return res.status(401).json({ error: 'Credenciales incorrectas.' });
+      const match = await bcrypt.compare(password, row.password);
+      if (!match) return res.status(401).json({ error: 'Credenciales incorrectas.' });
       res.json({ ok: true, nombre: row.nombre, id_medico: row.id_medico });
     }
   );
@@ -375,19 +354,6 @@ app.post('/api/admin/config', (req, res) => {
     });
   });
 });
-
-// =================== Crear tabla busquedas_log ===================
-db.run(`
-  CREATE TABLE IF NOT EXISTS busquedas_log (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    instruccion_id INTEGER NOT NULL,
-    titulo TEXT NOT NULL,
-    id_medico_creador TEXT NOT NULL,
-    nombre_medico_creador TEXT NOT NULL,
-    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(instruccion_id) REFERENCES instrucciones(id)
-  )
-`);
 
 // ============ REGISTRO DE BÚSQUEDAS (SOLDIER VIEWS) ============
 

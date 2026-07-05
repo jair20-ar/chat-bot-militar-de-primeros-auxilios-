@@ -30,7 +30,7 @@ const searchInstruccionesInput = document.getElementById('searchInstrucciones');
 const busquedasList = document.getElementById('busquedasList');
 const emptyBusquedas = document.getElementById('emptyBusquedas');
 const searchBusquedasInput = document.getElementById('searchBusquedas');
-const filterBtns = document.querySelectorAll('.filter-btn');
+const periodoSelect = document.getElementById('periodoSelect');
 
 const codeDisplay = document.getElementById('codeDisplay');
 const newRegCodeInput = document.getElementById('newRegCode');
@@ -363,14 +363,10 @@ function setupEventListeners() {
     }
   });
 
-  // Filtros de período para búsquedas
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentPeriodo = btn.dataset.periodo;
-      loadBusquedas();
-    });
+  // Filtro de período para búsquedas (dropdown)
+  periodoSelect.addEventListener('change', () => {
+    currentPeriodo = periodoSelect.value;
+    loadBusquedas();
   });
 
   // Buscador de búsquedas

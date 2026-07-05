@@ -22,6 +22,9 @@
         </button>
         <div class="header-title">
           <span class="icon-circle">
+            <span class="shield-ring r1"></span>
+            <span class="shield-ring r2"></span>
+            <span class="shield-ring r3"></span>
             <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </span>
           <h1>PANEL DE ADMINISTRACIÓN</h1>
@@ -97,9 +100,12 @@
     <!-- Búsquedas -->
     <section class="tab-panel" id="busquedas">
       <div class="filter-bar">
-        <button class="filter-btn active" data-periodo="dia">Día</button>
-        <button class="filter-btn" data-periodo="semana">Semana</button>
-        <button class="filter-btn" data-periodo="mes">Mes</button>
+        <select class="filter-select" id="periodoSelect">
+          <option value="dia">Hoy</option>
+          <option value="semana">Última semana</option>
+          <option value="mes">Último mes</option>
+          <option value="todas">Todas</option>
+        </select>
       </div>
 
       <input type="text" id="searchBusquedas" class="search-input" placeholder="Buscar por título de instrucción...">
