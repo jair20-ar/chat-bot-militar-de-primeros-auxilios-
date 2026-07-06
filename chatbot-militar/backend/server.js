@@ -123,17 +123,25 @@ app.post('/medicos/login', async (req, res) => {
   if (!id_medico || !password) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
   }
-  db.get(
-    'SELECT * FROM medicos WHERE id_medico = ?',
-    [id_medico],
-    async (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      if (!row) return res.status(401).json({ error: 'Credenciales incorrectas.' });
-      const match = await bcrypt.compare(password, row.password);
-      if (!match) return res.status(401).json({ error: 'Credenciales incorrectas.' });
-      res.json({ ok: true, nombre: row.nombre, id_medico: row.id_medico });
+  db.get('SELECT * FROM medicos WHERE id_medico = ?', [id_medico], async (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!row) return res.status(401).json({ error: 'Credenciales incorrectas.' });
+
+    let match = false;
+
+    if (row.password.startsWith('$2b$') || row.password.startsWith('$2a$')) {
+      match = await bcrypt.compare(password, row.password);
+    } else {
+      match = (password === row.password);
+      if (match) {
+        const hashed = await bcrypt.hash(password, 10);
+        db.run('UPDATE medicos SET password = ? WHERE id = ?', [hashed, row.id]);
+      }
     }
-  );
+
+    if (!match) return res.status(401).json({ error: 'Credenciales incorrectas.' });
+    res.json({ ok: true, nombre: row.nombre, id_medico: row.id_medico });
+  });
 });
 
 // ============ RUTAS PARA INSTRUCCIONES ===========
@@ -424,6 +432,11 @@ app.get('/api/admin/busquedas', (req, res) => {
     if (err) return res.status(500).json({ success: false, error: err.message });
     res.json({ success: true, data: rows });
   });
+});
+
+// =================== HEALTH CHECK (para Render) ====================
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
 });
 
 // =================== INICIA EL SERVIDOR ====================
