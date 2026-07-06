@@ -295,8 +295,7 @@ app.get('/api/admin/medicos', (req, res) => {
 app.delete('/api/admin/medicos/:id_medico', (req, res) => {
   const { id_medico } = req.params;
   
-  db.serialize(() => {
-    db.run('DELETE FROM instrucciones WHERE id_medico = ?', [id_medico]);
+  db.run('DELETE FROM instrucciones WHERE id_medico = ?', [id_medico], () => {
     db.run('DELETE FROM medicos WHERE id_medico = ?', [id_medico], function (err) {
       if (err) return res.status(500).json({ success: false, error: 'Error al eliminar al médico.' });
       res.json({ success: true });
@@ -338,29 +337,39 @@ app.get('/api/admin/config', (req, res) => {
 // Actualizar configuración
 app.post('/api/admin/config', (req, res) => {
   const { registro_code, admin_password } = req.body;
-  
-  db.serialize(() => {
-    let errOccurred = false;
-    
-    if (registro_code !== undefined) {
-      db.run("INSERT OR REPLACE INTO configuracion (clave, valor) VALUES ('registro_code', ?)", [registro_code], (err) => {
-        if (err) errOccurred = true;
-      });
-    }
-    
-    if (admin_password !== undefined) {
-      db.run("INSERT OR REPLACE INTO configuracion (clave, valor) VALUES ('admin_password', ?)", [admin_password], (err) => {
-        if (err) errOccurred = true;
-      });
-    }
-    
-    db.get("SELECT 1", (err) => {
-      if (errOccurred || err) {
-        return res.status(500).json({ success: false, error: 'Error al actualizar configuraciones.' });
-      }
+  let errOccurred = false;
+  let completed = 0;
+  let total = 0;
+
+  const checkDone = () => {
+    completed++;
+    if (completed >= total) {
+      if (errOccurred) return res.status(500).json({ success: false, error: 'Error al actualizar configuraciones.' });
       res.json({ success: true });
-    });
-  });
+    }
+  };
+
+  if (registro_code !== undefined) {
+    total++;
+    db.run(
+      "INSERT INTO configuracion (clave, valor) VALUES (?, ?) ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor",
+      [registro_code],
+      (err) => { if (err) errOccurred = true; checkDone(); }
+    );
+  }
+
+  if (admin_password !== undefined) {
+    total++;
+    db.run(
+      "INSERT INTO configuracion (clave, valor) VALUES (?, ?) ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor",
+      [admin_password],
+      (err) => { if (err) errOccurred = true; checkDone(); }
+    );
+  }
+
+  if (total === 0) {
+    res.json({ success: true });
+  }
 });
 
 // ============ REGISTRO DE BÚSQUEDAS (SOLDIER VIEWS) ============

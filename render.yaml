@@ -4,10 +4,18 @@ services:
     runtime: node
     rootDir: chatbot-militar/backend
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node --max-old-space-size=180 server.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
         value: 18.19.0
-      - key: NODE_OPTIONS
-        value: "--max-old-space-size=256"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: chatbot-militar-db
+          property: connectionString
+
+databases:
+  - name: chatbot-militar-db
+    plan: free
+    databaseName: chatbot_militar
+    user: chatbot_militar_user
