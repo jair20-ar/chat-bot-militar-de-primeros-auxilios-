@@ -9,3 +9,5 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 18.19.0
+      - key: NODE_OPTIONS
+        value: "--max-old-space-size=256"

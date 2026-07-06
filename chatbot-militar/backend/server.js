@@ -434,6 +434,14 @@ app.get('/api/admin/busquedas', (req, res) => {
   });
 });
 
+// =================== MANEJADORES DE ERRORES GLOBALES ====================
+process.on('uncaughtException', (err) => {
+  console.error('Error no capturado:', err.message);
+});
+process.on('unhandledRejection', (err) => {
+  console.error('Promesa rechazada:', err.message);
+});
+
 // =================== HEALTH CHECK (para Render) ====================
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
