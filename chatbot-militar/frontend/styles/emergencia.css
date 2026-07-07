@@ -444,9 +444,9 @@ textarea {
 }
 
 .toast.error {
-    background: rgba(255, 68, 68, 0.1);
-    border-color: #ff4444;
-    color: #ff4444;
+    background: rgba(0, 82, 0, 0.1);
+    border-color: #006600;
+    color: #006600;
 }
 
 @keyframes slideInRight {
@@ -487,53 +487,61 @@ textarea {
    TEMA CLARO TÁCTICO MILITAR DIURNO - OVERRIDES PARA EMERGENCIA
    ========================================================================== */
 body[data-theme="light"] {
-    --bg-dark: #d0d9e0;
-    --bg-gradient: radial-gradient(circle at top, #e2e8f0 0%, #dbe2e8 100%);
+    --bg-dark: #e6e6e3;
+    --bg-gradient: radial-gradient(circle at top, #e2e8f0 0%, #e6e6e3 100%);
     --card-bg: rgba(255, 255, 255, 0.9);
     --input-bg: #f1f5f9;
-    --border-color: rgba(15, 23, 42, 0.12);
-    --border-focus: #dc2626;
-    --cyan-accent: #dc2626;
-    --cyan-hover: #b91c1c;
-    --text-main: #1e293b;
+    --border-color: rgba(15, 31, 15, 0.12);
+    --border-focus: #005200;
+    --cyan-accent: #005200;
+    --cyan-hover: #003d00;
+    --text-main: #0f1f0f;
     --text-muted: #475569;
-    --danger: #dc2626;
-    --green-accent: #b91c1c;
+    --danger: #005200;
+    --green-accent: #003d00;
 
-    background-color: #dbe2e8 !important;
+    background-color: #e6e6e3 !important;
     background-image: 
-        url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ESYS: TACMED_FANB_RSC%3C/text%3E%3Ctext x='30' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELAT: 10.4806° N%3C/text%3E%3Ctext x='30' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELON: 66.9036° W%3C/text%3E%3Ctext x='90%25' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESTATUS: ACTIVE%3C/text%3E%3Ctext x='90%25' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 500KM%3C/text%3E%3Ctext x='90%25' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EALT: 852M%3C/text%3E%3C/svg%3E"),
-        radial-gradient(circle at 90% 10%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 10% 80%, rgba(71, 85, 105, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.02) 0%, transparent 70%),
-        linear-gradient(rgba(15, 23, 42, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px) !important;
-    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 30px 30px, 30px 30px !important;
+        url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23005200' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ECHART: 4406_BAHIA%3C/text%3E%3Ctext x='30' y='85' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9'%3EDEPTH: 18.5M%3C/text%3E%3Ctext x='30' y='98' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9'%3ESNDG: 50KHZ%3C/text%3E%3Ctext x='90%25' y='70' fill='%23005200' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESEC: BAHIA_NAV%3C/text%3E%3Ctext x='90%25' y='85' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EBRG: 045%3C/text%3E%3Ctext x='90%25' y='98' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 12NM%3C/text%3E%3C/svg%3E"),
+        radial-gradient(circle at 5% 5%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 11% 11%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 95% 5%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 89% 11%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 5% 95%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 11% 89%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 95% 95%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 89% 89%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 50% 50%, rgba(0, 82, 0, 0.02) 0%, transparent 70%),
+        linear-gradient(rgba(0, 82, 0, 0.07) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(0, 82, 0, 0.07) 2px, transparent 2px),
+        linear-gradient(rgba(0, 82, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 82, 0, 0.03) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 120px 120px, 120px 120px, 24px 24px, 24px 24px !important;
     background-attachment: fixed !important;
-    color: #0f172a !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"]::before,
 body[data-theme="light"]::after {
-    border-color: rgba(220, 38, 38, 0.35) !important;
+    border-color: rgba(0, 82, 0, 0.35) !important;
 }
 
 body[data-theme="light"] .card {
     background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    border: 1px solid rgba(15, 31, 15, 0.1) !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
 }
 
 body[data-theme="light"] .card-general {
-    border-top: 1px solid rgba(220, 38, 38, 0.3) !important;
+    border-top: 1px solid rgba(0, 82, 0, 0.3) !important;
 }
 
 body[data-theme="light"] .section-header {
-    color: #0f172a !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] .section-header svg {
-    stroke: #dc2626 !important;
+    stroke: #005200 !important;
 }
 
 body[data-theme="light"] label {
@@ -549,53 +557,53 @@ body[data-theme="light"] input[type="number"],
 body[data-theme="light"] select,
 body[data-theme="light"] textarea {
     background: #f1f5f9 !important;
-    border: 1px solid rgba(15, 23, 42, 0.12) !important;
-    color: #0f172a !important;
+    border: 1px solid rgba(15, 31, 15, 0.12) !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] input[type="text"]:focus,
 body[data-theme="light"] input[type="number"]:focus,
 body[data-theme="light"] select:focus,
 body[data-theme="light"] textarea:focus {
-    border-color: #dc2626 !important;
-    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1) !important;
+    border-color: #005200 !important;
+    box-shadow: 0 0 0 2px rgba(0, 82, 0, 0.1) !important;
     background: #ffffff !important;
 }
 
 body[data-theme="light"] .steps-title {
-    color: #0f172a !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] .btn-add-step {
-    background: rgba(220, 38, 38, 0.08) !important;
-    border: 1px solid rgba(220, 38, 38, 0.3) !important;
-    color: #dc2626 !important;
+    background: rgba(0, 82, 0, 0.08) !important;
+    border: 1px solid rgba(0, 82, 0, 0.3) !important;
+    color: #005200 !important;
 }
 
 body[data-theme="light"] .btn-add-step:hover {
-    background: rgba(220, 38, 38, 0.15) !important;
-    border-color: #dc2626 !important;
+    background: rgba(0, 82, 0, 0.15) !important;
+    border-color: #005200 !important;
 }
 
 body[data-theme="light"] .step-number {
-    background: rgba(220, 38, 38, 0.08) !important;
-    color: #dc2626 !important;
-    border: 1px solid rgba(220, 38, 38, 0.2) !important;
+    background: rgba(0, 82, 0, 0.08) !important;
+    color: #005200 !important;
+    border: 1px solid rgba(0, 82, 0, 0.2) !important;
 }
 
 body[data-theme="light"] .step-card {
-    border-left: 3px solid #dc2626 !important;
+    border-left: 3px solid #005200 !important;
 }
 
 body[data-theme="light"] .file-input-label {
     background: #f8fafc !important;
-    border: 1px dashed rgba(15, 23, 42, 0.15) !important;
+    border: 1px dashed rgba(15, 31, 15, 0.15) !important;
     color: #64748b !important;
 }
 
 body[data-theme="light"] .file-input-label:hover {
-    border-color: #dc2626 !important;
-    color: #dc2626 !important;
+    border-color: #005200 !important;
+    color: #005200 !important;
 }
 
 body[data-theme="light"] .file-input-label svg {
@@ -603,29 +611,29 @@ body[data-theme="light"] .file-input-label svg {
 }
 
 body[data-theme="light"] .file-input-label:hover svg {
-    stroke: #dc2626 !important;
+    stroke: #005200 !important;
 }
 
 body[data-theme="light"] .btn-save {
-    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
+    background: linear-gradient(135deg, #003d00 0%, #005200 100%) !important;
     color: #ffffff !important;
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.25) !important;
+    box-shadow: 0 0 15px rgba(0, 82, 0, 0.25) !important;
 }
 
 body[data-theme="light"] .btn-save:hover {
-    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
-    box-shadow: 0 0 25px rgba(220, 38, 38, 0.4) !important;
+    background: linear-gradient(135deg, #002b00 0%, #003d00 100%) !important;
+    box-shadow: 0 0 25px rgba(0, 82, 0, 0.4) !important;
     transform: translateY(-2px) !important;
 }
 
 body[data-theme="light"] .btn-back-panel {
     background: #f1f5f9 !important;
-    border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
+    border: 1.5px solid rgba(15, 31, 15, 0.12) !important;
     color: #334155 !important;
 }
 
 body[data-theme="light"] .btn-back-panel:hover {
     background: #e2e8f0 !important;
-    border-color: #dc2626 !important;
-    color: #dc2626 !important;
+    border-color: #005200 !important;
+    color: #005200 !important;
 }

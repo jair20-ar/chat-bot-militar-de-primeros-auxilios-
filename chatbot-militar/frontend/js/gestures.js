@@ -283,19 +283,19 @@ function ensureMenu() {
     /* === LIGHT THEME OVERRIDES FOR CONTEXT MENU & TOAST === */
     body[data-theme="light"] #tactical-context-menu {
       background: rgba(255, 255, 255, 0.98) !important;
-      border: 1px solid rgba(220, 38, 38, 0.3) !important;
-      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.12), inset 0 0 10px rgba(220, 38, 38, 0.04) !important;
+      border: 1px solid rgba(0, 82, 0, 0.3) !important;
+      box-shadow: 0 10px 30px rgba(0, 82, 0, 0.12), inset 0 0 10px rgba(0, 82, 0, 0.04) !important;
     }
     body[data-theme="light"] .context-menu-item {
       color: #475569 !important;
     }
     body[data-theme="light"] .context-menu-item:hover {
-      color: #dc2626 !important;
-      background: rgba(220, 38, 38, 0.06) !important;
-      border-left: 3px solid #dc2626 !important;
+      color: #005200 !important;
+      background: rgba(0, 82, 0, 0.06) !important;
+      border-left: 3px solid #005200 !important;
     }
     body[data-theme="light"] .context-menu-divider {
-      background: rgba(220, 38, 38, 0.12) !important;
+      background: rgba(0, 82, 0, 0.12) !important;
     }
     body[data-theme="light"] .gesture-toast {
       background: rgba(255, 255, 255, 0.98) !important;
@@ -589,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
         height: 100%;
       }
       .ecg-path {
-        stroke: #dc2626;
+        stroke: #005200;
         stroke-width: 2.8;
         fill: none;
         stroke-linecap: round;
@@ -597,7 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stroke-dasharray: 300 900;
         stroke-dashoffset: 1200;
         animation: ecg-sweep 8s linear infinite;
-        filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.75));
+        filter: drop-shadow(0 0 4px rgba(0, 82, 0, 0.75));
       }
       @keyframes ecg-sweep {
         0% { stroke-dashoffset: 1200; }

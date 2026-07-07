@@ -844,56 +844,64 @@ spline-viewer {
    TEMA CLARO TÁCTICO MILITAR DIURNO - OVERRIDES PARA INSTRUCCIONES
    ========================================================================== */
 body[data-theme="light"] {
-    --bg-main: #dbe2e8;
+    --bg-main: #e6e6e3;
     --bg-card: rgba(255, 255, 255, 0.9);
     --bg-button: rgba(226, 232, 240, 0.9);
-    --cyan: #dc2626;
-    --cyan-hover: #b91c1c;
-    --text-main: #1e293b;
+    --cyan: #005200;
+    --cyan-hover: #003d00;
+    --text-main: #0f1f0f;
     --text-muted: #475569;
-    --border-color: rgba(15, 23, 42, 0.12);
+    --border-color: rgba(15, 31, 15, 0.12);
 
-    background-color: #dbe2e8 !important;
+    background-color: #e6e6e3 !important;
     background-image: 
-        url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ESYS: TACMED_FANB_RSC%3C/text%3E%3Ctext x='30' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELAT: 10.4806° N%3C/text%3E%3Ctext x='30' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELON: 66.9036° W%3C/text%3E%3Ctext x='90%25' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESTATUS: ACTIVE%3C/text%3E%3Ctext x='90%25' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 500KM%3C/text%3E%3Ctext x='90%25' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EALT: 852M%3C/text%3E%3C/svg%3E"),
-        radial-gradient(circle at 90% 10%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 10% 80%, rgba(71, 85, 105, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.02) 0%, transparent 70%),
-        linear-gradient(rgba(15, 23, 42, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px) !important;
-    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 30px 30px, 30px 30px !important;
+        url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23005200' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ECHART: 4406_BAHIA%3C/text%3E%3Ctext x='30' y='85' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9'%3EDEPTH: 18.5M%3C/text%3E%3Ctext x='30' y='98' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9'%3ESNDG: 50KHZ%3C/text%3E%3Ctext x='90%25' y='70' fill='%23005200' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESEC: BAHIA_NAV%3C/text%3E%3Ctext x='90%25' y='85' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EBRG: 045%3C/text%3E%3Ctext x='90%25' y='98' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 12NM%3C/text%3E%3C/svg%3E"),
+        radial-gradient(circle at 5% 5%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 11% 11%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 95% 5%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 89% 11%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 5% 95%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 11% 89%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 95% 95%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 89% 89%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 50% 50%, rgba(0, 82, 0, 0.02) 0%, transparent 70%),
+        linear-gradient(rgba(0, 82, 0, 0.07) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(0, 82, 0, 0.07) 2px, transparent 2px),
+        linear-gradient(rgba(0, 82, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 82, 0, 0.03) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 120px 120px, 120px 120px, 24px 24px, 24px 24px !important;
     background-attachment: fixed !important;
-    color: #0f172a !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"]::before,
 body[data-theme="light"]::after {
-    border-color: rgba(220, 38, 38, 0.35) !important;
+    border-color: rgba(0, 82, 0, 0.35) !important;
 }
 
 body[data-theme="light"] .header {
-    border-bottom: 1px solid rgba(15, 23, 42, 0.1) !important;
+    border-bottom: 1px solid rgba(15, 31, 15, 0.1) !important;
 }
 
 body[data-theme="light"] .header .icon-btn {
     background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.12) !important;
-    color: #0f172a !important;
+    border: 1px solid rgba(15, 31, 15, 0.12) !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] .header .icon-btn:hover {
-    background: rgba(220, 38, 38, 0.08) !important;
-    border-color: #dc2626 !important;
-    color: #dc2626 !important;
-    box-shadow: 0 0 12px rgba(220, 38, 38, 0.15) !important;
+    background: rgba(0, 82, 0, 0.08) !important;
+    border-color: #005200 !important;
+    color: #005200 !important;
+    box-shadow: 0 0 12px rgba(0, 82, 0, 0.15) !important;
 }
 
 body[data-theme="light"] .header .icon-btn:last-child {
-    border: 1.5px solid rgba(220, 38, 38, 0.25) !important;
+    border: 1.5px solid rgba(0, 82, 0, 0.25) !important;
 }
 
 body[data-theme="light"] .header .icon-btn:last-child svg {
-    stroke: #dc2626 !important;
+    stroke: #005200 !important;
     filter: none !important;
 }
 
@@ -902,27 +910,27 @@ body[data-theme="light"] .titles span {
 }
 
 body[data-theme="light"] .titles h1 {
-    color: #0f172a !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] .titles::after {
-    background: #dc2626 !important;
-    box-shadow: 0 0 8px rgba(220, 38, 38, 0.5) !important;
+    background: #005200 !important;
+    box-shadow: 0 0 8px rgba(0, 82, 0, 0.5) !important;
 }
 
 body[data-theme="light"] .avatar-circle {
     background: radial-gradient(circle at 50% 50%, rgba(226, 232, 240, 0.9) 0%, rgba(203, 213, 225, 0.95) 100%) !important;
-    border: 2px solid rgba(220, 38, 38, 0.35) !important;
-    box-shadow: 0 0 25px rgba(220, 38, 38, 0.1), inset 0 0 15px rgba(220, 38, 38, 0.1) !important;
+    border: 2px solid rgba(0, 82, 0, 0.35) !important;
+    box-shadow: 0 0 25px rgba(0, 82, 0, 0.1), inset 0 0 15px rgba(0, 82, 0, 0.1) !important;
 }
 
 body[data-theme="light"] .scanner-ring-outer {
-    border: 1.5px dashed rgba(220, 38, 38, 0.35) !important;
+    border: 1.5px dashed rgba(0, 82, 0, 0.35) !important;
     box-shadow: none !important;
 }
 
 body[data-theme="light"] .scanner-ring-inner {
-    border: 1px solid rgba(220, 38, 38, 0.15) !important;
+    border: 1px solid rgba(0, 82, 0, 0.15) !important;
 }
 
 body[data-theme="light"] .view-toggle button {
@@ -931,12 +939,12 @@ body[data-theme="light"] .view-toggle button {
 }
 
 body[data-theme="light"] .view-toggle button.active {
-    color: #0f172a !important;
+    color: #0f1f0f !important;
     opacity: 1 !important;
 }
 
 body[data-theme="light"] .view-toggle .step-suffix {
-    color: #dc2626 !important;
+    color: #005200 !important;
     filter: none !important;
 }
 
@@ -949,7 +957,7 @@ body[data-theme="light"] .progress-labels {
 }
 
 body[data-theme="light"] .progress-labels .highlight {
-    color: #dc2626 !important;
+    color: #005200 !important;
 }
 
 body[data-theme="light"] .progress-bar-bg {
@@ -957,31 +965,31 @@ body[data-theme="light"] .progress-bar-bg {
 }
 
 body[data-theme="light"] .progress-fill {
-    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
-    box-shadow: 0 0 10px rgba(220, 38, 38, 0.4) !important;
+    background: linear-gradient(135deg, #003d00 0%, #005200 100%) !important;
+    box-shadow: 0 0 10px rgba(0, 82, 0, 0.4) !important;
 }
 
 body[data-theme="light"] .playback-controls .icon-btn {
     background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.12) !important;
-    color: #0f172a !important;
+    border: 1px solid rgba(15, 31, 15, 0.12) !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] .playback-controls .icon-btn:hover {
-    border-color: rgba(220, 38, 38, 0.45) !important;
+    border-color: rgba(0, 82, 0, 0.45) !important;
     background: #f8fafc !important;
-    color: #dc2626 !important;
-    box-shadow: 0 0 10px rgba(220, 38, 38, 0.1) !important;
+    color: #005200 !important;
+    box-shadow: 0 0 10px rgba(0, 82, 0, 0.1) !important;
 }
 
 body[data-theme="light"] .play-btn {
-    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.3) !important;
+    background: linear-gradient(135deg, #003d00 0%, #005200 100%) !important;
+    box-shadow: 0 0 15px rgba(0, 82, 0, 0.3) !important;
     color: #ffffff !important;
 }
 
 body[data-theme="light"] .play-btn:hover {
-    box-shadow: 0 0 25px rgba(220, 38, 38, 0.5) !important;
+    box-shadow: 0 0 25px rgba(0, 82, 0, 0.5) !important;
 }
 
 body[data-theme="light"] .play-btn svg {
@@ -990,12 +998,12 @@ body[data-theme="light"] .play-btn svg {
 }
 
 body[data-theme="light"] .play-btn.paused {
-    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.3) !important;
+    background: linear-gradient(135deg, #005200 0%, #006600 100%) !important;
+    box-shadow: 0 0 15px rgba(0, 82, 0, 0.3) !important;
 }
 
 body[data-theme="light"] .play-btn.paused:hover {
-    box-shadow: 0 0 25px rgba(220, 38, 38, 0.5) !important;
+    box-shadow: 0 0 25px rgba(0, 82, 0, 0.5) !important;
 }
 
 body[data-theme="light"] .play-btn.paused svg {
@@ -1004,66 +1012,66 @@ body[data-theme="light"] .play-btn.paused svg {
 }
 
 body[data-theme="light"] .voice-btn.muted {
-    border-color: rgba(220, 38, 38, 0.4) !important;
-    color: #dc2626 !important;
-    background: rgba(220, 38, 38, 0.08) !important;
+    border-color: rgba(0, 82, 0, 0.4) !important;
+    color: #005200 !important;
+    background: rgba(0, 82, 0, 0.08) !important;
 }
 
 body[data-theme="light"] .instruction-card {
     background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    border: 1px solid rgba(15, 31, 15, 0.1) !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
 }
 
 body[data-theme="light"] .step-badge {
-    background: rgba(220, 38, 38, 0.08) !important;
-    border: 2px solid #dc2626 !important;
-    color: #dc2626 !important;
+    background: rgba(0, 82, 0, 0.08) !important;
+    border: 2px solid #005200 !important;
+    color: #005200 !important;
     box-shadow: none !important;
 }
 
 body[data-theme="light"] .instruction-card h3 {
-    color: #0f172a !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] .instruction-card p {
-    color: #1e293b !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] .step-image {
-    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    border: 1px solid rgba(15, 31, 15, 0.1) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
 }
 
 body[data-theme="light"] .step-nav-btn {
     background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    border: 1px solid rgba(15, 31, 15, 0.12) !important;
     color: #475569 !important;
 }
 
 body[data-theme="light"] .step-nav-btn:hover:not(.active) {
     background: #f8fafc !important;
-    border-color: rgba(220, 38, 38, 0.35) !important;
-    color: #dc2626 !important;
-    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.06) !important;
+    border-color: rgba(0, 82, 0, 0.35) !important;
+    color: #005200 !important;
+    box-shadow: 0 4px 10px rgba(0, 82, 0, 0.06) !important;
 }
 
 body[data-theme="light"] .step-nav-btn.active {
-    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
+    background: linear-gradient(135deg, #003d00 0%, #005200 100%) !important;
     color: #ffffff !important;
     border: none !important;
-    box-shadow: 0 0 10px rgba(220, 38, 38, 0.3) !important;
+    box-shadow: 0 0 10px rgba(0, 82, 0, 0.3) !important;
 }
 
 body[data-theme="light"] .btn-finish {
-    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
+    background: linear-gradient(135deg, #003d00 0%, #005200 100%) !important;
     color: #ffffff !important;
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.25) !important;
+    box-shadow: 0 0 15px rgba(0, 82, 0, 0.25) !important;
 }
 
 body[data-theme="light"] .btn-finish:hover {
-    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
-    box-shadow: 0 0 25px rgba(220, 38, 38, 0.4) !important;
+    background: linear-gradient(135deg, #002b00 0%, #003d00 100%) !important;
+    box-shadow: 0 0 25px rgba(0, 82, 0, 0.4) !important;
 }
 
 body[data-theme="light"] .btn-finish svg {
@@ -1071,21 +1079,21 @@ body[data-theme="light"] .btn-finish svg {
 }
 
 body[data-theme="light"] .tactical-modal-overlay {
-    background: rgba(15, 23, 42, 0.6) !important;
+    background: rgba(15, 31, 15, 0.6) !important;
 }
 
 body[data-theme="light"] .tactical-modal {
     background: #ffffff !important;
-    border: 2px solid rgba(220, 38, 38, 0.3) !important;
-    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15), inset 0 0 25px rgba(220, 38, 38, 0.03) !important;
+    border: 2px solid rgba(0, 82, 0, 0.3) !important;
+    box-shadow: 0 20px 50px rgba(15, 31, 15, 0.15), inset 0 0 25px rgba(0, 82, 0, 0.03) !important;
 }
 
 body[data-theme="light"] .tactical-modal .modal-corner {
-    border-color: #dc2626 !important;
+    border-color: #005200 !important;
 }
 
 body[data-theme="light"] .tactical-modal .modal-header h2 {
-    color: #0f172a !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] .tactical-modal .modal-body p {
@@ -1094,23 +1102,23 @@ body[data-theme="light"] .tactical-modal .modal-body p {
 
 body[data-theme="light"] .tactical-modal .btn-restart {
     background: #f1f5f9 !important;
-    border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
+    border: 1.5px solid rgba(15, 31, 15, 0.12) !important;
     color: #334155 !important;
 }
 
 body[data-theme="light"] .tactical-modal .btn-restart:hover {
     background: #e2e8f0 !important;
-    border-color: #dc2626 !important;
-    color: #dc2626 !important;
+    border-color: #005200 !important;
+    color: #005200 !important;
 }
 
 body[data-theme="light"] .tactical-modal .btn-exit {
-    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
+    background: linear-gradient(135deg, #003d00 0%, #005200 100%) !important;
     color: #ffffff !important;
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.2) !important;
+    box-shadow: 0 0 15px rgba(0, 82, 0, 0.2) !important;
 }
 
 body[data-theme="light"] .tactical-modal .btn-exit:hover {
-    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
-    box-shadow: 0 0 25px rgba(220, 38, 38, 0.4) !important;
+    background: linear-gradient(135deg, #002b00 0%, #003d00 100%) !important;
+    box-shadow: 0 0 25px rgba(0, 82, 0, 0.4) !important;
 }

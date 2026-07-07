@@ -442,36 +442,44 @@ input::placeholder {
    TEMA CLARO TÁCTICO MILITAR DIURNO - OVERRIDES PARA MEDICOS
    ========================================================================== */
 body[data-theme="light"] {
-    --bg-dark: #d0d9e0;
+    --bg-dark: #e6e6e3;
     --bg-card: rgba(255, 255, 255, 0.9);
     --bg-input: #f1f5f9;
-    --cyan-accent: #dc2626;
-    --cyan-dim: rgba(220, 38, 38, 0.05);
-    --text-main: #1e293b;
+    --cyan-accent: #005200;
+    --cyan-dim: rgba(0, 82, 0, 0.05);
+    --text-main: #0f1f0f;
     --text-muted: #475569;
-    --border-color: rgba(15, 23, 42, 0.12);
+    --border-color: rgba(15, 31, 15, 0.12);
 
-    background-color: #dbe2e8 !important;
+    background-color: #e6e6e3 !important;
     background-image: 
-        url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ESYS: TACMED_FANB_RSC%3C/text%3E%3Ctext x='30' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELAT: 10.4806° N%3C/text%3E%3Ctext x='30' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9'%3ELON: 66.9036° W%3C/text%3E%3Ctext x='90%25' y='70' fill='%23dc2626' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESTATUS: ACTIVE%3C/text%3E%3Ctext x='90%25' y='85' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 500KM%3C/text%3E%3Ctext x='90%25' y='98' fill='%23dc2626' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EALT: 852M%3C/text%3E%3C/svg%3E"),
-        radial-gradient(circle at 90% 10%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 10% 80%, rgba(71, 85, 105, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.02) 0%, transparent 70%),
-        linear-gradient(rgba(15, 23, 42, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px) !important;
-    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 30px 30px, 30px 30px !important;
+        url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23005200' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ECHART: 4406_BAHIA%3C/text%3E%3Ctext x='30' y='85' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9'%3EDEPTH: 18.5M%3C/text%3E%3Ctext x='30' y='98' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9'%3ESNDG: 50KHZ%3C/text%3E%3Ctext x='90%25' y='70' fill='%23005200' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESEC: BAHIA_NAV%3C/text%3E%3Ctext x='90%25' y='85' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EBRG: 045%3C/text%3E%3Ctext x='90%25' y='98' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 12NM%3C/text%3E%3C/svg%3E"),
+        radial-gradient(circle at 5% 5%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 11% 11%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 95% 5%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 89% 11%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 5% 95%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 11% 89%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 95% 95%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
+        radial-gradient(circle at 89% 89%, rgba(0, 82, 0, 0.08) 0%, transparent 22%),
+        radial-gradient(circle at 50% 50%, rgba(0, 82, 0, 0.02) 0%, transparent 70%),
+        linear-gradient(rgba(0, 82, 0, 0.07) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(0, 82, 0, 0.07) 2px, transparent 2px),
+        linear-gradient(rgba(0, 82, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 82, 0, 0.03) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 120px 120px, 120px 120px, 24px 24px, 24px 24px !important;
     background-attachment: fixed !important;
-    color: #0f172a !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"]::before,
 body[data-theme="light"]::after {
-    border-color: rgba(220, 38, 38, 0.35) !important;
+    border-color: rgba(0, 82, 0, 0.35) !important;
 }
 
 body[data-theme="light"] .login-card {
     background: rgba(255, 255, 255, 0.9) !important;
-    border: 1px solid rgba(220, 38, 38, 0.18) !important;
+    border: 1px solid rgba(0, 82, 0, 0.18) !important;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05) !important;
 }
 
@@ -482,40 +490,40 @@ body[data-theme="light"] .form-label {
 
 body[data-theme="light"] input {
     background: #f1f5f9 !important;
-    border: 1px solid rgba(15, 23, 42, 0.15) !important;
-    color: #0f172a !important;
+    border: 1px solid rgba(15, 31, 15, 0.15) !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] input:focus {
-    border-color: #dc2626 !important;
+    border-color: #005200 !important;
     background: #ffffff !important;
 }
 
 body[data-theme="light"] .submit-btn {
-    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
+    background: linear-gradient(135deg, #003d00 0%, #005200 100%) !important;
     color: #ffffff !important;
 }
 
 body[data-theme="light"] .submit-btn:hover {
-    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
+    background: linear-gradient(135deg, #002b00 0%, #003d00 100%) !important;
 }
 
 body[data-theme="light"] .medico-card {
     background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    border: 1px solid rgba(15, 31, 15, 0.08) !important;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02) !important;
-    color: #0f172a !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] .medico-card:hover {
-    border-color: #dc2626 !important;
-    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.1) !important;
+    border-color: #005200 !important;
+    box-shadow: 0 8px 25px rgba(0, 82, 0, 0.1) !important;
 }
 
 body[data-theme="light"] .medico-name {
-    color: #0f172a !important;
+    color: #0f1f0f !important;
 }
 
 body[data-theme="light"] .medico-spec {
-    color: #dc2626 !important;
+    color: #005200 !important;
 }
