@@ -32,7 +32,14 @@ function loadInstructionToEdit(id) {
                 document.getElementById('parte_cuerpo').value = inst.parte_cuerpo || '';
                 document.getElementById('tiempo_estimado').value = inst.tiempo_estimado || '';
 
-                const pasos = typeof inst.pasos === 'string' ? JSON.parse(inst.pasos) : inst.pasos;
+                let pasos;
+                try {
+                    pasos = typeof inst.pasos === 'string' ? JSON.parse(inst.pasos) : inst.pasos;
+                } catch (e) {
+                    console.error('Error parsing pasos:', e);
+                    pasos = [];
+                }
+                if (!Array.isArray(pasos)) pasos = [];
                 const stepsContainer = document.getElementById('steps-container');
                 stepsContainer.innerHTML = '';
                 stepCount = 0;
@@ -96,8 +103,6 @@ function loadInstructionToEdit(id) {
         .catch(err => {
             console.error(err);
             showToast('❌ Error al cargar instrucción', true);
-            const redirectUrl = (localStorage.getItem('adminToken') === 'true') ? '/admin.html' : '/panel.html';
-            setTimeout(() => window.location.href = redirectUrl, 2000);
         });
 }
 
@@ -333,8 +338,7 @@ function sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tie
         if (data.success) {
             const msg = editingId ? '✅ Instrucción actualizada correctamente' : '✅ Instrucción guardada correctamente';
             showToast(msg);
-            const redirectUrl = (localStorage.getItem('adminToken') === 'true') ? '/admin.html' : '/panel.html';
-            setTimeout(() => window.location.href = redirectUrl, 1500);
+            setTimeout(() => window.location.href = '/panel.html', 1500);
         } else {
             showToast('❌ ' + (data.error || 'Error al guardar'), true);
             resetSaveBtn(btnSave);

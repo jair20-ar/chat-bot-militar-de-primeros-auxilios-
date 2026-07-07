@@ -113,10 +113,18 @@ function displayInstructions(instructions) {
             <div class="instruction-actions">
                 <a href="/emergencia.html?edit=${inst.id}" class="btn-edit">✏️ Editar</a>
                 <button onclick="deleteInstruction(${inst.id})" class="btn-delete">🗑️ Eliminar</button>
+                <button onclick="previewSoldado(${inst.id})" class="btn-preview" title="Ver como soldado">👁️</button>
             </div>
         `;
         container.appendChild(card);
     });
+}
+
+// Vista Soldado - previsualizar instrucción como la ve un soldado
+function previewSoldado(id) {
+    sessionStorage.setItem('previewMode', 'true');
+    sessionStorage.setItem('selectedInstructionId', id);
+    window.location.href = 'instrucciones.html';
 }
 
 // Eliminar instrucción
