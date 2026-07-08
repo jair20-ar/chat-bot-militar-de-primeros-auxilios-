@@ -319,7 +319,7 @@ function ensureMenu() {
 function updateMenuOptions() {
   if (!menu) return;
   
-  const isAdmin = localStorage.getItem('adminToken') === 'true';
+  const isAdmin = localStorage.getItem('adminToken') !== null;
   const isMedico = localStorage.getItem('medicoData') !== null;
   
   let userSection = '';

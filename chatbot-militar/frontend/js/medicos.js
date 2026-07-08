@@ -54,11 +54,13 @@ document.getElementById('login-form').addEventListener('submit', async function(
         const data = await response.json();
 
         if (response.ok) {
-            // Guardar datos del médico en localStorage
             localStorage.setItem('medicoData', JSON.stringify({
                 id_medico: data.id_medico,
-                nombre: data.nombre
+                nombre: data.nombre,
+                token: data.token
             }));
+
+            localStorage.removeItem('adminToken');
             
             // Mostrar modal de bienvenida
             showWelcomeModal(data.nombre);

@@ -250,21 +250,9 @@ function saveInstruction() {
     const parte_cuerpo = document.getElementById('parte_cuerpo').value.trim();
     const tiempo_estimado = document.getElementById('tiempo_estimado').value.trim();
 
-    const medicoData = localStorage.getItem('medicoData');
-    const isAdmin = localStorage.getItem('adminToken') === 'true';
-    let id_medico = null;
-
-    if (medicoData) {
-        try {
-            const userData = JSON.parse(medicoData);
-            id_medico = userData.id_medico;
-            console.log('✅ ID Médico obtenido:', id_medico);
-        } catch (err) {
-            console.error('❌ Error al parsear medicoData:', err);
-        }
-    } else if (isAdmin) {
-        id_medico = 'admin';
-        console.log('✅ Modo Administrador detectado para edición de instrucciones');
+    if (!isAuthenticated()) {
+        showToast('❌ Debes iniciar sesión primero', true);
+        return;
     }
 
     if (!titulo) { showToast('❌ El título es obligatorio', true); return; }
@@ -272,7 +260,6 @@ function saveInstruction() {
     if (!severidad) { showToast('❌ Debes seleccionar un nivel de severidad', true); return; }
     if (!parte_cuerpo) { showToast('❌ Debes seleccionar una parte del cuerpo', true); return; }
     if (!tiempo_estimado) { showToast('❌ El tiempo estimado es obligatorio', true); return; }
-    if (!id_medico) { showToast('❌ Debes iniciar sesión primero', true); return; }
 
     const btnSave = document.getElementById('btn-save');
     btnSave.disabled = true;
@@ -311,7 +298,7 @@ function saveInstruction() {
             processedSteps++;
 
             if (processedSteps === stepCards.length) {
-                sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, id_medico, btnSave);
+                sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, btnSave);
             }
         });
     } catch (e) {
@@ -324,14 +311,14 @@ function resetSaveBtn(btnSave) {
     btnSave.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>GUARDAR INSTRUCCIÓN`;
 }
 
-function sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, id_medico, btnSave) {
+function sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, btnSave) {
     const method = editingId ? 'PUT' : 'POST';
     const url = editingId ? `${API_URL}/api/instrucciones/${editingId}` : `${API_URL}/api/instrucciones`;
 
     fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, id_medico })
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos })
     })
     .then(res => res.json())
     .then(data => {

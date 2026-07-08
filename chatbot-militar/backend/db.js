@@ -1,4 +1,5 @@
 const path = require('path');
+const { logEvent, logError } = require('./middleware/logger');
 
 let db;
 
@@ -54,9 +55,9 @@ if (process.env.DATABASE_URL) {
   const sqlite3 = require('sqlite3').verbose();
   db = new sqlite3.Database(path.join(__dirname, './chatbotmilitar.db'), (err) => {
     if (err) {
-      console.error('Error opening database:', err.message);
+      logError('DB_OPEN_ERROR', new Error(err.message));
     } else {
-      console.log('Connected to SQLite database');
+      logEvent('DB_CONNECTED', { type: 'SQLite' });
       initializeSqliteTables();
     }
   });
@@ -113,9 +114,9 @@ function initializePgTables(pool) {
     await pool.query('DROP TABLE IF EXISTS indicaciones_protocolo');
     await pool.query('DROP TABLE IF EXISTS indicaciones_procolo');
     await pool.query('DROP TABLE IF EXISTS instructions');
-    console.log('PostgreSQL tables ready');
+    logEvent('DB_CONNECTED', { type: 'PostgreSQL' });
   };
-  init().catch(err => console.error('Error initializing PostgreSQL:', err.message));
+  init().catch(err => logError('DB_INIT_ERROR', new Error(err.message), { type: 'PostgreSQL' }));
 }
 
 function initializeSqliteTables() {
@@ -163,9 +164,9 @@ function initializeSqliteTables() {
       )
     `, (err) => {
       if (err) {
-        console.error('Error creating configuracion table:', err);
+        logError('DB_TABLE_ERROR', new Error(err.message || String(err)), { table: 'configuracion' });
       } else {
-        console.log('Configuracion table ready');
+        logEvent('DB_TABLE_READY', { table: 'configuracion' });
         db.run("INSERT OR IGNORE INTO configuracion (clave, valor) VALUES ('admin_password', 'UNEFA2026')");
         db.run("INSERT OR IGNORE INTO configuracion (clave, valor) VALUES ('registro_code', '31150106')");
       }

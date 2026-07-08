@@ -9,6 +9,10 @@ const { Model, Recognizer } = require('vosk');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('ffmpeg-static');
 const bcrypt = require('bcryptjs');
+const { signToken, verifyToken, requireAdmin } = require('./middleware/auth');
+const { registroMedico, loginMedico, loginAdmin, instruccion, logBusqueda, configUpdate } = require('./middleware/validate');
+const { correlationMiddleware } = require('./middleware/correlation');
+const { logEvent, logError } = require('./middleware/logger');
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
@@ -18,12 +22,12 @@ const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
-const upload = multer({ dest: uploadsDir });
+const upload = multer({ dest: uploadsDir, limits: { fileSize: 10 * 1024 * 1024 } });
 
 
 const modelpath = path.join(__dirname, 'model', 'vosk-model-small-es-0.42');
 if (!fs.existsSync(modelpath)) {
-  console.error('carpeta no encontrada:', modelpath);
+  logError('MODEL_PATH_ERROR', new Error('Model folder not found'), { path: modelpath });
   process.exit(1);
 }
 
@@ -31,9 +35,43 @@ const model = new Model(modelpath);
 
 
 // =================== MIDDLEWARE ===================
-app.use(cors());
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(bodyParser.json({ limit: '1mb' }));
+app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
+
+// Rate limiting: login (5 intentos/minuto)
+const loginLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  message: { error: 'Demasiados intentos. Intenta de nuevo en 1 minuto.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// Rate limiting: general (100 peticiones/minuto)
+const generalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  message: { error: 'Demasiadas peticiones. Intenta de nuevo en 1 minuto.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+app.use(correlationMiddleware);
+
+app.use('/api/', generalLimiter);
+
+// Rate limit estricto en rutas de login
+app.use('/medicos/login', loginLimiter);
+app.use('/api/admin/login', loginLimiter);
 
 // =============== Servir frontend estático ===============
 app.use(express.static(path.join(__dirname, '../frontend/html')));
@@ -82,11 +120,8 @@ app.post('/api/transcribir', upload.single('audio'), (req, res) => {
 });
 
 // ================ RUTA PARA REGISTRO DE MÉDICOS ================
-app.post('/medicos/registro', async (req, res) => {
+app.post('/medicos/registro', registroMedico, async (req, res) => {
   const { nombre, email, cedula, especializacion, password, codigo_registro } = req.body;
-  if (!nombre || !email || !cedula || !especializacion || !password || !codigo_registro) {
-    return res.status(400).json({ error: 'Todos los campos, incluyendo el código de registro, son obligatorios.' });
-  }
 
   // Verificar código de registro
   db.get("SELECT valor FROM configuracion WHERE clave = 'registro_code'", [], async (err, row) => {
@@ -103,10 +138,10 @@ app.post('/medicos/registro', async (req, res) => {
         [nombre, email, cedula, especializacion, cedula, hashedPassword],
         function (err) {
           if (err) {
-            if (err.message && err.message.includes('UNIQUE constraint failed')) {
+            if (err.message && err.message.includes('UNIQUE')) {
               return res.status(409).json({ error: 'El usuario/cédula ya está registrado.' });
             }
-            return res.status(500).json({ error: err.message });
+            return res.status(500).json({ error: "Error interno del servidor." });
           }
           res.json({ ok: true, id: this.lastID });
         }
@@ -118,13 +153,10 @@ app.post('/medicos/registro', async (req, res) => {
 });
 
 // ============= RUTA PARA INICIO DE SESIÓN DE MÉDICOS =============
-app.post('/medicos/login', async (req, res) => {
+app.post('/medicos/login', loginMedico, async (req, res) => {
   const { id_medico, password } = req.body;
-  if (!id_medico || !password) {
-    return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
-  }
   db.get('SELECT * FROM medicos WHERE id_medico = ?', [id_medico], async (err, row) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) return res.status(500).json({ error: "Error interno del servidor." });
     if (!row) return res.status(401).json({ error: 'Credenciales incorrectas.' });
 
     let match = false;
@@ -140,21 +172,19 @@ app.post('/medicos/login', async (req, res) => {
     }
 
     if (!match) return res.status(401).json({ error: 'Credenciales incorrectas.' });
-    res.json({ ok: true, nombre: row.nombre, id_medico: row.id_medico });
+    const token = signToken({ id: row.id, id_medico: row.id_medico, nombre: row.nombre, rol: 'medico' });
+    res.json({ ok: true, token, nombre: row.nombre, id_medico: row.id_medico });
   });
 });
 
 // ============ RUTAS PARA INSTRUCCIONES ===========
 
-// Crear nueva instrucción
-app.post('/api/instrucciones', (req, res) => {
-  const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, id_medico } = req.body;
-  
-  if (!titulo || !pasos || !id_medico || !parte_cuerpo) {
-    return res.status(400).json({ success: false, error: 'Título, pasos, parte del cuerpo e id_medico son obligatorios.' });
-  }
+// Crear nueva instrucción (requiere token)
+app.post('/api/instrucciones', verifyToken, instruccion, (req, res) => {
+  const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos } = req.body;
 
   const fecha = new Date().toISOString();
+  const id_medico = req.user.id_medico;
   
   db.run(
     `INSERT INTO instrucciones (titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, fecha, id_medico) 
@@ -162,7 +192,7 @@ app.post('/api/instrucciones', (req, res) => {
     [titulo, categoria || null, severidad || null, parte_cuerpo, tiempo_estimado || null, JSON.stringify(pasos), fecha, id_medico],
     function (err) {
       if (err) {
-        return res.status(500).json({ success: false, error: err.message });
+        return res.status(500).json({ success: false, error: "Error interno del servidor." });
       }
       res.json({ success: true, id: this.lastID });
     }
@@ -175,7 +205,7 @@ app.get('/api/instrucciones', (req, res) => {
     `SELECT * FROM instrucciones ORDER BY fecha DESC`,
     [],
     (err, rows) => {
-      if (err) return res.status(500).json({ success: false, error: err.message });
+      if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
       res.json({ success: true, data: rows });
     }
   );
@@ -187,41 +217,39 @@ app.get('/api/instrucciones/:id', (req, res) => {
     `SELECT * FROM instrucciones WHERE id = ?`,
     [req.params.id],
     (err, row) => {
-      if (err) return res.status(500).json({ success: false, error: err.message });
+      if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
       if (!row) return res.status(404).json({ success: false, error: 'Instrucción no encontrada.' });
       res.json({ success: true, data: row });
     }
   );
 });
 
-// Actualizar instrucción (VALIDAR DUEÑO)
-app.put('/api/instrucciones/:id', (req, res) => {
-  const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, id_medico } = req.body;
-  
-  if (!titulo || !pasos || !id_medico || !parte_cuerpo) {
-    return res.status(400).json({ success: false, error: 'Título, pasos, parte del cuerpo e id_medico son obligatorios.' });
-  }
+// Actualizar instrucción (requiere token)
+app.put('/api/instrucciones/:id', verifyToken, instruccion, (req, res) => {
+  const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos } = req.body;
+
+  const id_medico = req.user.id_medico;
+  const isAdmin = req.user.rol === 'admin';
 
   const updateFn = () => {
     db.run(
       `UPDATE instrucciones SET titulo = ?, categoria = ?, severidad = ?, parte_cuerpo = ?, tiempo_estimado = ?, pasos = ? WHERE id = ?`,
       [titulo, categoria || null, severidad || null, parte_cuerpo, tiempo_estimado || null, JSON.stringify(pasos), req.params.id],
       function (err) {
-        if (err) return res.status(500).json({ success: false, error: err.message });
+        if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
         res.json({ success: true });
       }
     );
   };
 
-  if (id_medico === 'admin') {
+  if (isAdmin) {
     updateFn();
   } else {
-    // Verificar que el médico es el dueño
     db.get(
       `SELECT * FROM instrucciones WHERE id = ? AND id_medico = ?`,
       [req.params.id, id_medico],
       (err, row) => {
-        if (err) return res.status(500).json({ success: false, error: err.message });
+        if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
         if (!row) return res.status(403).json({ success: false, error: 'No tienes permiso para editar esta instrucción.' });
         updateFn();
       }
@@ -229,34 +257,30 @@ app.put('/api/instrucciones/:id', (req, res) => {
   }
 });
 
-// Eliminar instrucción (VALIDAR DUEÑO)
-app.delete('/api/instrucciones/:id', (req, res) => {
-  const { id_medico } = req.body;
-  
-  if (!id_medico) {
-    return res.status(400).json({ success: false, error: 'id_medico es obligatorio.' });
-  }
+// Eliminar instrucción (requiere token)
+app.delete('/api/instrucciones/:id', verifyToken, (req, res) => {
+  const id_medico = req.user.id_medico;
+  const isAdmin = req.user.rol === 'admin';
 
   const deleteFn = () => {
     db.run(
       `DELETE FROM instrucciones WHERE id = ?`,
       [req.params.id],
       function (err) {
-        if (err) return res.status(500).json({ success: false, error: err.message });
+        if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
         res.json({ success: true });
       }
     );
   };
 
-  if (id_medico === 'admin') {
+  if (isAdmin) {
     deleteFn();
   } else {
-    // Verificar que el médico es el dueño
     db.get(
       `SELECT * FROM instrucciones WHERE id = ? AND id_medico = ?`,
       [req.params.id, id_medico],
       (err, row) => {
-        if (err) return res.status(500).json({ success: false, error: err.message });
+        if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
         if (!row) return res.status(403).json({ success: false, error: 'No tienes permiso para eliminar esta instrucción.' });
         deleteFn();
       }
@@ -266,33 +290,42 @@ app.delete('/api/instrucciones/:id', (req, res) => {
 
 // ======================= RUTAS DE ADMINISTRACIÓN =========================
 
-// Login del Administrador
-app.post('/api/admin/login', (req, res) => {
+// ======================= RUTAS DE ADMINISTRACIÓN =========================
+
+// Login del Administrador (retorna JWT)
+app.post('/api/admin/login', loginAdmin, async (req, res) => {
   const { password } = req.body;
-  if (!password) {
-    return res.status(400).json({ success: false, error: 'Contraseña requerida.' });
-  }
-  db.get("SELECT valor FROM configuracion WHERE clave = 'admin_password'", [], (err, row) => {
+  db.get("SELECT valor FROM configuracion WHERE clave = 'admin_password'", [], async (err, row) => {
     if (err) return res.status(500).json({ success: false, error: 'Error de base de datos.' });
-    const correctPassword = row ? row.valor : 'UNEFA2026';
-    if (password === correctPassword) {
-      res.json({ success: true, token: 'admin-session-token' });
+    const storedPassword = row ? row.valor : 'UNEFA2026';
+
+    let match = false;
+    if (storedPassword.startsWith('$2b$') || storedPassword.startsWith('$2a$')) {
+      match = await bcrypt.compare(password, storedPassword);
     } else {
-      res.status(401).json({ success: false, error: 'Contraseña incorrecta.' });
+      match = (password === storedPassword);
+      if (match) {
+        const hashed = await bcrypt.hash(password, 10);
+        db.run("INSERT INTO configuracion (clave, valor) VALUES ('admin_password', ?) ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor", [hashed]);
+      }
     }
+
+    if (!match) return res.status(401).json({ success: false, error: 'Contraseña incorrecta.' });
+    const token = signToken({ rol: 'admin' });
+    res.json({ success: true, token });
   });
 });
 
-// Listar médicos registrados
-app.get('/api/admin/medicos', (req, res) => {
+// Listar médicos registrados (requiere admin)
+app.get('/api/admin/medicos', verifyToken, requireAdmin, (req, res) => {
   db.all('SELECT nombre, email, cedula, especializacion, id_medico FROM medicos ORDER BY nombre ASC', [], (err, rows) => {
-    if (err) return res.status(500).json({ success: false, error: err.message });
+    if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
     res.json({ success: true, data: rows });
   });
 });
 
-// Eliminar médico y sus instrucciones
-app.delete('/api/admin/medicos/:id_medico', (req, res) => {
+// Eliminar médico y sus instrucciones (requiere admin)
+app.delete('/api/admin/medicos/:id_medico', verifyToken, requireAdmin, (req, res) => {
   const { id_medico } = req.params;
   
   db.run('DELETE FROM instrucciones WHERE id_medico = ?', [id_medico], () => {
@@ -303,21 +336,21 @@ app.delete('/api/admin/medicos/:id_medico', (req, res) => {
   });
 });
 
-// Obtener códigos de configuración e info de administración
-app.get('/api/admin/config', (req, res) => {
+// Obtener códigos de configuración e info (requiere admin)
+app.get('/api/admin/config', verifyToken, requireAdmin, (req, res) => {
   db.get("SELECT valor FROM configuracion WHERE clave = 'registro_code'", [], (err, codeRow) => {
     if (err) return res.status(500).json({ success: false, error: 'Error de base de datos.' });
     
     const regCode = codeRow ? codeRow.valor : 'FANB2026';
 
     db.get('SELECT COUNT(*) as count FROM medicos', [], (err, medicosRow) => {
-      if (err) return res.status(500).json({ success: false, error: err.message });
+      if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
       
       db.get('SELECT COUNT(*) as count FROM instrucciones', [], (err, instRow) => {
-        if (err) return res.status(500).json({ success: false, error: err.message });
+        if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
         
         db.get("SELECT COUNT(*) as count FROM instrucciones WHERE severidad = 'critico'", [], (err, critRow) => {
-          if (err) return res.status(500).json({ success: false, error: err.message });
+          if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
           
           res.json({
             success: true,
@@ -334,12 +367,16 @@ app.get('/api/admin/config', (req, res) => {
   });
 });
 
-// Actualizar configuración
-app.post('/api/admin/config', (req, res) => {
-  const { registro_code, admin_password } = req.body;
+// Actualizar configuración (requiere admin)
+app.post('/api/admin/config', verifyToken, requireAdmin, configUpdate, async (req, res) => {
+  let { registro_code, admin_password } = req.body;
   let errOccurred = false;
   let completed = 0;
   let total = 0;
+
+  if (admin_password !== undefined) {
+    admin_password = await bcrypt.hash(admin_password, 10);
+  }
 
   const checkDone = () => {
     completed++;
@@ -353,7 +390,7 @@ app.post('/api/admin/config', (req, res) => {
     total++;
     db.run(
       "INSERT INTO configuracion (clave, valor) VALUES (?, ?) ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor",
-      [registro_code],
+      ['registro_code', registro_code],
       (err) => { if (err) errOccurred = true; checkDone(); }
     );
   }
@@ -362,7 +399,7 @@ app.post('/api/admin/config', (req, res) => {
     total++;
     db.run(
       "INSERT INTO configuracion (clave, valor) VALUES (?, ?) ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor",
-      [admin_password],
+      ['admin_password', admin_password],
       (err) => { if (err) errOccurred = true; checkDone(); }
     );
   }
@@ -375,11 +412,8 @@ app.post('/api/admin/config', (req, res) => {
 // ============ REGISTRO DE BÚSQUEDAS (SOLDIER VIEWS) ============
 
 // Log cuando un soldado ve una instrucción
-app.post('/api/log-busqueda', (req, res) => {
+app.post('/api/log-busqueda', logBusqueda, (req, res) => {
   const { instruccion_id } = req.body;
-  if (!instruccion_id) {
-    return res.status(400).json({ success: false, error: 'instruccion_id es obligatorio.' });
-  }
 
   db.get(`SELECT titulo, id_medico FROM instrucciones WHERE id = ?`, [instruccion_id], (err, inst) => {
     if (err || !inst) return res.status(404).json({ success: false, error: 'Instrucción no encontrada.' });
@@ -390,7 +424,7 @@ app.post('/api/log-busqueda', (req, res) => {
         `INSERT INTO busquedas_log (instruccion_id, titulo, id_medico_creador, nombre_medico_creador) VALUES (?, ?, ?, ?)`,
         [instruccion_id, inst.titulo, inst.id_medico, nombreMedico],
         (err) => {
-          if (err) return res.status(500).json({ success: false, error: err.message });
+          if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
           res.json({ success: true });
         }
       );
@@ -398,8 +432,8 @@ app.post('/api/log-busqueda', (req, res) => {
   });
 });
 
-// Obtener logs de búsquedas (admin)
-app.get('/api/admin/busquedas', (req, res) => {
+// Obtener logs de búsquedas (requiere admin)
+app.get('/api/admin/busquedas', verifyToken, requireAdmin, (req, res) => {
   const { periodo, search } = req.query;
   let fechaLimite = '';
   const now = new Date();
@@ -438,17 +472,32 @@ app.get('/api/admin/busquedas', (req, res) => {
   query += ' ORDER BY fecha DESC';
 
   db.all(query, params, (err, rows) => {
-    if (err) return res.status(500).json({ success: false, error: err.message });
+    if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
     res.json({ success: true, data: rows });
   });
 });
 
-// =================== MANEJADORES DE ERRORES GLOBALES ====================
-process.on('uncaughtException', (err) => {
-  console.error('Error no capturado:', err.message);
+// =================== MIDDLEWARE DE ERRORES ====================
+
+// 404 - Ruta no encontrada
+app.use((req, res) => {
+  logEvent('ROUTE_404', { method: req.method, path: req.path, correlationId: req.correlationId });
+  res.status(404).json({ error: 'Ruta no encontrada.', correlationId: req.correlationId });
 });
+
+// Middleware global de errores Express (evita filtrar información interna)
+app.use((err, req, res, next) => {
+  logError('EXPRESS_ERROR', err, { correlationId: req.correlationId, method: req.method, path: req.path });
+  res.status(500).json({ error: 'Error interno del servidor.', correlationId: req.correlationId });
+});
+
+// Manejadores de errores no capturados (protegen el proceso)
+process.on('uncaughtException', (err) => {
+  logError('UNCAUGHT_EXCEPTION', err);
+});
+
 process.on('unhandledRejection', (err) => {
-  console.error('Promesa rechazada:', err.message);
+  logError('UNHANDLED_REJECTION', err);
 });
 
 // =================== HEALTH CHECK (para Render) ====================
@@ -458,5 +507,5 @@ app.get('/api/health', (req, res) => {
 
 // =================== INICIA EL SERVIDOR ====================
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor backend escuchando en http://localhost:${PORT}`);
+  logEvent('SERVER_START', { puerto: PORT });
 });

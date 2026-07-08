@@ -51,3 +51,6 @@ build/
 # Temporary
 temp/
 .tmp/
+
+# Uploads (multer temp files)
+uploads/

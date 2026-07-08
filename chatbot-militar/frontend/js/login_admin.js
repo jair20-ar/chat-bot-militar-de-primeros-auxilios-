@@ -36,8 +36,8 @@ async function handleLogin() {
         const data = await res.json();
 
         if (data.success) {
-            localStorage.setItem('adminToken', 'true');
-            localStorage.removeItem('medicoData'); // Limpiar sesión de médico para evitar conflictos
+            localStorage.setItem('adminToken', data.token);
+            localStorage.removeItem('medicoData');
             window.location.href = 'admin.html';
         } else {
             alert(data.error || 'Acceso denegado.');

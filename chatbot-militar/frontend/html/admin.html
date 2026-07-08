@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel de Administración</title>
 <link rel="stylesheet" href="../styles/admin.css">
+<script src="../js/api.js"></script>
 <script>
-  if (localStorage.getItem('adminToken') !== 'true') {
+  if (!isAuthenticated()) {
     window.location.href = 'login_admin.html';
   }
 </script>

@@ -1,4 +1,3 @@
-const API_URL = '';
 let currentUserId = null;
 let currentUserNombre = null;
 
@@ -137,8 +136,7 @@ function deleteInstruction(id) {
     if (confirm('¿Estás seguro que deseas eliminar esta instrucción?')) {
         fetch(`${API_URL}/api/instrucciones/${id}`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_medico: currentUserId })
+            headers: getAuthHeaders()
         })
         .then(res => res.json())
         .then(data => {

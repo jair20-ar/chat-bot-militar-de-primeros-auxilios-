@@ -1,7 +1,5 @@
-const API_URL = '';
-
 // Verificar sesión
-if (localStorage.getItem('adminToken') !== 'true') {
+if (!isAuthenticated()) {
   window.location.href = 'login_admin.html';
 }
 
@@ -71,7 +69,7 @@ async function loadData() {
 // Cargar estadísticas y configuraciones generales
 async function loadStatsAndConfig() {
   try {
-    const res = await fetch(`${API_URL}/api/admin/config`);
+    const res = await fetch(`${API_URL}/api/admin/config`, { headers: getAuthHeaders() });
     const data = await res.json();
     if (data.success) {
       statTotalInstrucciones.textContent = data.stats.instrucciones;
@@ -87,7 +85,7 @@ async function loadStatsAndConfig() {
 // Cargar médicos registrados
 async function loadMedicos() {
   try {
-    const res = await fetch(`${API_URL}/api/admin/medicos`);
+    const res = await fetch(`${API_URL}/api/admin/medicos`, { headers: getAuthHeaders() });
     const data = await res.json();
     if (data.success) {
       allMedicos = data.data;
@@ -136,7 +134,8 @@ async function deleteMedico(id_medico) {
   }
   try {
     const res = await fetch(`${API_URL}/api/admin/medicos/${id_medico}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: getAuthHeaders()
     });
     const data = await res.json();
     if (data.success) {
@@ -222,8 +221,7 @@ async function deleteInstruccion(id) {
   try {
     const res = await fetch(`${API_URL}/api/instrucciones/${id}`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id_medico: 'admin' })
+      headers: getAuthHeaders()
     });
     const data = await res.json();
     if (data.success) {
@@ -243,7 +241,7 @@ function loadBusquedas() {
   const search = searchBusquedasInput.value.trim();
   const url = `${API_URL}/api/admin/busquedas?periodo=${currentPeriodo}${search ? '&search=' + encodeURIComponent(search) : ''}`;
 
-  fetch(url)
+  fetch(url, { headers: getAuthHeaders() })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -318,7 +316,7 @@ function setupEventListeners() {
     try {
       const res = await fetch(`${API_URL}/api/admin/config`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ registro_code: code })
       });
       const data = await res.json();
@@ -356,7 +354,7 @@ function setupEventListeners() {
     try {
       const res = await fetch(`${API_URL}/api/admin/config`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ admin_password: pass })
       });
       const data = await res.json();
