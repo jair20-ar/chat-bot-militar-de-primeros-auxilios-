@@ -33,6 +33,7 @@ const loginAdmin = [
 const instruccion = [
   body('titulo').trim().isLength({ min: 3, max: 200 }).withMessage('El título debe tener entre 3 y 200 caracteres.'),
   body('parte_cuerpo').trim().isLength({ min: 2, max: 100 }).withMessage('La parte del cuerpo debe tener entre 2 y 100 caracteres.'),
+  body('descripcion').optional({ values: 'falsy' }).trim().isLength({ max: 2000 }).withMessage('La descripción no debe superar los 2000 caracteres.'),
   body('pasos').custom((value) => {
     if (!Array.isArray(value)) {
       throw new Error('Los pasos deben ser un arreglo.');
@@ -41,8 +42,8 @@ const instruccion = [
       throw new Error('Debe haber al menos un paso.');
     }
     for (let i = 0; i < value.length; i++) {
-      if (!value[i].texto || typeof value[i].texto !== 'string' || value[i].texto.trim().length === 0) {
-        throw new Error(`El paso ${i + 1} debe tener un texto válido.`);
+      if (!value[i].titulo || typeof value[i].titulo !== 'string' || value[i].titulo.trim().length === 0) {
+        throw new Error(`El paso ${i + 1} debe tener un título válido.`);
       }
     }
     return true;

@@ -21,6 +21,15 @@ const INSTRUCCIONES = [
     severidad: 'critico',
     parte_cuerpo: 'Torax/Abdomen',
     tiempo_estimado: '15 min',
+    descripcion: [
+      'Herida por proyectil de arma de fuego en el torso',
+      'Sangrado abundante en el pecho o abdomen',
+      'Orificio de entrada y salida de bala',
+      'Herida abierta con sangrado que no para',
+      'Impacto de bala en el cuerpo',
+      'Lesion por disparo en el pecho o barriga',
+      'Ayuda para compañero herido por arma de fuego'
+    ].join('\n'),
     pasos: [
       buildPaso('Seguridad de escena',
         'Asegúrese de que el área esté segura. Use guantes y equipo de protección personal. Solicite apoyo táctico si es necesario.',
@@ -48,6 +57,15 @@ const INSTRUCCIONES = [
     severidad: 'critico',
     parte_cuerpo: 'Extremidades',
     tiempo_estimado: '10 min',
+    descripcion: [
+      'Perdida abundante de sangre en brazo o pierna',
+      'Sangre que no se detiene con presion',
+      'Herida profunda que sangra mucho en una extremidad',
+      'La persona se ve palida y mareada por perdida de sangre',
+      'Sangrado arterial con sangre roja brillante que sale a chorros',
+      'Corte profundo en el brazo o pierna con mucha sangre',
+      'Hemorrhagia que no para con simple presion'
+    ].join('\n'),
     pasos: [
       buildPaso('Identificar tipo de hemorragia',
         'Determine si es arterial (sangre roja brillante, pulsatil), venosa (sangre oscura, flujo continuo) o capilar.',
@@ -75,6 +93,17 @@ const INSTRUCCIONES = [
     severidad: 'critico',
     parte_cuerpo: 'Torax',
     tiempo_estimado: '20 min',
+    descripcion: [
+      'Persona inconsciente que no responde al llamado',
+      'Alguien que no respira o solo jadea',
+      'Persona desplomada sin signos de vida',
+      'Como hacer reanimacion cardiopulmonar paso a paso',
+      'Emergencia: alguien se desmayo y no despierta',
+      'El corazon dejo de latir, necesita RCP urgente',
+      'Companero inconsciente que no se mueve',
+      'Ahogamiento con perdida del conocimiento',
+      'Paro cardiaco repentino en el campo'
+    ].join('\n'),
     pasos: [
       buildPaso('Verificar inconsciencia',
         'Verifique si el paciente responde. Sacuda los hombros suavemente y pregunte "¿Está bien?" en voz alta.',
@@ -155,8 +184,8 @@ async function run() {
           const fecha = new Date().toISOString();
           const idM = MEDICO.id_medico;
           db.run(
-            'INSERT INTO instrucciones (titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, fecha, id_medico) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [inst.titulo, inst.categoria, inst.severidad, inst.parte_cuerpo, inst.tiempo_estimado, JSON.stringify(inst.pasos), fecha, idM],
+            'INSERT INTO instrucciones (titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, fecha, id_medico, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [inst.titulo, inst.categoria, inst.severidad, inst.parte_cuerpo, inst.tiempo_estimado, JSON.stringify(inst.pasos), fecha, idM, inst.descripcion || null],
             function (err) {
               if (err) {
                 console.error('Error al insertar instrucción:', err.message);

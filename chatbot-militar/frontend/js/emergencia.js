@@ -31,6 +31,7 @@ function loadInstructionToEdit(id) {
                 document.getElementById('severidad').value = inst.severidad || 'leve';
                 document.getElementById('parte_cuerpo').value = inst.parte_cuerpo || '';
                 document.getElementById('tiempo_estimado').value = inst.tiempo_estimado || '';
+                document.getElementById('descripcion').value = inst.descripcion || '';
 
                 let pasos;
                 try {
@@ -249,6 +250,7 @@ function saveInstruction() {
     const severidad = document.getElementById('severidad').value.trim();
     const parte_cuerpo = document.getElementById('parte_cuerpo').value.trim();
     const tiempo_estimado = document.getElementById('tiempo_estimado').value.trim();
+    const descripcion = document.getElementById('descripcion').value.trim();
 
     if (!isAuthenticated()) {
         showToast('❌ Debes iniciar sesión primero', true);
@@ -298,7 +300,7 @@ function saveInstruction() {
             processedSteps++;
 
             if (processedSteps === stepCards.length) {
-                sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, btnSave);
+                sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, descripcion, pasos, btnSave);
             }
         });
     } catch (e) {
@@ -311,14 +313,14 @@ function resetSaveBtn(btnSave) {
     btnSave.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>GUARDAR INSTRUCCIÓN`;
 }
 
-function sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, btnSave) {
+function sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, descripcion, pasos, btnSave) {
     const method = editingId ? 'PUT' : 'POST';
     const url = editingId ? `${API_URL}/api/instrucciones/${editingId}` : `${API_URL}/api/instrucciones`;
 
     fetch(url, {
         method,
         headers: getAuthHeaders(),
-        body: JSON.stringify({ titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos })
+        body: JSON.stringify({ titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, descripcion, pasos })
     })
     .then(res => res.json())
     .then(data => {

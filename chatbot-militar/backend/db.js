@@ -86,9 +86,11 @@ function initializePgTables(pool) {
         tiempo_estimado TEXT,
         pasos TEXT NOT NULL,
         fecha TEXT NOT NULL,
-        id_medico TEXT NOT NULL REFERENCES medicos(id_medico)
+        id_medico TEXT NOT NULL REFERENCES medicos(id_medico),
+        descripcion TEXT
       )
     `);
+    await pool.query('ALTER TABLE instrucciones ADD COLUMN IF NOT EXISTS descripcion TEXT');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS busquedas_log (
         id SERIAL PRIMARY KEY,
@@ -143,9 +145,15 @@ function initializeSqliteTables() {
         pasos TEXT NOT NULL,
         fecha TEXT NOT NULL,
         id_medico TEXT NOT NULL,
+        descripcion TEXT,
         FOREIGN KEY(id_medico) REFERENCES medicos(id_medico)
       )
     `);
+    db.run("ALTER TABLE instrucciones ADD COLUMN descripcion TEXT", (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        logError('DB_MIGRATE_ERROR', new Error(err.message), { table: 'instrucciones', column: 'descripcion' });
+      }
+    });
     db.run(`
       CREATE TABLE IF NOT EXISTS busquedas_log (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -22,11 +22,18 @@ async function searchInstructions(searchTerm) {
 
         if (data.success && Array.isArray(data.data)) {
             const searchLower = searchTerm.toLowerCase();
-            const filteredResults = data.data.filter(inst =>
-                inst.titulo.toLowerCase().includes(searchLower) ||
-                inst.categoria.toLowerCase().includes(searchLower) ||
-                inst.severidad.toLowerCase().includes(searchLower)
-            );
+const filteredResults = data.data.filter(inst => {
+    if (inst.titulo.toLowerCase().includes(searchLower)) return true;
+    if (inst.categoria && inst.categoria.toLowerCase().includes(searchLower)) return true;
+    if (inst.severidad && inst.severidad.toLowerCase().includes(searchLower)) return true;
+    if (inst.descripcion) {
+        const lines = inst.descripcion.split('\n');
+        for (const line of lines) {
+            if (line.trim().toLowerCase().includes(searchLower)) return true;
+        }
+    }
+    return false;
+});
 
             if (filteredResults.length > 0) {
                 displayResults(filteredResults);
@@ -67,6 +74,7 @@ function displayResults(results) {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
                         ${inst.categoria}
                     </div>
+                    ${inst.descripcion ? `<div class="card-desc">${inst.descripcion.split('\n')[0]}</div>` : ''}
                 </div>
 
                 <div class="action-btn">

@@ -181,15 +181,15 @@ app.post('/medicos/login', loginMedico, async (req, res) => {
 
 // Crear nueva instrucción (requiere token)
 app.post('/api/instrucciones', verifyToken, instruccion, (req, res) => {
-  const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos } = req.body;
+  const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, descripcion } = req.body;
 
   const fecha = new Date().toISOString();
   const id_medico = req.user.id_medico;
   
   db.run(
-    `INSERT INTO instrucciones (titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, fecha, id_medico) 
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [titulo, categoria || null, severidad || null, parte_cuerpo, tiempo_estimado || null, JSON.stringify(pasos), fecha, id_medico],
+    `INSERT INTO instrucciones (titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, fecha, id_medico, descripcion) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [titulo, categoria || null, severidad || null, parte_cuerpo, tiempo_estimado || null, JSON.stringify(pasos), fecha, id_medico, descripcion || null],
     function (err) {
       if (err) {
         return res.status(500).json({ success: false, error: "Error interno del servidor." });
@@ -226,15 +226,15 @@ app.get('/api/instrucciones/:id', (req, res) => {
 
 // Actualizar instrucción (requiere token)
 app.put('/api/instrucciones/:id', verifyToken, instruccion, (req, res) => {
-  const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos } = req.body;
+  const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, descripcion } = req.body;
 
   const id_medico = req.user.id_medico;
   const isAdmin = req.user.rol === 'admin';
 
   const updateFn = () => {
     db.run(
-      `UPDATE instrucciones SET titulo = ?, categoria = ?, severidad = ?, parte_cuerpo = ?, tiempo_estimado = ?, pasos = ? WHERE id = ?`,
-      [titulo, categoria || null, severidad || null, parte_cuerpo, tiempo_estimado || null, JSON.stringify(pasos), req.params.id],
+      `UPDATE instrucciones SET titulo = ?, categoria = ?, severidad = ?, parte_cuerpo = ?, tiempo_estimado = ?, pasos = ?, descripcion = ? WHERE id = ?`,
+      [titulo, categoria || null, severidad || null, parte_cuerpo, tiempo_estimado || null, JSON.stringify(pasos), descripcion || null, req.params.id],
       function (err) {
         if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
         res.json({ success: true });

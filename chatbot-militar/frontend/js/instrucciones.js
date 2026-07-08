@@ -110,6 +110,18 @@ function displayInstruction() {
     document.getElementById('titulo-instruccion').textContent = instructionData.titulo;
     document.getElementById('titulo-tipo').textContent = instructionData.categoria.toUpperCase();
 
+    // Mostrar descripciones de búsqueda
+    const descContainer = document.getElementById('descripcion-container');
+    if (instructionData.descripcion && descContainer) {
+        const lines = instructionData.descripcion.split('\n').filter(l => l.trim());
+        if (lines.length > 0) {
+            descContainer.innerHTML = lines.map(l =>
+                `<span class="desc-tag">${l.trim()}</span>`
+            ).join('');
+            descContainer.style.display = 'flex';
+        }
+    }
+
     // Parsear pasos
     const pasos = typeof instructionData.pasos === 'string' ? 
         JSON.parse(instructionData.pasos) : instructionData.pasos;

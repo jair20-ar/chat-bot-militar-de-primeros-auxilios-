@@ -409,6 +409,26 @@ body::after {
     background: rgba(255, 71, 87, 0.08) !important;
 }
 
+/* --- TAGS DE DESCRIPCIÓN DE BÚSQUEDA --- */
+.desc-tags-container {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 0 4px;
+}
+
+.desc-tag {
+    background: rgba(0, 229, 255, 0.08);
+    border: 1px solid rgba(0, 229, 255, 0.15);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--cyan, #00e5ff);
+    letter-spacing: 0.3px;
+    font-weight: 500;
+}
+
 /* --- TARJETA DE INSTRUCCIÓN --- */
 .instruction-card {
     background: var(--bg-card);
