@@ -19,6 +19,15 @@ function getAuthHeaders() {
   return headers;
 }
 
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 function isAuthenticated() {
   const medicoData = localStorage.getItem('medicoData');
   if (medicoData) return true;

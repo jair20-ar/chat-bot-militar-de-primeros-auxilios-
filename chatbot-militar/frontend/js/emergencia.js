@@ -45,17 +45,27 @@ function loadInstructionToEdit(id) {
                 stepsContainer.innerHTML = '';
                 stepCount = 0;
 
+                if (pasos.length === 0) {
+                    showToast('⚠️ La instrucción no tiene pasos.', true);
+                }
+
                 pasos.forEach((paso, index) => {
                     stepCount = index + 1;
-                    const imagenHTML = paso.imagen ? `
+                    const imgSrc = escapeHtml(paso.imagen || '');
+                    const imagenHTML = imgSrc ? `
                         <div class="image-preview-container" style="display: block;">
-                            <img class="image-preview" src="${paso.imagen}" alt="Preview">
+                            <img class="image-preview" src="${imgSrc}" alt="Preview">
                             <button type="button" class="btn-remove-image">
                                 <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                 REMOVER IMAGEN
                             </button>
                         </div>
                     ` : `<div class="image-preview-container"></div>`;
+
+                    const titulo = escapeHtml(paso.titulo);
+                    const descripcion = escapeHtml(paso.descripcion);
+                    const duracion = escapeHtml(String(paso.duracion || 30));
+                    const textoVoz = escapeHtml(paso.texto_voz || '');
 
                     const stepHTML = `
                         <section class="card step-card" id="step-${stepCount}">
@@ -66,20 +76,20 @@ function loadInstructionToEdit(id) {
                             </div>
                             <div class="form-group">
                                 <label>Título del Paso *</label>
-                                <input type="text" value="${paso.titulo}" placeholder="Ej: Siguiente paso del procedimiento">
+                                <input type="text" value="${titulo}" placeholder="Ej: Siguiente paso del procedimiento">
                             </div>
                             <div class="form-group">
                                 <label>Descripción Detallada *</label>
-                                <textarea placeholder="Descripción detallada del procedimiento...">${paso.descripcion}</textarea>
+                                <textarea placeholder="Descripción detallada del procedimiento...">${descripcion}</textarea>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Duración (segundos)</label>
-                                    <input type="number" value="${paso.duracion || 30}">
+                                    <input type="number" value="${duracion}">
                                 </div>
                                 <div class="form-group">
                                     <label>Texto para Voz</label>
-                                    <input type="text" value="${paso.texto_voz || ''}" placeholder="Texto simplificado para síntesis de voz">
+                                    <input type="text" value="${textoVoz}" placeholder="Texto simplificado para síntesis de voz">
                                 </div>
                             </div>
                             <div class="form-group">
