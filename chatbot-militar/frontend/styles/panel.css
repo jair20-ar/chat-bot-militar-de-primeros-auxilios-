@@ -435,31 +435,6 @@ main {
     }
 }
 
-/* Help Button */
-.help-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-muted);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-.help-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: var(--text-main);
-}
-
 @media (max-width: 768px) {
     .stats-grid {
         grid-template-columns: 1fr;
@@ -763,18 +738,6 @@ body[data-theme="light"] .empty-state p {
 
 body[data-theme="light"] .empty-icon svg {
     stroke: #64748b !important;
-}
-
-body[data-theme="light"] .help-btn {
-    background: #ffffff !important;
-    border: 1px solid rgba(15, 31, 15, 0.15) !important;
-    color: #475569 !important;
-}
-
-body[data-theme="light"] .help-btn:hover {
-    background: rgba(0, 82, 0, 0.08) !important;
-    border-color: #005200 !important;
-    color: #005200 !important;
 }
 
 body[data-theme="light"] .modal-card {

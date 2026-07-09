@@ -359,27 +359,3 @@ body {
     stroke-linejoin: round;
 }
 
-/* === BOTÓN AYUDA === */
-.help-btn {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    color: var(--text-secondary);
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.help-btn:hover {
-    color: var(--text-primary);
-    border-color: rgba(255, 255, 255, 0.15);
-}

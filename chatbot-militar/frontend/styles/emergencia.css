@@ -460,29 +460,6 @@ textarea {
     }
 }
 
-.help-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-muted);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    z-index: 100;
-}
-
-.help-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: var(--text-main);
-}
-
 /* ==========================================================================
    TEMA CLARO TÁCTICO MILITAR DIURNO - OVERRIDES PARA EMERGENCIA
    ========================================================================== */

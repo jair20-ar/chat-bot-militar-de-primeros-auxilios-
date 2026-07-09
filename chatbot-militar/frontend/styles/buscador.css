@@ -8,6 +8,10 @@
     padding: 0;
 }
 
+:root {
+    --section-title-color: #5d7285;
+}
+
 body {
     background-color: #060d13;
     /* Rejilla táctica HUD y gradientes radiales de fondo para profundidad */
@@ -351,108 +355,124 @@ input[type="text"]::placeholder {
     fill: #050b11;
 }
 
-/* --- SECCIÓN BÚSQUEDAS RÁPIDAS --- */
-.quick-searches-title {
+/* --- SELECTOR ANATÓMICO --- */
+.anatomical-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.anatomical-title {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #5d7285;
+    color: var(--section-title-color);
     letter-spacing: 4px;
     text-align: center;
     margin-bottom: 24px;
     text-transform: uppercase;
 }
 
-.quick-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+.figure-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
 }
 
-.quick-btn {
+.zone-btns-left,
+.zone-btns-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+}
+
+.zone-btn {
     display: flex;
     align-items: center;
     gap: 16px;
-    background: rgba(14, 23, 31, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 20px; /* Bordes redondeados elegantes */
+    background: rgba(8, 18, 28, 0.45);
+    border: 1.5px solid rgba(0, 229, 255, 0.15);
+    border-radius: 16px;
     padding: 14px 22px;
     color: #ffffff;
     font-family: 'Inter', sans-serif;
     font-size: 0.95rem;
-    font-weight: 600;
-    text-align: left;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    width: 240px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.quick-btn:hover {
-    background: rgba(20, 32, 44, 0.8);
-    border-color: rgba(0, 229, 255, 0.35);
-    box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+.zone-btn svg.btn-icon {
+    width: 24px;
+    height: 24px;
+    stroke: #00e5ff;
+    fill: none;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.zone-btn:hover {
+    background: rgba(0, 229, 255, 0.08);
+    border-color: #00e5ff;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
     transform: translateY(-2px);
 }
 
-.quick-icon-wrapper {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(0, 229, 255, 0.05);
-    border: 1px solid rgba(0, 229, 255, 0.2);
+.zone-btn:hover svg.btn-icon {
+    filter: drop-shadow(0 0 5px rgba(0, 229, 255, 0.8));
+}
+
+.body-image {
+    flex: 1;
+    min-height: 580px;
+    max-width: 380px;
     display: flex;
-    justify-content: center;
     align-items: center;
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.05);
-    flex-shrink: 0;
-    transition: all 0.3s ease;
+    justify-content: center;
+    position: relative;
 }
 
-.quick-icon-wrapper svg {
-    stroke: #00e5ff;
-    transition: all 0.3s ease;
+.anatomy-display-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.25));
+    transition: filter 0.3s ease;
 }
 
-.quick-btn:hover .quick-icon-wrapper {
-    background: rgba(0, 229, 255, 0.15);
-    border-color: rgba(0, 229, 255, 0.6);
-    box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
+body[data-theme="light"] .anatomy-display-img {
+    filter: drop-shadow(0 0 10px rgba(15, 82, 15, 0.15));
 }
 
-.quick-btn:hover .quick-icon-wrapper svg {
-    transform: scale(1.1);
-}
-
-.quick-btn span {
-    letter-spacing: 0.3px;
-}
-
-/* --- HELP FLOATING BUTTON --- */
-.help-btn {
+/* --- TOAST SYSTEM --- */
+.toast {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 38px;
-    height: 38px;
-    background: rgba(8, 18, 28, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #64748b;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 100;
-}
-
-.help-btn:hover {
-    background: rgba(0, 229, 255, 0.1);
-    border-color: rgba(0, 229, 255, 0.4);
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(5, 15, 25, 0.85);
+    border: 1px solid #00e5ff;
     color: #00e5ff;
-    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
-    transform: scale(1.08);
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    box-shadow: 0 10px 25px rgba(0, 229, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
 }
 
 /* --- VOICE HINT (esquina superior derecha) --- */
@@ -564,16 +584,96 @@ body[data-theme="light"] .voice-hint-text {
         padding: 25px 20px;
     }
     
-    .quick-grid {
-        grid-template-columns: 1fr;
+    .figure-container {
+        max-width: 500px;
+        gap: 12px;
     }
+    
+    .zone-btn {
+        padding: 8px 12px;
+        font-size: 0.7rem;
+    }
+    
+    .body-image {
+        min-height: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 15px 10px;
+    }
+    
+    .header-area {
+        margin-bottom: 20px;
+    }
+    
+    h2 {
+        font-size: 1rem;
+        letter-spacing: 2px;
+    }
+    
+    .back-btn, .theme-btn {
+        width: 38px;
+        height: 38px;
+    }
+    
+    .search-card {
+        padding: 18px 14px;
+        margin-bottom: 30px;
+    }
+    
+    .instruction-row span {
+        font-size: 0.82rem;
+    }
+    
+    input[type="text"] {
+        height: 44px;
+        font-size: 0.85rem;
+        padding: 0 40px 0 14px;
+    }
+    
+    .mic-btn {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .btn-submit {
+        height: 44px;
+        font-size: 0.82rem;
+        letter-spacing: 1.5px;
+    }
+    
+    .anatomical-title {
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+        margin-bottom: 16px;
+    }
+    
+    .figure-container {
+        max-width: 100%;
+        gap: 8px;
+    }
+    
+    .zone-btn {
+        padding: 6px 10px;
+        font-size: 0.65rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .body-image {
+        min-height: 240px;
+    }
+    
 }
 
 /* ==========================================================================
    TEMA CLARO TÁCTICO MILITAR DIURNO - OVERRIDES PARA BUSCADOR
    ========================================================================== */
 body[data-theme="light"] {
-    background-color: #e6e6e3 !important;
+    --section-title-color: #334155;
+
+    background-color: #ffffff !important;
     background-image: 
         url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Ctext x='30' y='70' fill='%23005200' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold'%3ECHART: 4406_BAHIA%3C/text%3E%3Ctext x='30' y='85' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9'%3EDEPTH: 18.5M%3C/text%3E%3Ctext x='30' y='98' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9'%3ESNDG: 50KHZ%3C/text%3E%3Ctext x='90%25' y='70' fill='%23005200' opacity='0.05' font-family='monospace' font-size='10' font-weight='bold' text-anchor='end'%3ESEC: BAHIA_NAV%3C/text%3E%3Ctext x='90%25' y='85' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3EBRG: 045%3C/text%3E%3Ctext x='90%25' y='98' fill='%23005200' opacity='0.04' font-family='monospace' font-size='9' text-anchor='end'%3ERNG: 12NM%3C/text%3E%3C/svg%3E"),
         radial-gradient(circle at 5% 5%, rgba(0, 82, 0, 0.18) 0%, transparent 15%),
@@ -656,34 +756,8 @@ body[data-theme="light"] input[type="text"]:focus {
     background: #ffffff !important;
 }
 
-body[data-theme="light"] .quick-searches-title {
+body[data-theme="light"] .anatomical-title {
     color: #334155 !important;
-}
-
-body[data-theme="light"] .quick-btn {
-    background: rgba(255, 255, 255, 0.85) !important;
-    border: 1px solid rgba(15, 31, 15, 0.08) !important;
-    color: #0f1f0f !important;
-}
-
-body[data-theme="light"] .quick-btn:hover {
-    background: #ffffff !important;
-    border-color: #005200 !important;
-    box-shadow: 0 5px 15px rgba(0, 82, 0, 0.08) !important;
-}
-
-body[data-theme="light"] .quick-btn .quick-icon-wrapper {
-    background: rgba(0, 82, 0, 0.05) !important;
-    border: 1px solid rgba(0, 82, 0, 0.18) !important;
-}
-
-body[data-theme="light"] .quick-btn:hover .quick-icon-wrapper {
-    background: rgba(0, 82, 0, 0.1) !important;
-    border-color: #005200 !important;
-}
-
-body[data-theme="light"] .quick-btn .quick-icon-wrapper svg {
-    stroke: #005200 !important;
 }
 
 body[data-theme="light"] .instruction-row {
@@ -718,4 +792,22 @@ body[data-theme="light"] .mic-btn:hover {
 
 body[data-theme="light"] .mic-btn svg {
     stroke: #ffffff !important;
+}
+
+/* Light Theme Overrides for anatomical zone buttons */
+body[data-theme="light"] .zone-btn {
+    background: rgba(255, 255, 255, 0.75) !important;
+    border: 1.5px solid rgba(0, 82, 0, 0.2) !important;
+    color: #0f1f0f !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+}
+
+body[data-theme="light"] .zone-btn svg.btn-icon {
+    stroke: #005200 !important;
+}
+
+body[data-theme="light"] .zone-btn:hover {
+    background: rgba(0, 82, 0, 0.06) !important;
+    border-color: #005200 !important;
+    box-shadow: 0 0 15px rgba(0, 82, 0, 0.25) !important;
 }

@@ -55,71 +55,80 @@
 
         </div>
 
-        <div class="quick-searches-title">Búsquedas Rápidas</div>
-        
-        <div class="quick-grid drag-scroll">
-            <button class="quick-btn" onclick="performSearch('Herida de Bala')">
-                <div class="quick-icon-wrapper">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="22" y1="12" x2="18" y2="12"></line>
-                        <line x1="6" y1="12" x2="2" y2="12"></line>
-                        <line x1="12" y1="6" x2="12" y2="2"></line>
-                        <line x1="12" y1="22" x2="12" y2="18"></line>
-                    </svg>
+        <div class="anatomical-section">
+            <div class="anatomical-title">SELECCIÓN DE ÁREA CORPORAL</div>
+            <div class="figure-container">
+                <div class="zone-btns-left">
+                    <button class="zone-btn" data-search="cabeza">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                            <path d="M12 2a7 7 0 0 0-7 7c0 2.5 1.5 4.5 3 5.5v3a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-3c1.5-1 3-3 3-5.5a7 7 0 0 0-7-7Z" />
+                            <path d="M9 10a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM15 10a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Z" />
+                            <path d="M10 14h4M12 14v4" />
+                        </svg>
+                        <span>CABEZA</span>
+                    </button>
+                    <button class="zone-btn" data-search="cuello">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                            <path d="M12 2v20M6 8h12M7 14h10" />
+                            <path d="M8 4c0 4-2 6-2 10a6 6 0 0 0 12 0c0-4-2-6-2-10Z" />
+                        </svg>
+                        <span>CUELLO</span>
+                    </button>
+                    <button class="zone-btn" data-search="torax">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                            <path d="M6 3h12l2 4-2 7v7H6v-7L4 7Z" />
+                            <path d="M12 3v18" />
+                            <path d="M6 8h12M6 13h12" />
+                        </svg>
+                        <span>TÓRAX</span>
+                    </button>
+                    <button class="zone-btn" data-search="abdomen">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                            <path d="M5 3h14l-1 8-1 9H7l-1-9Z" />
+                            <path d="M12 3v17" />
+                            <path d="M6 10h12M7 15h10" />
+                        </svg>
+                        <span>ABDOMEN</span>
+                    </button>
                 </div>
-                <span>Herida de Bala</span>
-            </button>
-            
-            <button class="quick-btn" onclick="performSearch('Fractura Ósea')">
-                <div class="quick-icon-wrapper">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                    </svg>
+                
+                <div class="body-image">
+                    <img src="../imagenes/anatomia_dark.png" alt="Anatomía Médica" class="anatomy-display-img">
                 </div>
-                <span>Fractura Ósea</span>
-            </button>
-            
-            <button class="quick-btn" onclick="performSearch('Hemorragia Severa')">
-                <div class="quick-icon-wrapper">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 11 5 15a7 7 0 0 0 7 7z"></path>
-                    </svg>
+                
+                <div class="zone-btns-right">
+                    <button class="zone-btn" data-search="brazos">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                            <path d="M15 14a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1a4 4 0 0 1 4 4v2a4 4 0 0 1-4 4h-2Z" />
+                            <path d="M9 14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H8a4 4 0 0 0-4 4v2a4 4 0 0 0 4 4h2Z" />
+                        </svg>
+                        <span>BRAZOS</span>
+                    </button>
+                    <button class="zone-btn" data-search="manos">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                            <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v5m0 0V5a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6m0 0V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6m0 0V9a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8a7 7 0 0 0 7 7h4a7 7 0 0 0 7-7v-6" />
+                        </svg>
+                        <span>MANOS</span>
+                    </button>
+                    <button class="zone-btn" data-search="piernas">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                            <path d="M6 3h4l1 5 1 5-1 6-2 2H6l-1-7 1-5Z" />
+                            <path d="M18 3h-4l-1 5-1 5 1 6 2 2h3l1-7-1-5Z" />
+                        </svg>
+                        <span>PIERNAS</span>
+                    </button>
+                    <button class="zone-btn" data-search="pies">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                            <path d="M3 17a2 2 0 0 1 2-2h1l3-4c1-1 2-2 4-2a4 4 0 0 1 4 4v1a4 4 0 0 1-4 4H5a2 2 0 0 1-2-2Z" />
+                            <circle cx="15" cy="8" r="1" />
+                        </svg>
+                        <span>PIES</span>
+                    </button>
                 </div>
-                <span>Hemorragia Severa</span>
-            </button>
-            
-            <button class="quick-btn" onclick="performSearch('Quemaduras')">
-                <div class="quick-icon-wrapper">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
-                    </svg>
-                </div>
-                <span>Quemaduras</span>
-            </button>
-            
-            <button class="quick-btn" onclick="performSearch('RCP')">
-                <div class="quick-icon-wrapper">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </div>
-                <span>RCP</span>
-            </button>
-            
-            <button class="quick-btn" onclick="performSearch('Shock')">
-                <div class="quick-icon-wrapper">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                    </svg>
-                </div>
-                <span>Shock</span>
-            </button>
+            </div>
         </div>
 
     </div>
-
-    <div class="help-btn">?</div>
 
 <script src="../js/buscador.js"></script>
 <script src="../js/gestures.js"></script>

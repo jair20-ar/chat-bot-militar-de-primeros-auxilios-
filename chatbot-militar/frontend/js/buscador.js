@@ -102,3 +102,25 @@ function showToast(message, isError = false) {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
+
+const zoneNames = {
+    cabeza: 'Cabeza',
+    cuello: 'Cuello',
+    torax: 'Tórax',
+    abdomen: 'Abdomen',
+    brazos: 'Brazos',
+    manos: 'Manos',
+    piernas: 'Piernas',
+    pies: 'Pies'
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.zone-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const search = btn.dataset.search;
+            const name = zoneNames[search] || search;
+            sessionStorage.setItem('searchTerm', name);
+            window.location.href = `resultados.html?zona=${encodeURIComponent(search)}`;
+        });
+    });
+});

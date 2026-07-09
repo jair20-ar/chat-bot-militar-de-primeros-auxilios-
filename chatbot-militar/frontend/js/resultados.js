@@ -1,16 +1,74 @@
 const API_URL = '';
 
+const zonaDisplayNames = {
+    cabeza: 'Cabeza',
+    cuello: 'Cuello',
+    torax: 'Tórax',
+    abdomen: 'Abdomen',
+    brazos: 'Brazos',
+    manos: 'Manos',
+    piernas: 'Piernas',
+    pies: 'Pies'
+};
+
+function matchesZona(parteCuerpo, zona) {
+    const p = parteCuerpo.toLowerCase().replace(/[ó]/g, 'o');
+    const aliases = {
+        torax: ['torax', 'torax/abdomen'],
+        abdomen: ['abdomen', 'torax/abdomen'],
+        brazos: ['brazos', 'extremidades'],
+        piernas: ['piernas', 'extremidades']
+    };
+    const matches = aliases[zona] || [zona];
+    return matches.some(a => p.includes(a));
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
     const query = params.get('q');
+    const zona = params.get('zona');
 
-    if (query) {
+    if (zona) {
+        const displayName = zonaDisplayNames[zona] || zona;
+        const pill = document.getElementById('zona-pill');
+        pill.textContent = `Zona anatómica: ${displayName}`;
+        pill.style.display = 'inline-block';
+        document.getElementById('search-term-display').style.display = 'none';
+        searchByZone(zona);
+    } else if (query) {
         document.getElementById('search-term-display').textContent = `"${query}"`;
         searchInstructions(query);
     } else {
         showNoResults("No se especificó término de búsqueda");
     }
 });
+
+async function searchByZone(zona) {
+    const container = document.getElementById('results-container');
+    container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Buscando instrucciones...</p></div>';
+
+    try {
+        const response = await fetch(`${API_URL}/api/instrucciones`);
+        const data = await response.json();
+
+        if (data.success && Array.isArray(data.data)) {
+            const filteredResults = data.data.filter(inst =>
+                inst.parte_cuerpo && matchesZona(inst.parte_cuerpo, zona)
+            );
+
+            if (filteredResults.length > 0) {
+                displayResults(filteredResults);
+            } else {
+                showNoResults(`No se encontraron protocolos para la zona "${zonaDisplayNames[zona] || zona}"`);
+            }
+        } else {
+            showNoResults("Error al buscar instrucciones");
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNoResults("Error de conexión con el servidor");
+    }
+}
 
 async function searchInstructions(searchTerm) {
     const container = document.getElementById('results-container');

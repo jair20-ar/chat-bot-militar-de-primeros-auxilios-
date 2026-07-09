@@ -19,7 +19,7 @@ const INSTRUCCIONES = [
     titulo: 'HERIDA DE BALA',
     categoria: 'Trauma',
     severidad: 'critico',
-    parte_cuerpo: 'Torax/Abdomen',
+    parte_cuerpo: 'torax',
     tiempo_estimado: '15 min',
     descripcion: [
       'Herida por proyectil de arma de fuego en el torso',
@@ -55,7 +55,7 @@ const INSTRUCCIONES = [
     titulo: 'HEMORRAGIA SEVERA',
     categoria: 'Emergencia',
     severidad: 'critico',
-    parte_cuerpo: 'Extremidades',
+    parte_cuerpo: 'brazos',
     tiempo_estimado: '10 min',
     descripcion: [
       'Perdida abundante de sangre en brazo o pierna',
@@ -91,7 +91,7 @@ const INSTRUCCIONES = [
     titulo: 'RCP (REANIMACION CARDIOPULMONAR)',
     categoria: 'Paro Cardiaco',
     severidad: 'critico',
-    parte_cuerpo: 'Torax',
+    parte_cuerpo: 'torax',
     tiempo_estimado: '20 min',
     descripcion: [
       'Persona inconsciente que no responde al llamado',

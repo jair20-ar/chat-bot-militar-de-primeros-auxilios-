@@ -407,6 +407,17 @@ function updateThemeIcons(theme) {
   });
 }
 
+function updateAnatomyImage(theme) {
+  const img = document.querySelector('.anatomy-display-img');
+  if (img) {
+    if (theme === 'light') {
+      img.src = '../imagenes/anatomia_light.png';
+    } else {
+      img.src = '../imagenes/anatomia_dark.png';
+    }
+  }
+}
+
 function toggleTheme() {
   const body = document.body;
   const html = document.documentElement;
@@ -417,6 +428,7 @@ function toggleTheme() {
   localStorage.setItem('theme', nextTheme);
   
   updateThemeIcons(nextTheme);
+  updateAnatomyImage(nextTheme);
   showToast(`TEMA ${nextTheme.toUpperCase()}`);
 }
 
@@ -480,6 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.setAttribute('data-theme', savedTheme);
   document.documentElement.setAttribute('data-theme', savedTheme);
   updateThemeIcons(savedTheme);
+  updateAnatomyImage(savedTheme);
 
   // Vincular eventos click a todos los botones físicos de cambio de tema
   const themeSelectors = '.theme-btn, .theme-toggle, #themeToggle, .top-right-btn';

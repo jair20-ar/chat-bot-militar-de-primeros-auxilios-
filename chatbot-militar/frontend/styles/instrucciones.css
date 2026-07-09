@@ -534,36 +534,6 @@ body::after {
     box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
 }
 
-/* --- HELP FLOATING BUTTON --- */
-.help-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 38px;
-    height: 38px;
-    background: rgba(8, 18, 28, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #64748b;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: var(--transition);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 100;
-}
-
-.help-btn:hover {
-    background: rgba(0, 229, 255, 0.1);
-    border-color: rgba(0, 229, 255, 0.4);
-    color: #00e5ff;
-    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
-    transform: scale(1.08);
-}
-
 /* --- LOADING & ERRORS --- */
 .loading {
     text-align: center;
