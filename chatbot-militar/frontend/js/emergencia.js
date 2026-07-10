@@ -19,6 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
     addImageEventListeners();
 });
 
+function setSelectValue(id, value) {
+    const select = document.getElementById(id);
+    if (!select || !value) return;
+    const options = select.options;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value.toLowerCase() === value.toLowerCase()) {
+            select.selectedIndex = i;
+            return;
+        }
+    }
+}
+
 // Cargar instrucción para editar
 function loadInstructionToEdit(id) {
     fetch(`${API_URL}/api/instrucciones/${id}`)
@@ -26,10 +38,10 @@ function loadInstructionToEdit(id) {
         .then(data => {
             if (data.success) {
                 const inst = data.data;
-                document.getElementById('titulo').value = inst.titulo;
+                document.getElementById('titulo').value = inst.titulo || '';
                 document.getElementById('categoria').value = inst.categoria || '';
-                document.getElementById('severidad').value = inst.severidad || 'leve';
-                document.getElementById('parte_cuerpo').value = inst.parte_cuerpo || '';
+                setSelectValue('severidad', inst.severidad);
+                setSelectValue('parte_cuerpo', inst.parte_cuerpo);
                 document.getElementById('tiempo_estimado').value = inst.tiempo_estimado || '';
                 document.getElementById('descripcion').value = inst.descripcion || '';
 
@@ -108,12 +120,15 @@ function loadInstructionToEdit(id) {
                     stepsContainer.innerHTML += stepHTML;
                 });
 
+                recalculateSteps();
                 addImageEventListeners();
+            } else {
+                showToast('❌ Error al cargar instrucción: ' + (data.error || 'desconocido'), true);
             }
         })
         .catch(err => {
             console.error(err);
-            showToast('❌ Error al cargar instrucción', true);
+            showToast('❌ Error de conexión al cargar instrucción', true);
         });
 }
 
