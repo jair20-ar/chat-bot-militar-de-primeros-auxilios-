@@ -1,355 +1,187 @@
-# Chatbot Militar de Primeros Auxilios  🏥⚕️
+# Sistema de Asistencia Médica Táctica (TACMED FANB)
 
-Sistema inteligente de asistencia médica para contextos militares, basado en inteligencia artificial y procesamiento de lenguaje natural para proporcionar guía de primeros auxilios en tiempo real.
-
-## 📋 Tabla de Contenidos
-
-- [Descripción](#descripción)
-- [Características](#características)
-- [Arquitectura del Sistema](#arquitectura-del-sistema)
-- [Componentes Principales](#componentes-principales)
-- [Flujo de Datos](#flujo-de-datos)
-- [Flujo de Respuestas](#flujo-de-respuestas)
-- [Stack Tecnológico](#stack-tecnológico)
-- [Instalación](#instalación)
-- [Uso](#uso)
-- [Contribución](#contribución)
-- [Licencia](#licencia)
-
----
-
-## 📝 Descripción
-
-Este proyecto implementa un chatbot conversacional especializado en primeros auxilios militares, capaz de:
-
-- **Diagnosticar síntomas** mediante análisis de lenguaje natural
-- **Proporcionar orientación médica** según protocolos establecidos
-- **Sugerir procedimientos de emergencia** adaptados a contextos operacionales
-- **Mantener conversaciones contextuales** con seguimiento de historiales
+Chatbot web para primeros auxilios en contexto militar. Permite a soldados buscar instrucciones médicas por texto o voz, y a médicos registrar protocolos de emergencia.
 
 ---
 
 ## ✨ Características
 
-✅ Procesamiento de lenguaje natural (NLP)  
-✅ Módulo de inteligencia artificial para diagnósticos  
-✅ Base de datos de protocolos médicos militares  
-✅ Interfaz conversacional en tiempo real  
-✅ Integración con APIs médicas  
-✅ Almacenamiento seguro de sesiones  
-✅ Logs y auditoría completa  
-
----
-
-## 🏗️ Arquitectura del Sistema
-
-```mermaid
-graph TB
-    subgraph "Cliente"
-        WEB["🌐 Aplicación Web<br/>React/Vue"]
-        MOB["📱 App Móvil<br/>Flutter/React Native"]
-    end
-    
-    subgraph "API Gateway"
-        APIGW["🔐 API Gateway<br/>Express/FastAPI<br/>Autenticación & Rate Limiting"]
-    end
-    
-    subgraph "Microservicios"
-        CHAT["💬 Servicio Chat<br/>Gestión de Conversaciones"]
-        NLP["🧠 Servicio NLP<br/>Procesamiento de Texto"]
-        DIAG["🔍 Servicio Diagnóstico<br/>Motor de Inferencia"]
-        AUTH["🔑 Servicio Autenticación<br/>JWT/OAuth2"]
-    end
-    
-    subgraph "Capas de Datos"
-        CACHE["⚡ Redis Cache<br/>Sesiones & Caché"]
-        DB["💾 Base de Datos<br/>PostgreSQL/MongoDB"]
-        PROTO["📚 Base Protocolos<br/>Datos Médicos"]
-    end
-    
-    subgraph "Servicios Externos"
-        IA["🤖 Motor IA<br/>OpenAI/Hugging Face"]
-        SMS["📞 SMS Gateway<br/>Notificaciones"]
-        LOG["📊 Logging<br/>ELK Stack"]
-    end
-    
-    WEB --> APIGW
-    MOB --> APIGW
-    
-    APIGW --> AUTH
-    APIGW --> CHAT
-    
-    CHAT --> NLP
-    CHAT --> CACHE
-    NLP --> IA
-    NLP --> DIAG
-    DIAG --> PROTO
-    DIAG --> DB
-    
-    CHAT --> DB
-    AUTH --> DB
-    
-    DIAG --> LOG
-    CHAT --> LOG
-    NLP --> LOG
-    
-    CHAT -.->|Alertas| SMS
-```
-
----
-
-## 🔧 Componentes Principales
-
-### 1. **Cliente (Frontend)**
-- **Aplicación Web**: Interfaz responsiva para navegadores
-- **Aplicación Móvil**: Cliente nativo para iOS/Android
-
-### 2. **API Gateway**
-- Punto de entrada único para todas las solicitudes
-- Autenticación y autorización centralizada
-- Rate limiting y protección DDoS
-- Enrutamiento inteligente hacia microservicios
-
-### 3. **Microservicios**
-
-#### 💬 Servicio Chat
-- Gestión de sesiones de conversación
-- Historial de mensajes
-- Contexto conversacional persistente
-
-#### 🧠 Servicio NLP
-- Procesamiento de lenguaje natural
-- Tokenización y análisis sintáctico
-- Extracción de entidades médicas
-- Análisis de sentimientos
-
-#### 🔍 Servicio Diagnóstico
-- Motor de reglas basado en síntomas
-- Integración con modelos de IA
-- Base de protocolos médicos militares
-- Sugerencias terapéuticas
-
-#### 🔑 Servicio Autenticación
-- Gestión de usuarios y permisos
-- JWT y OAuth2
-- Control de acceso basado en roles (RBAC)
-
-### 4. **Capas de Datos**
-- **Redis**: Caché distribuido y sesiones
-- **PostgreSQL/MongoDB**: Base de datos principal
-- **Base de Protocolos**: Información médica estructurada
-
-### 5. **Servicios Externos**
-- **Motor de IA**: Generación de respuestas avanzadas
-- **SMS Gateway**: Notificaciones de emergencia
-- **ELK Stack**: Logging centralizado
-
----
-
-## 📊 Flujo de Datos
-
-```mermaid
-graph LR
-    USER["👤 Usuario"]
-    INPUT["📝 Entrada de Texto"]
-    PREPROC["🔄 Preprocesamiento<br/>Normalización, Tokenización"]
-    NLP["🧠 Análisis NLP<br/>Entidades, Intención"]
-    CONTEXT["📍 Análisis de Contexto<br/>Historial, Sesión"]
-    MATCH["🎯 Búsqueda en BD<br/>Protocolos Médicos"]
-    MODEL["🤖 Modelo IA<br/>Generación de Respuesta"]
-    RANK["⭐ Ranking de Respuestas<br/>Confianza & Relevancia"]
-    OUTPUT["💬 Respuesta Final"]
-    
-    USER -->|Pregunta| INPUT
-    INPUT --> PREPROC
-    PREPROC --> NLP
-    NLP --> CONTEXT
-    CONTEXT --> MATCH
-    MATCH --> MODEL
-    MODEL --> RANK
-    RANK --> OUTPUT
-    OUTPUT -->|Respuesta| USER
-```
-
----
-
-## 🔄 Flujo de Respuestas
-
-```mermaid
-sequenceDiagram
-    actor User
-    participant Client as Cliente Web/Móvil
-    participant Gateway as API Gateway
-    participant ChatSvc as Servicio Chat
-    participant NLPSvc as Servicio NLP
-    participant DiagSvc as Servicio Diagnóstico
-    participant DB as Base de Datos
-    participant Cache as Redis Cache
-    
-    User->>Client: Envía pregunta
-    Client->>Gateway: POST /chat/message
-    
-    Note over Gateway: Validación & Autenticación
-    
-    Gateway->>ChatSvc: Procesa mensaje
-    ChatSvc->>Cache: Obtiene sesión
-    
-    ChatSvc->>NLPSvc: Análisis de texto
-    NLPSvc->>NLPSvc: Tokenización & Entidades
-    NLPSvc-->>ChatSvc: Resultado NLP
-    
-    ChatSvc->>DiagSvc: Solicita diagnóstico
-    DiagSvc->>DB: Consulta protocolos
-    DiagSvc->>DiagSvc: Análisis de síntomas
-    DiagSvc-->>ChatSvc: Sugerencias médicas
-    
-    ChatSvc->>DB: Almacena conversación
-    ChatSvc->>Cache: Actualiza sesión
-    
-    ChatSvc-->>Gateway: Respuesta procesada
-    Gateway-->>Client: JSON con respuesta
-    Client->>User: Muestra respuesta
-```
+- **Búsqueda por texto y voz** — Transcripción offline con Vosk (modelo español)
+- **Selector anatómico** — Filtro por zona del cuerpo (cabeza, tórax, abdomen, extremidades, etc.)
+- **Reproducción de instrucciones** — Paso a paso con síntesis de voz (`SpeechSynthesis`) y avance automático
+- **Roles de usuario** — Soldado (sin autenticación), Médico (registro con código), Administrador
+- **Panel médico** — Creación, edición y eliminación de instrucciones médicas
+- **Panel administrador** — Gestión de médicos, instrucciones y registro de búsquedas
+- **Reconocimiento de gestos** — Navegación táctil con dibujo de gestos en pantalla
+- **Tema claro/oscuro** — Alternancia con persistencia en `localStorage`
 
 ---
 
 ## 💻 Stack Tecnológico
 
 ### Backend
-- **Runtime**: Node.js / Python 3.9+
-- **Framework**: Express.js / FastAPI
-- **Base de Datos**: PostgreSQL 12+ / MongoDB
-- **Caché**: Redis 6+
-- **IA/ML**: TensorFlow, PyTorch, Transformers
+| Tecnología | Uso |
+|---|---|
+| **Node.js 18 + Express** | Servidor HTTP monolítico |
+| **SQLite3** / **PostgreSQL** | Base de datos (SQLite local, PostgreSQL en producción) |
+| **Vosk** (modelo pequeño español) | Reconocimiento de voz offline |
+| **ffmpeg** | Conversión de audio a WAV |
+| **jsonwebtoken** + **bcryptjs** | Autenticación y hash de contraseñas |
+| **helmet** + **cors** + **express-rate-limit** | Seguridad HTTP |
+| **express-validator** | Validación de entrada |
+| **winston** | Logging estructurado |
+| **multer** | Subida de archivos (audio) |
 
 ### Frontend
-- **Framework Web**: React 18+ / Vue 3+
-- **Framework Móvil**: Flutter / React Native
-- **Styling**: Tailwind CSS / Material-UI
-- **State Management**: Redux / Vuex
-
-### DevOps & Infraestructura
-- **Containerización**: Docker
-- **Orquestación**: Kubernetes / Docker Compose
-- **CI/CD**: GitHub Actions / GitLab CI
-- **Logging**: ELK Stack (Elasticsearch, Logstash, Kibana)
-- **Monitoreo**: Prometheus + Grafana
-
-### Seguridad
-- **Autenticación**: JWT, OAuth2, 2FA
-- **Encriptación**: TLS/SSL, AES-256
-- **OWASP**: Implementación de mejores prácticas
+| Tecnología | Uso |
+|---|---|
+| **HTML + CSS + JavaScript vanilla** | Sin frameworks ni build steps |
+| **SpeechSynthesis API** | Síntesis de voz en instrucciones |
+| **MediaRecorder API** | Grabación de audio para búsqueda por voz |
+| **Canvas API** | Sistema de gestos táctiles |
 
 ---
 
-## 🚀 Instalación
+## 🗂️ Estructura del Proyecto
 
-### Requisitos Previos
-- Node.js v16+
-- Python 3.9+
-- Docker & Docker Compose
-- Git
+```
+proyecto b/
+├── chatbot-militar/
+│   ├── backend/
+│   │   ├── server.js              # Servidor Express (API + archivos estáticos)
+│   │   ├── db.js                  # Conexión SQLite / PostgreSQL
+│   │   ├── seed.js                # Semilla de base de datos
+│   │   ├── middleware/
+│   │   │   ├── auth.js            # JWT sign/verify + requireAdmin
+│   │   │   ├── validate.js        # Cadenas de validación express-validator
+│   │   │   ├── logger.js          # Winston logger
+│   │   │   └── correlation.js     # Correlation ID por request
+│   │   ├── model/                 # Modelo Vosk de reconocimiento de voz
+│   │   └── logs/                  # Logs generados por Winston
+│   ├── frontend/
+│   │   ├── html/                  # 10 páginas HTML (index, buscador, admin, etc.)
+│   │   ├── styles/                # CSS por página + temas
+│   │   ├── js/                    # JS por página + utilidades
+│   │   └── imagenes/              # Escudo FANB, anatomía, etc.
+├── render.yaml                    # Configuración de despliegue en Render
+├── package.json                   # Script raíz (start, dev)
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+└── README.md
+```
 
-### Pasos de Instalación
+---
 
-1. **Clonar el repositorio**
+## 👥 Roles de Usuario
+
+| Rol | Acceso |
+|---|---|
+| **Soldado** | Sin autenticación. Busca instrucciones, filtra por zona corporal, reproduce pasos con voz. |
+| **Médico** | Se registra con código (`FANB2026` por defecto). Crea, edita y elimina sus propias instrucciones. |
+| **Administrador** | Login con contraseña (`UNEFA2026` por defecto). Gestiona médicos, instrucciones, código de registro y logs de búsqueda. |
+
+---
+
+## 🚀 Instalación y Uso Local
+
+### Requisitos
+- Node.js 18.19.0
+
+### Pasos
+
 ```bash
+# 1. Clonar
 git clone https://github.com/jair20-ar/chat-bot-militar-de-primeros-auxilios-.git
 cd chat-bot-militar-de-primeros-auxilios-
-```
 
-2. **Configurar variables de entorno**
-```bash
-cp .env.example .env
-# Editar .env con tus credenciales
-```
-
-3. **Instalar dependencias**
-```bash
-# Backend
+# 2. Instalar dependencias del backend
 cd chatbot-militar/backend
 npm install
 
-# Frontend
-cd ../frontend
-npm install
-```
-
-4. **Iniciar servicios con Docker**
-```bash
-docker-compose up -d
-```
-
-5. **Ejecutar migraciones de BD**
-```bash
-npm run migrate
-```
-
-6. **Iniciar aplicación**
-```bash
+# 3. Iniciar servidor
 npm start
+
+# 4. Abrir en el navegador
+# http://localhost:3001
 ```
+
+> El servidor usa SQLite por defecto. En producción (Render) usa PostgreSQL vía la variable `DATABASE_URL`.
 
 ---
 
-## 📖 Uso
+## 📡 API
 
-### API REST Básica
+### Autenticación
+| Método | Endpoint | Descripción |
+|---|---|---|
+| `POST` | `/medicos/registro` | Registro de médico (requiere `codigo_registro`) |
+| `POST` | `/medicos/login` | Login de médico, devuelve JWT |
+| `POST` | `/api/admin/login` | Login de administrador, devuelve JWT |
 
-**Enviar mensaje**
+### Instrucciones médicas
+| Método | Endpoint | Auth | Descripción |
+|---|---|---|---|
+| `GET` | `/api/instrucciones` | — | Listar todas las instrucciones |
+| `GET` | `/api/instrucciones/:id` | — | Obtener instrucción por ID |
+| `POST` | `/api/instrucciones` | JWT médico | Crear instrucción |
+| `PUT` | `/api/instrucciones/:id` | JWT médico | Actualizar instrucción |
+| `DELETE` | `/api/instrucciones/:id` | JWT médico | Eliminar instrucción |
+
+### Transcripción de voz
+| Método | Endpoint | Descripción |
+|---|---|---|
+| `POST` | `/api/transcribir` | Sube audio (webm), devuelve texto transcrito vía Vosk |
+
+### Administración
+| Método | Endpoint | Auth | Descripción |
+|---|---|---|---|
+| `GET` | `/api/admin/medicos` | JWT admin | Listar médicos |
+| `DELETE` | `/api/admin/medicos/:id` | JWT admin | Eliminar médico y sus instrucciones |
+| `GET` | `/api/admin/config` | JWT admin | Obtener configuración y estadísticas |
+| `POST` | `/api/admin/config` | JWT admin | Actualizar configuración |
+| `GET` | `/api/admin/busquedas` | JWT admin | Log de búsquedas (filtro por período) |
+
+### Logging de búsquedas
+| Método | Endpoint | Descripción |
+|---|---|---|
+| `POST` | `/api/log-busqueda` | Registra cuando un soldado ve una instrucción |
+
+### Health Check
 ```bash
-curl -X POST http://localhost:3000/api/chat/message \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{
-    "message": "Me duele la cabeza y tengo fiebre",
-    "session_id": "user-12345"
-  }'
-```
-
-**Obtener historial de sesión**
-```bash
-curl -X GET http://localhost:3000/api/chat/history/user-12345 \
-  -H "Authorization: Bearer YOUR_TOKEN"
+curl http://localhost:3001/api/health
+# → { "status": "ok" }
 ```
 
 ---
 
-## 🤝 Contribución
+## 🌐 Despliegue en Render
 
-¡Tus contribuciones son bienvenidas! Por favor:
+El proyecto incluye `render.yaml` con la configuración:
 
-1. Fork el proyecto
-2. Crea una rama con tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-Consulta [CONTRIBUTING.md](CONTRIBUTING.md) para más detalles.
+- **Runtime**: Node 18.19.0
+- **Root directory**: `chatbot-militar/backend`
+- **Start command**: `node --max-old-space-size=180 server.js`
+- **Base de datos**: PostgreSQL (plan free)
+- **Health check**: `GET /api/health`
 
 ---
 
-## 📜 Licencia
+## 📄 Licencia
 
-Este proyecto está licenciado bajo la Licencia MIT - ver [LICENSE](LICENSE) para más detalles.
-
----
-
-## 📞 Contacto
-
-- **Autor**: Jair Rodríguez
-- **Email**: jair20.ar@example.com
-- **GitHub**: [@jair20-ar](https://github.com/jair20-ar)
+ISC
 
 ---
 
-## 🙏 Agradecimientos
+## 👨‍💻 Autores
 
-- Equipo de desarrollo militar
-- Consultores médicos especializados
-- Comunidad de código abierto
+- **Jair Molleda** & **Mariangel Chirinos**
+- Email: jaircolina@gmail.com
+- GitHub: [@jair20-ar](https://github.com/jair20-ar)
 
 ---
 
-**Última actualización**: 30 de Mayo, 2026  
-**Versión**: 1.0.0
+## 📚 Más Información
+
+- [Guía de contribución](CONTRIBUTING.md)
+- [Registro de cambios](CHANGELOG.md)
+- [RUNBOOK operativo](chatbot-militar/backend/RUNBOOK.md)
