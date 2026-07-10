@@ -7,28 +7,30 @@ Chatbot web para primeros auxilios en contexto militar. Permite a soldados busca
 ## 📊 Diagrama de Casos de Uso
 
 ```mermaid
-usecaseDiagram
-    actor Soldado as 💂 Soldado
-    actor Médico as 🩺 Médico
-    actor Administrador as ⚙️ Administrador
+flowchart LR
+    subgraph Soldado["💂 Soldado"]
+        S1[Buscar por texto]
+        S2[Buscar por voz]
+        S3[Filtrar por zona corporal]
+        S4[Ver instrucción paso a paso]
+    end
 
-    Soldado --> (Buscar por texto)
-    Soldado --> (Buscar por voz)
-    Soldado --> (Filtrar por zona corporal)
-    Soldado --> (Ver instrucción paso a paso)
+    subgraph Medico["🩺 Médico"]
+        M1[Iniciar sesión]
+        M2[Registrarse con código]
+        M3[Crear instrucción médica]
+        M4[Editar instrucción]
+        M5[Eliminar instrucción]
+        M6[Ver panel de estadísticas]
+    end
 
-    Médico --> (Iniciar sesión)
-    Médico --> (Registrarse con código)
-    Médico --> (Crear instrucción médica)
-    Médico --> (Editar instrucción)
-    Médico --> (Eliminar instrucción)
-    Médico --> (Ver panel de estadísticas)
-
-    Administrador --> (Iniciar sesión admin)
-    Administrador --> (Gestionar médicos)
-    Administrador --> (Gestionar instrucciones)
-    Administrador --> (Ver logs de búsquedas)
-    Administrador --> (Configurar sistema)
+    subgraph Admin["⚙️ Administrador"]
+        A1[Iniciar sesión admin]
+        A2[Gestionar médicos]
+        A3[Gestionar instrucciones]
+        A4[Ver logs de búsquedas]
+        A5[Configurar sistema]
+    end
 ```
 
 ## 🔄 Diagrama de Flujo del Sistema
