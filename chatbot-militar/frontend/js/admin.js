@@ -386,7 +386,6 @@ function setupEventListeners() {
   const backBtn = document.querySelector('.icon-btn[aria-label="Volver"]');
   if (backBtn) {
     backBtn.addEventListener('click', () => {
-      localStorage.removeItem('adminToken');
       window.location.href = '/';
     });
   }}
