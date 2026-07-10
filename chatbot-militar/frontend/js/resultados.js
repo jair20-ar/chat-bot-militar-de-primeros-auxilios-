@@ -1,4 +1,3 @@
-const API_URL = '';
 
 const zonaDisplayNames = {
     cabeza: 'Cabeza',

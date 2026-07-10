@@ -1,4 +1,3 @@
-const API_URL = '';
 let stepCount = 1;
 let editingId = null;
 

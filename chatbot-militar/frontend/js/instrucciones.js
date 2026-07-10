@@ -1,4 +1,3 @@
-const API_URL = '';
 let instructionData = null;
 let currentStep = 0;
 let synth = window.speechSynthesis;
