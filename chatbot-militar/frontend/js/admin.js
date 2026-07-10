@@ -1,5 +1,5 @@
-// Verificar sesión
-if (!isAuthenticated()) {
+// Verificar sesión de administrador
+if (!localStorage.getItem('adminToken')) {
   window.location.href = 'login_admin.html';
 }
 
@@ -69,7 +69,7 @@ async function loadData() {
 // Cargar estadísticas y configuraciones generales
 async function loadStatsAndConfig() {
   try {
-    const res = await fetch(`${API_URL}/api/admin/config`, { headers: getAuthHeaders() });
+    const res = await fetch(`${API_URL}/api/admin/config`, { headers: getAdminHeaders() });
     const data = await res.json();
     if (data.success) {
       statTotalInstrucciones.textContent = data.stats.instrucciones;
@@ -85,7 +85,7 @@ async function loadStatsAndConfig() {
 // Cargar médicos registrados
 async function loadMedicos() {
   try {
-    const res = await fetch(`${API_URL}/api/admin/medicos`, { headers: getAuthHeaders() });
+    const res = await fetch(`${API_URL}/api/admin/medicos`, { headers: getAdminHeaders() });
     const data = await res.json();
     if (data.success) {
       allMedicos = data.data;
@@ -135,7 +135,7 @@ async function deleteMedico(id_medico) {
   try {
     const res = await fetch(`${API_URL}/api/admin/medicos/${id_medico}`, {
       method: 'DELETE',
-      headers: getAuthHeaders()
+      headers: getAdminHeaders()
     });
     const data = await res.json();
     if (data.success) {
@@ -221,7 +221,7 @@ async function deleteInstruccion(id) {
   try {
     const res = await fetch(`${API_URL}/api/instrucciones/${id}`, {
       method: 'DELETE',
-      headers: getAuthHeaders()
+      headers: getAdminHeaders()
     });
     const data = await res.json();
     if (data.success) {
@@ -241,7 +241,7 @@ function loadBusquedas() {
   const search = searchBusquedasInput.value.trim();
   const url = `${API_URL}/api/admin/busquedas?periodo=${currentPeriodo}${search ? '&search=' + encodeURIComponent(search) : ''}`;
 
-  fetch(url, { headers: getAuthHeaders() })
+  fetch(url, { headers: getAdminHeaders() })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -316,7 +316,7 @@ function setupEventListeners() {
     try {
       const res = await fetch(`${API_URL}/api/admin/config`, {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({ registro_code: code })
       });
       const data = await res.json();
@@ -354,7 +354,7 @@ function setupEventListeners() {
     try {
       const res = await fetch(`${API_URL}/api/admin/config`, {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: getAdminHeaders(),
         body: JSON.stringify({ admin_password: pass })
       });
       const data = await res.json();

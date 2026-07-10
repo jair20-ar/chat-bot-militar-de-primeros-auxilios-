@@ -19,6 +19,15 @@ function getAuthHeaders() {
   return headers;
 }
 
+function getAdminHeaders() {
+  const headers = { 'Content-Type': 'application/json' };
+  const adminToken = localStorage.getItem('adminToken');
+  if (adminToken && adminToken.length > 10) {
+    headers['Authorization'] = 'Bearer ' + adminToken;
+  }
+  return headers;
+}
+
 function escapeHtml(str) {
   if (typeof str !== 'string') return '';
   return str

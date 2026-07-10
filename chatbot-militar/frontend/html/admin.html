@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="../styles/admin.css">
 <script src="../js/api.js"></script>
 <script>
-  if (!isAuthenticated()) {
+  if (!localStorage.getItem('adminToken')) {
     window.location.href = 'login_admin.html';
   }
 </script>
