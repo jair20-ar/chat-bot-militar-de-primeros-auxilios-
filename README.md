@@ -4,6 +4,74 @@ Chatbot web para primeros auxilios en contexto militar. Permite a soldados busca
 
 ---
 
+## 📊 Diagrama de Casos de Uso
+
+```mermaid
+usecaseDiagram
+    actor Soldado as 💂 Soldado
+    actor Médico as 🩺 Médico
+    actor Administrador as ⚙️ Administrador
+
+    Soldado --> (Buscar por texto)
+    Soldado --> (Buscar por voz)
+    Soldado --> (Filtrar por zona corporal)
+    Soldado --> (Ver instrucción paso a paso)
+
+    Médico --> (Iniciar sesión)
+    Médico --> (Registrarse con código)
+    Médico --> (Crear instrucción médica)
+    Médico --> (Editar instrucción)
+    Médico --> (Eliminar instrucción)
+    Médico --> (Ver panel de estadísticas)
+
+    Administrador --> (Iniciar sesión admin)
+    Administrador --> (Gestionar médicos)
+    Administrador --> (Gestionar instrucciones)
+    Administrador --> (Ver logs de búsquedas)
+    Administrador --> (Configurar sistema)
+```
+
+## 🔄 Diagrama de Flujo del Sistema
+
+```mermaid
+flowchart TD
+    subgraph Cliente["💻 Cliente (Navegador)"]
+        S[💂 Soldado]
+        F[Frontend HTML/CSS/JS]
+        TTS[🔊 Síntesis de voz<br/>SpeechSynthesis API]
+    end
+
+    subgraph Servidor["🌐 Servidor Express"]
+        API[server.js<br/>API REST]
+        VK[🎙️ Vosk<br/>Reconocimiento de voz]
+        AUTH[🔐 JWT + bcrypt<br/>Autenticación]
+        VAL[✅ express-validator<br/>Validación]
+        LOG[📝 Winston<br/>Logging]
+    end
+
+    subgraph BD["💾 Base de Datos"]
+        DB[(SQLite<br/>PostgreSQL)]
+    end
+
+    S -->|Texto / Voz / Zona| F
+    F -->|GET/POST /api/*| API
+    API -->|/api/transcribir| VK
+    VK -->|Texto transcrito| API
+    API -->|/medicos/login| AUTH
+    API -->|Validar entrada| VAL
+    API -->|Registrar eventos| LOG
+    API <-->|CRUD| DB
+
+    F -->|POST /api/log-busqueda| API
+    F -->|POST /api/transcribir| VK
+    F -->|SpeechSynthesis| TTS
+
+    M{{🩺 Médico}} -->|Crear / Editar| API
+    A{{⚙️ Administrador}} -->|Gestionar| API
+```
+
+---
+
 ## ✨ Características
 
 - **Búsqueda por texto y voz** — Transcripción offline con Vosk (modelo español)
