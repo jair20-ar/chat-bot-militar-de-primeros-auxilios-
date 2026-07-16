@@ -27,38 +27,40 @@
             </button>
         </div>
 
-        <div class="search-card">
+        <div class="main-layout">
             
-            <div class="instruction-row">
-                <div class="search-title-icon-wrapper">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </div>
-                <span>Describe la emergencia o condición médica</span>
-            </div>
-
-            <div class="input-group">
-                <div class="input-wrapper">
-                    <input type="text" id="search" placeholder="Ej: herida de bala, fractura, hemorragia..." onkeypress="handleEnter(event)">
-                    <span class="search-inner-icon">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    </span>
-                </div>
+            <div class="search-card">
                 
-                <button class="mic-btn" id="voice-card" title="Buscar por voz">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                <div class="instruction-row">
+                    <div class="search-title-icon-wrapper">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                    <span>Describe la emergencia</span>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <input type="text" id="search" placeholder="Ej: herida de bala, fractura..." onkeypress="handleEnter(event)">
+                        <span class="search-inner-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </span>
+                    </div>
+                    
+                    <button class="mic-btn" id="voice-card" title="Buscar por voz">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    </button>
+                </div>
+
+                <button class="btn-submit" id="btn-resultados" onclick="handleSearch()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    BUSCAR
                 </button>
+
             </div>
 
-            <button class="btn-submit" id="btn-resultados" onclick="handleSearch()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                BUSCAR INSTRUCCIONES
-            </button>
-
-        </div>
-
-        <div class="anatomical-section">
-            <div class="anatomical-title">SELECCIÓN DE ÁREA CORPORAL</div>
-            <div class="figure-container">
+            <div class="anatomical-section">
+                <div class="anatomical-title">SELECCIÓN DE ÁREA CORPORAL</div>
+                <div class="figure-container">
                 <div class="zone-btns-left">
                     <button class="zone-btn" data-search="cabeza">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
@@ -126,6 +128,7 @@
                         <span>PIES</span>
                     </button>
                 </div>
+            </div>
             </div>
         </div>
 
