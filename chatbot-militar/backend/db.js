@@ -11,6 +11,12 @@ if (process.env.DATABASE_URL) {
     ssl: { rejectUnauthorized: false },
   });
 
+  /**
+   * Convierte una consulta SQL con placeholders `?` al formato `$n` de PostgreSQL
+   * y agrega `RETURNING id` a los INSERT que no lo tengan.
+   * @param {string} sql - Consulta SQL original con placeholders `?`
+   * @returns {string} Consulta SQL convertida para PostgreSQL
+   */
   function convertSql(sql) {
     let idx = 0;
     sql = sql.replace(/\?/g, () => `$${++idx}`);
@@ -22,6 +28,12 @@ if (process.env.DATABASE_URL) {
     return sql;
   }
 
+  /**
+   * Normaliza errores de PostgreSQL para que tengan el mismo formato que SQLite.
+   * Convierte el código 23505 (UNIQUE violation) en un mensaje legible.
+   * @param {Error} err - Error original de PostgreSQL
+   * @returns {Error} Error normalizado
+   */
   function normalizeError(err) {
     if (err && err.code === '23505') {
       err.message = 'UNIQUE constraint failed: ' + (err.constraint || err.detail || '');
@@ -63,6 +75,12 @@ if (process.env.DATABASE_URL) {
   });
 }
 
+/**
+ * Crea las tablas necesarias en PostgreSQL si no existen
+ * e inserta los valores por defecto de configuración.
+ * @param {import('pg').Pool} pool - Pool de conexión a PostgreSQL
+ * @returns {void}
+ */
 function initializePgTables(pool) {
   const init = async () => {
     await pool.query(`
@@ -121,6 +139,11 @@ function initializePgTables(pool) {
   init().catch(err => logError('DB_INIT_ERROR', new Error(err.message), { type: 'PostgreSQL' }));
 }
 
+/**
+ * Crea las tablas necesarias en SQLite si no existen,
+ * ejecuta migraciones e inserta valores por defecto de configuración.
+ * @returns {void}
+ */
 function initializeSqliteTables() {
   db.serialize(() => {
     db.run(`

@@ -81,6 +81,15 @@ app.use('/styles', express.static(path.join(__dirname, '../frontend/styles')));
 
 // ======================= API =========================
 
+/**
+ * POST /api/transcribir - Transcribe un archivo de audio usando Vosk.
+ * Recibe un archivo multipart, lo convierte a WAV (16kHz mono) y lo transcribe.
+ * @param {import('express').Request} req - Request con archivo 'audio'
+ * @param {import('express').Response} res - Respuesta JSON con el texto transcrito
+ * @returns {void}
+ * @throws {400} Si no se recibe archivo de audio
+ * @throws {500} Si falla la conversión o transcripción
+ */
 app.post('/api/transcribir', upload.single('audio'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Archivo de audio no recibido' });
@@ -120,6 +129,16 @@ app.post('/api/transcribir', upload.single('audio'), (req, res) => {
 });
 
 // ================ RUTA PARA REGISTRO DE MÉDICOS ================
+/**
+ * POST /medicos/registro - Registra un nuevo médico en el sistema.
+ * Valida código de registro, hash de contraseña y crea el usuario.
+ * @param {import('express').Request} req - Body con nombre, email, cedula, especializacion, password, codigo_registro
+ * @param {import('express').Response} res - Respuesta JSON con ok e id del nuevo médico
+ * @returns {void}
+ * @throws {403} Si el código de registro es inválido
+ * @throws {409} Si el usuario/cédula ya existe
+ * @throws {500} Si hay error interno
+ */
 app.post('/medicos/registro', registroMedico, async (req, res) => {
   const { nombre, email, cedula, especializacion, password, codigo_registro } = req.body;
 
@@ -153,6 +172,15 @@ app.post('/medicos/registro', registroMedico, async (req, res) => {
 });
 
 // ============= RUTA PARA INICIO DE SESIÓN DE MÉDICOS =============
+/**
+ * POST /medicos/login - Inicia sesión un médico y devuelve un JWT.
+ * Verifica contraseña (con soporte para migración de hash plano a bcrypt).
+ * @param {import('express').Request} req - Body con id_medico y password
+ * @param {import('express').Response} res - Respuesta JSON con token, nombre e id_medico
+ * @returns {void}
+ * @throws {401} Si las credenciales son incorrectas
+ * @throws {500} Si hay error interno
+ */
 app.post('/medicos/login', loginMedico, async (req, res) => {
   const { id_medico, password } = req.body;
   db.get('SELECT * FROM medicos WHERE id_medico = ?', [id_medico], async (err, row) => {
@@ -179,7 +207,15 @@ app.post('/medicos/login', loginMedico, async (req, res) => {
 
 // ============ RUTAS PARA INSTRUCCIONES ===========
 
-// Crear nueva instrucción (requiere token)
+/**
+ * POST /api/instrucciones - Crea una nueva instrucción médica.
+ * Requiere autenticación JWT de médico.
+ * @param {import('express').Request} req - Body con titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, descripcion
+ * @param {import('express').Response} res - Respuesta JSON con success e id de la instrucción
+ * @returns {void}
+ * @throws {401} Si no hay token válido
+ * @throws {500} Si hay error interno
+ */
 app.post('/api/instrucciones', verifyToken, instruccion, (req, res) => {
   const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, descripcion } = req.body;
 
@@ -199,7 +235,14 @@ app.post('/api/instrucciones', verifyToken, instruccion, (req, res) => {
   );
 });
 
-// Obtener todas las instrucciones
+/**
+ * GET /api/instrucciones - Obtiene todas las instrucciones médicas ordenadas por fecha descendente.
+ * No requiere autenticación (acceso público para soldados).
+ * @param {import('express').Request} req - Request sin parámetros
+ * @param {import('express').Response} res - Respuesta JSON con array de instrucciones
+ * @returns {void}
+ * @throws {500} Si hay error interno
+ */
 app.get('/api/instrucciones', (req, res) => {
   db.all(
     `SELECT * FROM instrucciones ORDER BY fecha DESC`,
@@ -211,7 +254,15 @@ app.get('/api/instrucciones', (req, res) => {
   );
 });
 
-// Obtener instrucción por ID
+/**
+ * GET /api/instrucciones/:id - Obtiene una instrucción médica por su ID.
+ * Acceso público.
+ * @param {import('express').Request} req - params con id de la instrucción
+ * @param {import('express').Response} res - Respuesta JSON con la instrucción
+ * @returns {void}
+ * @throws {404} Si la instrucción no existe
+ * @throws {500} Si hay error interno
+ */
 app.get('/api/instrucciones/:id', (req, res) => {
   db.get(
     `SELECT * FROM instrucciones WHERE id = ?`,
@@ -224,7 +275,16 @@ app.get('/api/instrucciones/:id', (req, res) => {
   );
 });
 
-// Actualizar instrucción (requiere token)
+/**
+ * PUT /api/instrucciones/:id - Actualiza una instrucción existente.
+ * El médico propietario o un admin pueden editarla.
+ * @param {import('express').Request} req - params con id, body con campos a actualizar
+ * @param {import('express').Response} res - Respuesta JSON con success
+ * @returns {void}
+ * @throws {401} Si no hay token válido
+ * @throws {403} Si no es el propietario ni admin
+ * @throws {500} Si hay error interno
+ */
 app.put('/api/instrucciones/:id', verifyToken, instruccion, (req, res) => {
   const { titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, descripcion } = req.body;
 
@@ -257,7 +317,16 @@ app.put('/api/instrucciones/:id', verifyToken, instruccion, (req, res) => {
   }
 });
 
-// Eliminar instrucción (requiere token)
+/**
+ * DELETE /api/instrucciones/:id - Elimina una instrucción.
+ * El médico propietario o un admin pueden eliminarla.
+ * @param {import('express').Request} req - params con id de la instrucción
+ * @param {import('express').Response} res - Respuesta JSON con success
+ * @returns {void}
+ * @throws {401} Si no hay token válido
+ * @throws {403} Si no es el propietario ni admin
+ * @throws {500} Si hay error interno
+ */
 app.delete('/api/instrucciones/:id', verifyToken, (req, res) => {
   const id_medico = req.user.id_medico;
   const isAdmin = req.user.rol === 'admin';
@@ -292,7 +361,15 @@ app.delete('/api/instrucciones/:id', verifyToken, (req, res) => {
 
 // ======================= RUTAS DE ADMINISTRACIÓN =========================
 
-// Login del Administrador (retorna JWT)
+/**
+ * POST /api/admin/login - Inicia sesión como administrador.
+ * Verifica contra la contraseña almacenada en la tabla configuracion.
+ * @param {import('express').Request} req - Body con password
+ * @param {import('express').Response} res - Respuesta JSON con token de admin
+ * @returns {void}
+ * @throws {401} Si la contraseña es incorrecta
+ * @throws {500} Si hay error de base de datos
+ */
 app.post('/api/admin/login', loginAdmin, async (req, res) => {
   const { password } = req.body;
   db.get("SELECT valor FROM configuracion WHERE clave = 'admin_password'", [], async (err, row) => {
@@ -316,7 +393,16 @@ app.post('/api/admin/login', loginAdmin, async (req, res) => {
   });
 });
 
-// Listar médicos registrados (requiere admin)
+/**
+ * GET /api/admin/medicos - Lista todos los médicos registrados.
+ * Requiere autenticación de administrador.
+ * @param {import('express').Request} req - Request autenticado como admin
+ * @param {import('express').Response} res - Respuesta JSON con array de médicos
+ * @returns {void}
+ * @throws {401} Si no hay token
+ * @throws {403} Si no es admin
+ * @throws {500} Si hay error interno
+ */
 app.get('/api/admin/medicos', verifyToken, requireAdmin, (req, res) => {
   db.all('SELECT nombre, email, cedula, especializacion, id_medico FROM medicos ORDER BY nombre ASC', [], (err, rows) => {
     if (err) return res.status(500).json({ success: false, error: "Error interno del servidor." });
@@ -324,7 +410,16 @@ app.get('/api/admin/medicos', verifyToken, requireAdmin, (req, res) => {
   });
 });
 
-// Eliminar médico y sus instrucciones (requiere admin)
+/**
+ * DELETE /api/admin/medicos/:id_medico - Elimina un médico y todas sus instrucciones.
+ * Requiere autenticación de administrador.
+ * @param {import('express').Request} req - params con id_medico
+ * @param {import('express').Response} res - Respuesta JSON con success
+ * @returns {void}
+ * @throws {401} Si no hay token
+ * @throws {403} Si no es admin
+ * @throws {500} Si hay error al eliminar
+ */
 app.delete('/api/admin/medicos/:id_medico', verifyToken, requireAdmin, (req, res) => {
   const { id_medico } = req.params;
   
@@ -336,7 +431,16 @@ app.delete('/api/admin/medicos/:id_medico', verifyToken, requireAdmin, (req, res
   });
 });
 
-// Obtener códigos de configuración e info (requiere admin)
+/**
+ * GET /api/admin/config - Obtiene configuración y estadísticas del sistema.
+ * Requiere autenticación de administrador.
+ * @param {import('express').Request} req - Request autenticado como admin
+ * @param {import('express').Response} res - Respuesta JSON con config y stats
+ * @returns {void}
+ * @throws {401} Si no hay token
+ * @throws {403} Si no es admin
+ * @throws {500} Si hay error interno
+ */
 app.get('/api/admin/config', verifyToken, requireAdmin, (req, res) => {
   db.get("SELECT valor FROM configuracion WHERE clave = 'registro_code'", [], (err, codeRow) => {
     if (err) return res.status(500).json({ success: false, error: 'Error de base de datos.' });
@@ -367,7 +471,16 @@ app.get('/api/admin/config', verifyToken, requireAdmin, (req, res) => {
   });
 });
 
-// Actualizar configuración (requiere admin)
+/**
+ * POST /api/admin/config - Actualiza configuración del sistema (código de registro y/o contraseña admin).
+ * Requiere autenticación de administrador.
+ * @param {import('express').Request} req - Body con registro_code y/o admin_password
+ * @param {import('express').Response} res - Respuesta JSON con success
+ * @returns {void}
+ * @throws {401} Si no hay token
+ * @throws {403} Si no es admin
+ * @throws {500} Si hay error al actualizar
+ */
 app.post('/api/admin/config', verifyToken, requireAdmin, configUpdate, async (req, res) => {
   let { registro_code, admin_password } = req.body;
   let errOccurred = false;
@@ -411,7 +524,15 @@ app.post('/api/admin/config', verifyToken, requireAdmin, configUpdate, async (re
 
 // ============ REGISTRO DE BÚSQUEDAS (SOLDIER VIEWS) ============
 
-// Log cuando un soldado ve una instrucción
+/**
+ * POST /api/log-busqueda - Registra cuando un soldado visualiza una instrucción.
+ * No requiere autenticación.
+ * @param {import('express').Request} req - Body con instruccion_id
+ * @param {import('express').Response} res - Respuesta JSON con success
+ * @returns {void}
+ * @throws {404} Si la instrucción no existe
+ * @throws {500} Si hay error interno
+ */
 app.post('/api/log-busqueda', logBusqueda, (req, res) => {
   const { instruccion_id } = req.body;
 
@@ -432,7 +553,16 @@ app.post('/api/log-busqueda', logBusqueda, (req, res) => {
   });
 });
 
-// Obtener logs de búsquedas (requiere admin)
+/**
+ * GET /api/admin/busquedas - Obtiene logs de búsquedas con filtro opcional por periodo y texto.
+ * Requiere autenticación de administrador.
+ * @param {import('express').Request} req - Query params: periodo (dia|semana|mes), search (texto a buscar)
+ * @param {import('express').Response} res - Respuesta JSON con array de logs
+ * @returns {void}
+ * @throws {401} Si no hay token
+ * @throws {403} Si no es admin
+ * @throws {500} Si hay error interno
+ */
 app.get('/api/admin/busquedas', verifyToken, requireAdmin, (req, res) => {
   const { periodo, search } = req.query;
   let fechaLimite = '';
@@ -477,15 +607,40 @@ app.get('/api/admin/busquedas', verifyToken, requireAdmin, (req, res) => {
   });
 });
 
+// =================== HEALTH CHECK (para Render) ====================
+/**
+ * GET /api/health - Health check para el balanceador de Render.
+ * @param {import('express').Request} req - Objeto de solicitud Express
+ * @param {import('express').Response} res - Respuesta JSON con status 'ok'
+ * @returns {void}
+ */
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 // =================== MIDDLEWARE DE ERRORES ====================
 
-// 404 - Ruta no encontrada
+/**
+ * Middleware 404 - Ruta no encontrada.
+ * Se ejecuta cuando ninguna ruta coincide.
+ * @param {import('express').Request} req - Objeto de solicitud Express
+ * @param {import('express').Response} res - Objeto de respuesta Express
+ * @returns {void}
+ */
 app.use((req, res) => {
   logEvent('ROUTE_404', { method: req.method, path: req.path, correlationId: req.correlationId });
   res.status(404).json({ error: 'Ruta no encontrada.', correlationId: req.correlationId });
 });
 
-// Middleware global de errores Express (evita filtrar información interna)
+/**
+ * Middleware global de errores Express.
+ * Captura errores no manejados y responde sin filtrar información interna.
+ * @param {Error} err - Error capturado
+ * @param {import('express').Request} req - Objeto de solicitud Express
+ * @param {import('express').Response} res - Objeto de respuesta Express
+ * @param {import('express').NextFunction} next - Función next
+ * @returns {void}
+ */
 app.use((err, req, res, next) => {
   logError('EXPRESS_ERROR', err, { correlationId: req.correlationId, method: req.method, path: req.path });
   res.status(500).json({ error: 'Error interno del servidor.', correlationId: req.correlationId });
@@ -500,12 +655,10 @@ process.on('unhandledRejection', (err) => {
   logError('UNHANDLED_REJECTION', err);
 });
 
-// =================== HEALTH CHECK (para Render) ====================
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
-
 // =================== INICIA EL SERVIDOR ====================
-app.listen(PORT, () => {
-  logEvent('SERVER_START', { puerto: PORT });
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    logEvent('SERVER_START', { puerto: PORT });
+  });
+}
+module.exports = app;

@@ -1,0 +1,12 @@
+node_modules
+uploads
+logs
+*.db
+*.db-journal
+Sistema de Inventario Ari
+.git
+.gitignore
+README.md
+*.txt
+.eslintrc
+.prettierrc

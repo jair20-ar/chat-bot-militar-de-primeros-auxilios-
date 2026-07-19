@@ -16,10 +16,23 @@ const logger = winston.createLogger({
   ]
 });
 
+/**
+ * Registra un evento informativo en el logger.
+ * @param {string} eventType - Tipo de evento (ej: 'SERVER_START')
+ * @param {object} [data={}] - Datos adicionales a incluir en el log
+ * @returns {void}
+ */
 function logEvent(eventType, data = {}) {
   logger.info({ event: eventType, ...data });
 }
 
+/**
+ * Registra un error en el logger, incluyendo mensaje y stack trace.
+ * @param {string} eventType - Tipo de evento (ej: 'UNCAUGHT_EXCEPTION')
+ * @param {Error} error - Objeto de error
+ * @param {object} [data={}] - Datos adicionales a incluir en el log
+ * @returns {void}
+ */
 function logError(eventType, error, data = {}) {
   logger.error({
     event: eventType,

@@ -1,5 +1,13 @@
 const { body, validationResult } = require('express-validator');
 
+/**
+ * Middleware que verifica los resultados de express-validator.
+ * Si hay errores, retorna el primero con status 400.
+ * @param {import('express').Request} req - Objeto de solicitud Express
+ * @param {import('express').Response} res - Objeto de respuesta Express
+ * @param {import('express').NextFunction} next - Función para continuar
+ * @returns {void}
+ */
 function handleValidationErrors(req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -9,6 +17,7 @@ function handleValidationErrors(req, res, next) {
   next();
 }
 
+/** Validación para registro de médico. */
 const registroMedico = [
   body('nombre').trim().isLength({ min: 3, max: 100 }).withMessage('El nombre debe tener entre 3 y 100 caracteres.'),
   body('email').trim().isEmail().withMessage('Email inválido.'),
@@ -19,17 +28,20 @@ const registroMedico = [
   handleValidationErrors
 ];
 
+/** Validación para inicio de sesión de médico. */
 const loginMedico = [
   body('id_medico').trim().notEmpty().withMessage('ID de médico es obligatorio.'),
   body('password').notEmpty().withMessage('Contraseña es obligatoria.'),
   handleValidationErrors
 ];
 
+/** Validación para inicio de sesión de administrador. */
 const loginAdmin = [
   body('password').notEmpty().withMessage('Contraseña es obligatoria.'),
   handleValidationErrors
 ];
 
+/** Validación para creación/actualización de instrucción médica. */
 const instruccion = [
   body('titulo').trim().isLength({ min: 3, max: 200 }).withMessage('El título debe tener entre 3 y 200 caracteres.'),
   body('parte_cuerpo').trim().isLength({ min: 2, max: 100 }).withMessage('La parte del cuerpo debe tener entre 2 y 100 caracteres.'),
@@ -51,11 +63,13 @@ const instruccion = [
   handleValidationErrors
 ];
 
+/** Validación para registro de búsqueda de instrucción. */
 const logBusqueda = [
   body('instruccion_id').isInt({ min: 1 }).withMessage('ID de instrucción inválido.'),
   handleValidationErrors
 ];
 
+/** Validación para actualización de configuración del sistema. */
 const configUpdate = [
   body('registro_code').optional().trim().isLength({ min: 4, max: 50 }).withMessage('El código de registro debe tener entre 4 y 50 caracteres.'),
   handleValidationErrors
