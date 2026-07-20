@@ -19,18 +19,18 @@ function handleValidationErrors(req, res, next) {
 
 /** Validación para registro de médico. */
 const registroMedico = [
-  body('nombre').trim().isLength({ min: 3, max: 100 }).withMessage('El nombre debe tener entre 3 y 100 caracteres.'),
-  body('email').trim().isEmail().withMessage('Email inválido.'),
-  body('cedula').trim().matches(/^\d{7,10}$/).withMessage('La cédula debe tener entre 7 y 10 dígitos.'),
-  body('especializacion').trim().isLength({ min: 3, max: 100 }).withMessage('La especialización debe tener entre 3 y 100 caracteres.'),
+  body('nombre').trim().escape().isLength({ min: 3, max: 100 }).withMessage('El nombre debe tener entre 3 y 100 caracteres.'),
+  body('email').trim().escape().isEmail().withMessage('Email inválido.'),
+  body('cedula').trim().escape().matches(/^\d{7,10}$/).withMessage('La cédula debe tener entre 7 y 10 dígitos.'),
+  body('especializacion').trim().escape().isLength({ min: 3, max: 100 }).withMessage('La especialización debe tener entre 3 y 100 caracteres.'),
   body('password').isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres.'),
-  body('codigo_registro').trim().notEmpty().withMessage('El código de registro es obligatorio.'),
+  body('codigo_registro').trim().escape().notEmpty().withMessage('El código de registro es obligatorio.'),
   handleValidationErrors
 ];
 
 /** Validación para inicio de sesión de médico. */
 const loginMedico = [
-  body('id_medico').trim().notEmpty().withMessage('ID de médico es obligatorio.'),
+  body('id_medico').trim().escape().notEmpty().withMessage('ID de médico es obligatorio.'),
   body('password').notEmpty().withMessage('Contraseña es obligatoria.'),
   handleValidationErrors
 ];
@@ -43,10 +43,18 @@ const loginAdmin = [
 
 /** Validación para creación/actualización de instrucción médica. */
 const instruccion = [
-  body('titulo').trim().isLength({ min: 3, max: 200 }).withMessage('El título debe tener entre 3 y 200 caracteres.'),
-  body('parte_cuerpo').trim().isLength({ min: 2, max: 100 }).withMessage('La parte del cuerpo debe tener entre 2 y 100 caracteres.'),
-  body('descripcion').optional({ values: 'falsy' }).trim().isLength({ max: 2000 }).withMessage('La descripción no debe superar los 2000 caracteres.'),
-  body('pasos').custom((value) => {
+  body('titulo').trim().escape().isLength({ min: 3, max: 200 }).withMessage('El título debe tener entre 3 y 200 caracteres.'),
+  body('parte_cuerpo').trim().escape().isLength({ min: 2, max: 100 }).withMessage('La parte del cuerpo debe tener entre 2 y 100 caracteres.'),
+  body('descripcion').optional({ values: 'falsy' }).trim().escape().isLength({ max: 2000 }).withMessage('La descripción no debe superar los 2000 caracteres.'),
+  body('pasos').customSanitizer((value) => {
+    if (Array.isArray(value)) {
+      return value.map(p => ({
+        ...p,
+        titulo: p.titulo ? p.titulo.replace(/[<>&"'\/]/g, '') : p.titulo
+      }));
+    }
+    return value;
+  }).custom((value) => {
     if (!Array.isArray(value)) {
       throw new Error('Los pasos deben ser un arreglo.');
     }
@@ -71,7 +79,7 @@ const logBusqueda = [
 
 /** Validación para actualización de configuración del sistema. */
 const configUpdate = [
-  body('registro_code').optional().trim().isLength({ min: 4, max: 50 }).withMessage('El código de registro debe tener entre 4 y 50 caracteres.'),
+  body('registro_code').optional().trim().escape().isLength({ min: 4, max: 50 }).withMessage('El código de registro debe tener entre 4 y 50 caracteres.'),
   handleValidationErrors
 ];
 

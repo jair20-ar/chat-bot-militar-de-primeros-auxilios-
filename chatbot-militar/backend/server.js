@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
+const crypto = require('crypto');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const db = require('./db');
@@ -22,7 +23,19 @@ const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
-const upload = multer({ dest: uploadsDir, limits: { fileSize: 10 * 1024 * 1024 } });
+
+const allowedMimeTypes = ['audio/wav', 'audio/mpeg', 'audio/mp3', 'audio/ogg', 'audio/webm', 'audio/x-wav', 'audio/wave'];
+const upload = multer({
+  dest: uploadsDir,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Formato de audio no soportado. Use WAV, MP3, OGG o WEBM.'));
+    }
+  }
+});
 
 
 const modelpath = path.join(__dirname, 'model', 'vosk-model-small-es-0.42');
@@ -643,21 +656,40 @@ app.use((req, res) => {
  */
 app.use((err, req, res, next) => {
   logError('EXPRESS_ERROR', err, { correlationId: req.correlationId, method: req.method, path: req.path });
-  res.status(500).json({ error: 'Error interno del servidor.', correlationId: req.correlationId });
+  const code = req.correlationId || crypto.randomUUID();
+  res.status(500).json({ error: 'Ocurrió un error. Reporte el código: ' + code });
 });
 
-// Manejadores de errores no capturados (protegen el proceso)
+let server;
+
+// Manejadores de errores no capturados — shutdown graceful
 process.on('uncaughtException', (err) => {
   logError('UNCAUGHT_EXCEPTION', err);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+    setTimeout(() => process.exit(1), 5000).unref();
+  } else {
+    process.exit(1);
+  }
 });
 
 process.on('unhandledRejection', (err) => {
   logError('UNHANDLED_REJECTION', err);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+    setTimeout(() => process.exit(1), 5000).unref();
+  } else {
+    process.exit(1);
+  }
 });
 
 // =================== INICIA EL SERVIDOR ====================
 if (require.main === module) {
-  app.listen(PORT, () => {
+  server = app.listen(PORT, () => {
     logEvent('SERVER_START', { puerto: PORT });
   });
 }
