@@ -79,13 +79,12 @@ function loadInstruction() {
         return;
     }
 
-    fetch(`${API_URL}/api/instrucciones/${instructionId}`)
-        .then(res => res.json())
+    fetchOfflineFirst(`/api/instrucciones/${instructionId}`)
         .then(data => {
             if (data.success) {
                 instructionData = data.data;
                 displayInstruction();
-                if (sessionStorage.getItem('previewMode') !== 'true') {
+                if (sessionStorage.getItem('previewMode') !== 'true' && navigator.onLine) {
                     fetch('/api/log-busqueda', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },

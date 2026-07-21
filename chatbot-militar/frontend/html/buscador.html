@@ -7,6 +7,8 @@
     <title>BÚSQUEDA MÉDICA TÁCTICA</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles/buscador.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a101a">
 </head>
 <body>
 
@@ -131,7 +133,15 @@
 
     </div>
 
+<script src="../js/db-local.js"></script>
+<script src="../js/sync.js"></script>
 <script src="../js/buscador.js"></script>
 <script src="../js/gestures.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+  if (typeof SyncEngine !== 'undefined') SyncEngine.init();
+</script>
 </body>
 </html>

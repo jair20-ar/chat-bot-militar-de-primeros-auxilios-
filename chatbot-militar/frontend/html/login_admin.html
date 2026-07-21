@@ -6,6 +6,8 @@
     <link rel="icon" type="image/jpeg" href="/imagenes/escudo.jpeg">
     <title>Acceso Restringido</title>
     <link rel="stylesheet" href="../styles/login_admin.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a101a">
 </head>
 <body data-theme="dark">
 
@@ -60,8 +62,16 @@
         </div>
     </div>
 
+    <script src="../js/db-local.js"></script>
+    <script src="../js/sync.js"></script>
     <script src="../js/api.js"></script>
     <script src="../js/login_admin.js"></script>
     <script src="../js/gestures.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      }
+      if (typeof SyncEngine !== 'undefined') SyncEngine.init();
+    </script>
 </body>
 </html>

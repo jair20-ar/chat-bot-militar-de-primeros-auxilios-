@@ -620,6 +620,69 @@ app.get('/api/admin/busquedas', verifyToken, requireAdmin, (req, res) => {
   });
 });
 
+// =================== SYNC ENDPOINTS (offline-first) ====================
+
+/**
+ * GET /api/sync/full - Descarga completa de instrucciones para sincronización offline.
+ * @param {import('express').Request} req - Request sin parámetros
+ * @param {import('express').Response} res - Respuesta JSON con todas las instrucciones
+ * @returns {void}
+ * @throws {500} Si hay error interno
+ */
+app.get('/api/sync/full', (req, res) => {
+  db.all('SELECT * FROM instrucciones ORDER BY fecha DESC', [], (err, rows) => {
+    if (err) return res.status(500).json({ success: false, error: 'Error al sincronizar.' });
+    res.json({ success: true, instrucciones: rows, syncTimestamp: new Date().toISOString() });
+  });
+});
+
+/**
+ * POST /api/sync/upload - Recibe cambios pendientes de tablets offline.
+ * @param {import('express').Request} req - Body con array de changes
+ * @param {import('express').Response} res - Respuesta JSON con success
+ * @returns {void}
+ * @throws {500} Si hay error interno
+ */
+app.post('/api/sync/upload', (req, res) => {
+  const { changes } = req.body;
+  if (!Array.isArray(changes) || changes.length === 0) {
+    return res.json({ success: true, synced: 0 });
+  }
+
+  let completed = 0;
+  let errors = 0;
+  const total = changes.length;
+
+  const checkDone = () => {
+    completed++;
+    if (completed >= total) {
+      if (errors > 0) {
+        return res.status(500).json({ success: false, error: `Error sincronizando ${errors} de ${total} cambios.` });
+      }
+      res.json({ success: true, synced: total });
+    }
+  };
+
+  changes.forEach(change => {
+    try {
+      if (change.method === 'POST' && change.url.includes('/api/instrucciones')) {
+        const body = JSON.parse(change.body);
+        const fecha = new Date().toISOString();
+        db.run(
+          'INSERT INTO instrucciones (titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, pasos, fecha, id_medico, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [body.titulo, body.categoria || null, body.severidad || null, body.parte_cuerpo, body.tiempo_estimado || null, JSON.stringify(body.pasos), fecha, 'offline-sync', body.descripcion || null],
+          function (err) { if (err) errors++; checkDone(); }
+        );
+      } else {
+        checkDone();
+      }
+    } catch (e) {
+      errors++;
+      checkDone();
+    }
+  });
+});
+
 // =================== HEALTH CHECK (para Render) ====================
 /**
  * GET /api/health - Health check para el balanceador de Render.

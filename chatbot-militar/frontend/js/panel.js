@@ -55,8 +55,7 @@ function loadMyInstructions() {
 
     console.log('📥 Cargando instrucciones para médico:', currentUserId);
 
-    fetch(`${API_URL}/api/instrucciones`)
-        .then(res => res.json())
+    fetchOfflineFirst('/api/instrucciones')
         .then(data => {
             if (data.success) {
                 console.log('📊 Total instrucciones en BD:', data.data.length);
@@ -158,8 +157,7 @@ function deleteInstruction(id) {
 function updateStats() {
     if (!currentUserId) return;
 
-    fetch(`${API_URL}/api/instrucciones`)
-        .then(res => res.json())
+    fetchOfflineFirst('/api/instrucciones')
         .then(data => {
             if (data.success) {
                 const myInstructions = data.data.filter(inst =>

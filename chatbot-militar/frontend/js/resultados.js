@@ -47,8 +47,7 @@ async function searchByZone(zona) {
     container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Buscando instrucciones...</p></div>';
 
     try {
-        const response = await fetch(`${API_URL}/api/instrucciones`);
-        const data = await response.json();
+        const data = await fetchOfflineFirst('/api/instrucciones');
 
         if (data.success && Array.isArray(data.data)) {
             const filteredResults = data.data.filter(inst =>
@@ -74,8 +73,7 @@ async function searchInstructions(searchTerm) {
     container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Buscando instrucciones...</p></div>';
 
     try {
-        const response = await fetch(`${API_URL}/api/instrucciones`);
-        const data = await response.json();
+        const data = await fetchOfflineFirst('/api/instrucciones');
 
         if (data.success && Array.isArray(data.data)) {
             const searchLower = searchTerm.toLowerCase();

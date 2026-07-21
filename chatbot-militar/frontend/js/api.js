@@ -43,3 +43,33 @@ function isAuthenticated() {
   const adminToken = localStorage.getItem('adminToken');
   return adminToken !== null;
 }
+
+async function fetchOfflineFirst(url, options = {}) {
+  const isMutation = options.method && ['POST', 'PUT', 'DELETE'].includes(options.method.toUpperCase());
+  const isInstruccionesAPI = url.includes('/api/instrucciones') && !url.includes('/api/instrucciones/');
+
+  if (isMutation && !navigator.onLine) {
+    await LocalDB.agregarCambioPendiente({ url, method: options.method, body: options.body });
+    return { success: true, offline: true };
+  }
+
+  if (!isMutation && !navigator.onLine && typeof LocalDB !== 'undefined') {
+    const data = await LocalDB.obtenerInstrucciones();
+    return { success: true, data, offline: true };
+  }
+
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+    if (isInstruccionesAPI && data.success && data.data && typeof LocalDB !== 'undefined') {
+      await LocalDB.guardarInstrucciones(data.data);
+    }
+    return data;
+  } catch (err) {
+    if (typeof LocalDB !== 'undefined') {
+      const data = await LocalDB.obtenerInstrucciones();
+      return { success: true, data, offline: true };
+    }
+    throw err;
+  }
+}
