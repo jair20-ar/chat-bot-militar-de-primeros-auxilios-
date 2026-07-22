@@ -31,6 +31,14 @@ jobs:
         working-directory: chatbot-militar/backend
         run: npm run lint
 
-      - name: Run tests
+      - name: Run tests with coverage
         working-directory: chatbot-militar/backend
         run: npm test
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: chatbot-militar/backend/coverage/
+          retention-days: 7
