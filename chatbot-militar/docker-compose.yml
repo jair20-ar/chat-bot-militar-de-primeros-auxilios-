@@ -3,6 +3,7 @@ version: "3.9"
 services:
   postgres:
     image: postgres:16-alpine
+    restart: always
     environment:
       POSTGRES_DB: chatbot_militar
       POSTGRES_USER: chatbot
@@ -19,6 +20,7 @@ services:
 
   backend:
     build: .
+    restart: always
     ports:
       - "3001:3001"
     environment:

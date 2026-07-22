@@ -1,4 +1,4 @@
-name: CI
+name: CI Pipeline
 
 on:
   push:
@@ -10,23 +10,27 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: chatbot-militar/backend
+    strategy:
+      matrix:
+        node-version: [18.19.0]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 18
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: "npm"
-          cache-dependency-path: chatbot-militar/backend/package-lock.json
+          node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
+        working-directory: chatbot-militar/backend
         run: npm ci
 
+      - name: Run linter
+        working-directory: chatbot-militar/backend
+        run: npm run lint
+
       - name: Run tests
+        working-directory: chatbot-militar/backend
         run: npm test

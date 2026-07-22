@@ -133,7 +133,7 @@ app.post('/api/transcribir', upload.single('audio'), (req, res) => {
                 res.json({ text: result.text });
             });
         })
-        .on('error', (err) => {
+        .on('error', (_err) => {
             if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
             if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
             res.status(500).json({ error: 'Error en la conversion de audio' });
@@ -178,7 +178,7 @@ app.post('/medicos/registro', registroMedico, async (req, res) => {
           res.json({ ok: true, id: this.lastID });
         }
       );
-    } catch (err) {
+    } catch (_err) {
       return res.status(500).json({ error: 'Error al procesar la contraseña.' });
     }
   });
@@ -495,7 +495,8 @@ app.get('/api/admin/config', verifyToken, requireAdmin, (req, res) => {
  * @throws {500} Si hay error al actualizar
  */
 app.post('/api/admin/config', verifyToken, requireAdmin, configUpdate, async (req, res) => {
-  let { registro_code, admin_password } = req.body;
+  const { registro_code } = req.body;
+  let { admin_password } = req.body;
   let errOccurred = false;
   let completed = 0;
   let total = 0;
@@ -676,7 +677,7 @@ app.post('/api/sync/upload', (req, res) => {
       } else {
         checkDone();
       }
-    } catch (e) {
+    } catch (_e) {
       errors++;
       checkDone();
     }

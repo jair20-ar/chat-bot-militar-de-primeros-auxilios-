@@ -1,163 +1,206 @@
-# Sistema de Asistencia Médica Táctica (TACMED FANB)
+# X-60 — Sistema de Instrucciones Médicas Tácticas
 
-Chatbot web para primeros auxilios en contexto militar. Permite a soldados buscar instrucciones médicas por texto o voz, y a médicos registrar protocolos de emergencia.
+Chatbot web offline-first para primeros auxilios en contexto militar. Permite a soldados buscar instrucciones médicas por voz o gestos táctiles, y a médicos registrar protocolos de emergencia paso a paso. Funciona 100% sin internet gracias a reconocimiento de voz local (Vosk) y almacenamiento offline (IndexedDB + Service Worker).
+
+El nombre **X-60** hace referencia a los **60 minutos dorados** de la medicina táctica — la ventana de tiempo crítica que tiene un herido en campo de batalla para recibir atención médica y sobrevivir.
 
 ---
 
-## 📊 Diagrama de Casos de Uso
+## Diagrama de Casos de Uso
 
 ```mermaid
 flowchart LR
-    subgraph Soldado["💂 Soldado"]
+    subgraph Soldado["Soldado"]
         S1[Buscar por texto]
         S2[Buscar por voz]
         S3[Filtrar por zona corporal]
-        S4[Ver instrucción paso a paso]
+        S4[Ver instruccion paso a paso]
     end
 
-    subgraph Medico["🩺 Médico"]
-        M1[Iniciar sesión]
-        M2[Registrarse con código]
-        M3[Crear instrucción médica]
-        M4[Editar instrucción]
-        M5[Eliminar instrucción]
-        M6[Ver panel de estadísticas]
+    subgraph Medico["Medico"]
+        M1[Iniciar sesion]
+        M2[Registrarse con codigo]
+        M3[Crear instruccion medica]
+        M4[Editar instruccion]
+        M5[Eliminar instruccion]
+        M6[Ver panel de estadisticas]
     end
 
-    subgraph Admin["⚙️ Administrador"]
-        A1[Iniciar sesión admin]
-        A2[Gestionar médicos]
+    subgraph Admin["Administrador"]
+        A1[Iniciar sesion admin]
+        A2[Gestionar medicos]
         A3[Gestionar instrucciones]
-        A4[Ver logs de búsquedas]
+        A4[Ver logs de busquedas]
         A5[Configurar sistema]
     end
 ```
 
-## 🔄 Diagrama de Flujo del Sistema
+## Diagrama de Flujo del Sistema
 
 ```mermaid
 flowchart TD
-    subgraph Cliente["💻 Cliente (Navegador)"]
-        S[💂 Soldado]
-        F[Frontend HTML/CSS/JS]
-        TTS[🔊 Síntesis de voz<br/>SpeechSynthesis API]
+    subgraph Cliente["Cliente (Navegador)"]
+        S["Soldado"]
+        F["Frontend HTML/CSS/JS"]
+        TTS["Sintesis de voz - SpeechSynthesis API"]
+        IDB["IndexedDB (datos offline)"]
+        SW["Service Worker (cache de assets)"]
     end
 
-    subgraph Servidor["🌐 Servidor Express"]
-        API[server.js<br/>API REST]
-        VK[🎙️ Vosk<br/>Reconocimiento de voz]
-        AUTH[🔐 JWT + bcrypt<br/>Autenticación]
-        VAL[✅ express-validator<br/>Validación]
-        LOG[📝 Winston<br/>Logging]
+    subgraph Servidor["Servidor Express"]
+        API["server.js - API REST"]
+        VK["Vosk - Reconocimiento de voz offline"]
+        AUTH["JWT + bcrypt - Autenticacion"]
+        VAL["express-validator - Validacion"]
+        LOG["Winston - Logging estructurado"]
+        SYNC["Sync Endpoints - /api/sync/full, /api/sync/upload"]
     end
 
-    subgraph BD["💾 Base de Datos"]
-        DB[(SQLite<br/>PostgreSQL)]
+    subgraph BD["Base de Datos"]
+        DB[(SQLite / PostgreSQL)]
     end
 
     S -->|Texto / Voz / Zona| F
-    F -->|GET/POST /api/*| API
+    F -->|Online: GET/POST /api/*| API
+    F -->|Offline: leer de| IDB
+    SW -->|Cache first| F
     API -->|/api/transcribir| VK
     VK -->|Texto transcrito| API
     API -->|/medicos/login| AUTH
     API -->|Validar entrada| VAL
     API -->|Registrar eventos| LOG
     API <-->|CRUD| DB
-
-    F -->|POST /api/log-busqueda| API
-    F -->|POST /api/transcribir| VK
-    F -->|SpeechSynthesis| TTS
-
-    M{{🩺 Médico}} -->|Crear / Editar| API
-    A{{⚙️ Administrador}} -->|Gestionar| API
+    API -->|GET /api/sync/full| SYNC
+    SYNC -->|Download instrucciones| IDB
+    IDB -->|Upload cambios pendientes| SYNC
 ```
 
 ---
 
-## ✨ Características
+## Caracteristicas
 
-- **Búsqueda por texto y voz** — Transcripción offline con Vosk (modelo español)
-- **Selector anatómico** — Filtro por zona del cuerpo (cabeza, tórax, abdomen, extremidades, etc.)
-- **Reproducción de instrucciones** — Paso a paso con síntesis de voz (`SpeechSynthesis`) y avance automático
-- **Roles de usuario** — Soldado (sin autenticación), Médico (registro con código), Administrador
-- **Panel médico** — Creación, edición y eliminación de instrucciones médicas
-- **Panel administrador** — Gestión de médicos, instrucciones y registro de búsquedas
-- **Reconocimiento de gestos** — Navegación táctil con dibujo de gestos en pantalla
-- **Tema claro/oscuro** — Alternancia con persistencia en `localStorage`
+- **Offline-first** — Service Worker cachea assets, IndexedDB almacena datos localmente, sincronizacion automatica cuando hay red
+- **Reconocimiento de voz offline** — Vosk (modelo espanol ~50MB) sin dependencia de internet
+- **Selector anatomico** — Filtro por zona del cuerpo (cabeza, torax, abdomen, extremidades, etc.)
+- **Reproduccion de instrucciones** — Paso a paso con sintesis de voz (SpeechSynthesis) y avance automatico
+- **Roles de usuario** — Soldado (sin autenticacion), Medico (registro con codigo), Administrador
+- **Panel medico** — Creacion, edicion y eliminacion de instrucciones medicas
+- **Panel administrador** — Gestion de medicos, instrucciones y registro de busquedas
+- **Reconocimiento de gestos** — Navegacion tactil con dibujo de gestos en pantalla
+- **PWA instalable** — Se puede instalar en la pantalla de inicio del tablet
+- **Seguridad por capas** — JWT, bcrypt, rate limiting, helmet, sanitizacion XSS, correlation ID
 
 ---
 
-## 💻 Stack Tecnológico
+## Stack Tecnologico
 
 ### Backend
-| Tecnología | Uso |
+| Tecnologia | Uso |
 |---|---|
-| **Node.js 18 + Express** | Servidor HTTP monolítico |
-| **SQLite3** / **PostgreSQL** | Base de datos (SQLite local, PostgreSQL en producción) |
-| **Vosk** (modelo pequeño español) | Reconocimiento de voz offline |
-| **ffmpeg** | Conversión de audio a WAV |
-| **jsonwebtoken** + **bcryptjs** | Autenticación y hash de contraseñas |
+| **Node.js 18 + Express** | Servidor HTTP monolitico |
+| **SQLite3** / **PostgreSQL** | Base de datos (SQLite local, PostgreSQL en produccion) |
+| **Vosk** (modelo pequeno espanol) | Reconocimiento de voz offline |
+| **ffmpeg** | Conversion de audio a WAV |
+| **jsonwebtoken** + **bcryptjs** | Autenticacion y hash de contrasenas |
 | **helmet** + **cors** + **express-rate-limit** | Seguridad HTTP |
-| **express-validator** | Validación de entrada |
-| **winston** | Logging estructurado |
+| **express-validator** | Validacion de entrada + sanitizacion XSS |
+| **winston** | Logging estructurado JSON con correlation ID |
 | **multer** | Subida de archivos (audio) |
 
 ### Frontend
-| Tecnología | Uso |
+| Tecnologia | Uso |
 |---|---|
 | **HTML + CSS + JavaScript vanilla** | Sin frameworks ni build steps |
-| **SpeechSynthesis API** | Síntesis de voz en instrucciones |
-| **MediaRecorder API** | Grabación de audio para búsqueda por voz |
-| **Canvas API** | Sistema de gestos táctiles |
+| **IndexedDB** (db-local.js) | Almacenamiento offline de instrucciones |
+| **Service Worker** (sw.js) | Cache de assets para funcionar sin red |
+| **Web App Manifest** (manifest.json) | PWA instalable |
+| **SpeechSynthesis API** | Sintesis de voz en instrucciones |
+| **SpeechRecognition API** | Busqueda por voz en el navegador |
+| **Canvas API** | Sistema de gestos tactiles |
+
+### Infraestructura
+| Tecnologia | Uso |
+|---|---|
+| **Docker + Docker Compose** | Contenedorizacion y orquestacion |
+| **GitHub Actions** | CI/CD (lint + tests automaticos) |
+| **Jest + Supertest** | 58 pruebas automatizadas |
+| **Render** | Despliegue en produccion con health check |
 
 ---
 
-## 🗂️ Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 proyecto b/
-├── chatbot-militar/
-│   ├── backend/
-│   │   ├── server.js              # Servidor Express (API + archivos estáticos)
-│   │   ├── db.js                  # Conexión SQLite / PostgreSQL
-│   │   ├── seed.js                # Semilla de base de datos
-│   │   ├── middleware/
-│   │   │   ├── auth.js            # JWT sign/verify + requireAdmin
-│   │   │   ├── validate.js        # Cadenas de validación express-validator
-│   │   │   ├── logger.js          # Winston logger
-│   │   │   └── correlation.js     # Correlation ID por request
-│   │   ├── model/                 # Modelo Vosk de reconocimiento de voz
-│   │   └── logs/                  # Logs generados por Winston
-│   ├── frontend/
-│   │   ├── html/                  # 10 páginas HTML (index, buscador, admin, etc.)
-│   │   ├── styles/                # CSS por página + temas
-│   │   ├── js/                    # JS por página + utilidades
-│   │   └── imagenes/              # Escudo FANB, anatomía, etc.
-├── render.yaml                    # Configuración de despliegue en Render
-├── package.json                   # Script raíz (start, dev)
+├── .github/workflows/ci.yml    # Pipeline CI/CD
+├── .gitignore
+├── .env.example
+├── CONTRIBUTING.md              # Reglas de ramas y commits
 ├── CHANGELOG.md
-├── CONTRIBUTING.md
-└── README.md
+├── README.md
+├── chatbot-militar/
+│   ├── Dockerfile               # Artefacto inmutable
+│   ├── docker-compose.yml       # Backend + PostgreSQL
+│   ├── RUNBOOK.md               # Protocolo L1/L2/L3
+│   ├── backend/
+│   │   ├── server.js            # API REST (17+ endpoints)
+│   │   ├── db.js                # Conexion SQLite / PostgreSQL
+│   │   ├── seed.js              # Semilla de base de datos
+│   │   ├── middleware/
+│   │   │   ├── auth.js          # JWT sign/verify + requireAdmin
+│   │   │   ├── validate.js      # express-validator + sanitizacion
+│   │   │   ├── logger.js        # Winston logger JSON
+│   │   │   └── correlation.js   # Correlation ID por request
+│   │   ├── __tests__/           # 58 pruebas automatizadas
+│   │   ├── model/               # Modelo Vosk de reconocimiento de voz
+│   │   └── logs/                # Logs generados por Winston
+│   ├── frontend/
+│   │   ├── html/                # 10 paginas HTML
+│   │   ├── styles/              # CSS por pagina + temas
+│   │   ├── js/
+│   │   │   ├── api.js           # fetchOfflineFirst()
+│   │   │   ├── db-local.js      # IndexedDB wrapper
+│   │   │   ├── sync.js          # Motor de sincronizacion
+│   │   │   └── ...              # JS por pagina
+│   │   ├── sw.js                # Service Worker
+│   │   ├── manifest.json        # PWA manifest
+│   │   └── imagenes/
 ```
 
 ---
 
-## 👥 Roles de Usuario
+## Roles de Usuario
 
 | Rol | Acceso |
 |---|---|
-| **Soldado** | Sin autenticación. Busca instrucciones, filtra por zona corporal, reproduce pasos con voz. |
-| **Médico** | Se registra con código (`FANB2026` por defecto). Crea, edita y elimina sus propias instrucciones. |
-| **Administrador** | Login con contraseña (`UNEFA2026` por defecto). Gestiona médicos, instrucciones, código de registro y logs de búsqueda. |
+| **Soldado** | Sin autenticacion. Busca instrucciones, filtra por zona corporal, reproduce pasos con voz. |
+| **Medico** | Se registra con codigo (`31150106` por defecto). Crea, edita y elimina sus propias instrucciones. |
+| **Administrador** | Login con contrasena (`UNEFA2026` por defecto). Gestiona medicos, instrucciones, codigo de registro y logs de busqueda. |
 
 ---
 
-## 🚀 Instalación y Uso Local
+## Instalacion
 
-### Requisitos
-- Node.js 18.19.0
+### Opcion 1: Docker (Recomendado)
 
-### Pasos
+```bash
+# 1. Clonar
+git clone https://github.com/jair20-ar/chat-bot-militar-de-primeros-auxilios-.git
+cd chat-bot-militar-de-primeros-auxilios-
+
+# 2. Levantar con Docker Compose
+cd chatbot-militar
+docker-compose up -d
+
+# 3. Verificar
+curl http://localhost:3001/api/health
+# -> {"status":"ok"}
+
+# 4. Abrir en el navegador
+# http://localhost:3001
+```
+
+### Opcion 2: Manual
 
 ```bash
 # 1. Clonar
@@ -175,74 +218,121 @@ npm start
 # http://localhost:3001
 ```
 
-> El servidor usa SQLite por defecto. En producción (Render) usa PostgreSQL vía la variable `DATABASE_URL`.
+> El servidor usa SQLite por defecto. En produccion (Render) usa PostgreSQL via la variable `DATABASE_URL`.
+
+### Modo Offline / PWA
+
+Una vez que el navegador carga la app por segunda vez, el Service Worker cachea todos los assets estaticos. Despues, la app funciona sin internet:
+
+1. **Primera vez con internet** — La tablet descarga todas las instrucciones del servidor y las guarda en IndexedDB
+2. **Sin internet** — Todas las busquedas y visualizaciones se hacen desde datos locales
+3. **Cuando vuelve la red** — Los cambios pendientes se suben automaticamente al servidor
+
+Para instalar como PWA en Android: Chrome muestra "Agregar a pantalla de inicio". En Windows: Edge/Chrome muestra "Instalar aplicacion".
 
 ---
 
-## 📡 API
+## API
 
-### Autenticación
-| Método | Endpoint | Descripción |
+### Autenticacion
+| Metodo | Endpoint | Descripcion |
 |---|---|---|
-| `POST` | `/medicos/registro` | Registro de médico (requiere `codigo_registro`) |
-| `POST` | `/medicos/login` | Login de médico, devuelve JWT |
+| `POST` | `/medicos/registro` | Registro de medico (requiere `codigo_registro`) |
+| `POST` | `/medicos/login` | Login de medico, devuelve JWT |
 | `POST` | `/api/admin/login` | Login de administrador, devuelve JWT |
 
-### Instrucciones médicas
-| Método | Endpoint | Auth | Descripción |
+### Instrucciones medicas
+| Metodo | Endpoint | Auth | Descripcion |
 |---|---|---|---|
 | `GET` | `/api/instrucciones` | — | Listar todas las instrucciones |
-| `GET` | `/api/instrucciones/:id` | — | Obtener instrucción por ID |
-| `POST` | `/api/instrucciones` | JWT médico | Crear instrucción |
-| `PUT` | `/api/instrucciones/:id` | JWT médico | Actualizar instrucción |
-| `DELETE` | `/api/instrucciones/:id` | JWT médico | Eliminar instrucción |
+| `GET` | `/api/instrucciones/:id` | — | Obtener instruccion por ID |
+| `POST` | `/api/instrucciones` | JWT medico | Crear instruccion |
+| `PUT` | `/api/instrucciones/:id` | JWT medico | Actualizar instruccion |
+| `DELETE` | `/api/instrucciones/:id` | JWT medico | Eliminar instruccion |
 
-### Transcripción de voz
-| Método | Endpoint | Descripción |
+### Transcripcion de voz
+| Metodo | Endpoint | Descripcion |
 |---|---|---|
-| `POST` | `/api/transcribir` | Sube audio (webm), devuelve texto transcrito vía Vosk |
+| `POST` | `/api/transcribir` | Sube audio (webm/wav/mp3), devuelve texto transcrito via Vosk |
 
-### Administración
-| Método | Endpoint | Auth | Descripción |
+### Sincronizacion offline
+| Metodo | Endpoint | Descripcion |
+|---|---|---|
+| `GET` | `/api/sync/full` | Descarga completa de instrucciones para sync offline |
+| `POST` | `/api/sync/upload` | Sube cambios pendientes desde tablets offline |
+
+### Administracion
+| Metodo | Endpoint | Auth | Descripcion |
 |---|---|---|---|
-| `GET` | `/api/admin/medicos` | JWT admin | Listar médicos |
-| `DELETE` | `/api/admin/medicos/:id` | JWT admin | Eliminar médico y sus instrucciones |
-| `GET` | `/api/admin/config` | JWT admin | Obtener configuración y estadísticas |
-| `POST` | `/api/admin/config` | JWT admin | Actualizar configuración |
-| `GET` | `/api/admin/busquedas` | JWT admin | Log de búsquedas (filtro por período) |
+| `GET` | `/api/admin/medicos` | JWT admin | Listar medicos |
+| `DELETE` | `/api/admin/medicos/:id` | JWT admin | Eliminar medico y sus instrucciones |
+| `GET` | `/api/admin/config` | JWT admin | Obtener configuracion y estadisticas |
+| `POST` | `/api/admin/config` | JWT admin | Actualizar configuracion |
+| `GET` | `/api/admin/busquedas` | JWT admin | Log de busquedas (filtro por periodo) |
 
-### Logging de búsquedas
-| Método | Endpoint | Descripción |
+### Logging de busquedas
+| Metodo | Endpoint | Descripcion |
 |---|---|---|
-| `POST` | `/api/log-busqueda` | Registra cuando un soldado ve una instrucción |
+| `POST` | `/api/log-busqueda` | Registra cuando un soldado ve una instruccion |
 
 ### Health Check
 ```bash
 curl http://localhost:3001/api/health
-# → { "status": "ok" }
+# -> { "status": "ok" }
 ```
 
 ---
 
-## 🌐 Despliegue en Render
+## Testing
 
-El proyecto incluye `render.yaml` con la configuración:
+```bash
+cd chatbot-militar/backend
+npm test
+# 58 tests passing (api, auth, validate, correlation, logger)
+```
+
+---
+
+## Despliegue en Render
+
+El proyecto incluye `render.yaml` con la configuracion:
 
 - **Runtime**: Node 18.19.0
 - **Root directory**: `chatbot-militar/backend`
 - **Start command**: `node --max-old-space-size=180 server.js`
 - **Base de datos**: PostgreSQL (plan free)
 - **Health check**: `GET /api/health`
+- **Auto-deploy**: Push a rama main despliega automaticamente
 
 ---
 
-## 📄 Licencia
+## CI/CD
+
+GitHub Actions ejecuta automaticamente en cada push/PR a main:
+
+1. **Checkout** del repositorio
+2. **Setup** Node.js 18.19.0
+3. **Install** dependencias (`npm ci`)
+4. **Lint** (`npm run lint`)
+5. **Tests** (`npm test` — 58 pruebas)
+
+Ver `.github/workflows/ci.yml`.
+
+---
+
+## Contribuir
+
+Ver [CONTRIBUTING.md](CONTRIBUTING.md) para reglas de ramas (GitFlow), Conventional Commits y proceso de Pull Request.
+
+---
+
+## Licencia
 
 ISC
 
 ---
 
-## 👨‍💻 Autores
+## Autores
 
 - **Jair Molleda** & **Mariangel Chirinos**
 - Email: jaircolina@gmail.com
@@ -250,8 +340,8 @@ ISC
 
 ---
 
-## 📚 Más Información
+## Mas Informacion
 
-- [Guía de contribución](CONTRIBUTING.md)
+- [Guia de contribucion](CONTRIBUTING.md)
 - [Registro de cambios](CHANGELOG.md)
-- [RUNBOOK operativo](chatbot-militar/backend/RUNBOOK.md)
+- [RUNBOOK operativo](chatbot-militar/RUNBOOK.md)
