@@ -39,12 +39,20 @@ const upload = multer({
 
 
 const modelpath = path.join(__dirname, 'model', 'vosk-model-small-es-0.42');
-if (!fs.existsSync(modelpath)) {
-  logError('MODEL_PATH_ERROR', new Error('Model folder not found'), { path: modelpath });
-  process.exit(1);
-}
+let model = null;
 
-const model = new Model(modelpath);
+function getVoskModel() {
+  if (!model) {
+    if (!fs.existsSync(modelpath)) {
+      logError('MODEL_PATH_ERROR', new Error('Model folder not found'), { path: modelpath });
+      return null;
+    }
+    logEvent('VOSK_LOADING', { path: modelpath });
+    model = new Model(modelpath);
+    logEvent('VOSK_READY', {});
+  }
+  return model;
+}
 
 
 // =================== MIDDLEWARE ===================
@@ -108,6 +116,12 @@ app.post('/api/transcribir', upload.single('audio'), (req, res) => {
         return res.status(400).json({ error: 'Archivo de audio no recibido' });
     }
 
+    const voskModel = getVoskModel();
+    if (!voskModel) {
+        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        return res.status(500).json({ error: 'Modelo de reconocimiento de voz no disponible.' });
+    }
+
     const inputPath = req.file.path;
     const outputPath = inputPath + '.wav';
 
@@ -117,7 +131,7 @@ app.post('/api/transcribir', upload.single('audio'), (req, res) => {
         .audioFrequency(16000)
         .on('end', () => {
             const fileStream = fs.createReadStream(outputPath, { highWaterMark: 4096 });
-            const rec = new Recognizer({ model: model, sampleRate: 16000 });
+            const rec = new Recognizer({ model: voskModel, sampleRate: 16000 });
 
             fileStream.on('data', (chunk) => {
                 rec.acceptWaveform(chunk);

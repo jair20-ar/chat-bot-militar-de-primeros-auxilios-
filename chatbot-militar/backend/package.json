@@ -30,7 +30,7 @@
     "lint": "eslint . --ignore-pattern '__tests__/'"
   },
   "engines": {
-    "node": "18.19.0"
+    "node": "20.x"
   },
   "devDependencies": {
     "eslint": "^10.7.0",

@@ -8,7 +8,7 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
-        value: 18.19.0
+        value: 20.x
       - key: FRONTEND_URL
         value: https://chat-bot-militar-de-primeros-auxilios.onrender.com
       - key: DATABASE_URL

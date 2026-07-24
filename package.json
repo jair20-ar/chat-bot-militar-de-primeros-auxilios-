@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "Chatbot militar de primeros auxilios",
   "scripts": {
-    "start": "node chatbot-militar/backend/server.js",
+    "start": "cd chatbot-militar/backend && node --max-old-space-size=512 server.js",
     "postinstall": "cd chatbot-militar/backend && npm install --ignore-scripts && npm rebuild",
     "dev": "cd chatbot-militar/backend && npm run dev"
   },
   "engines": {
-    "node": "18.19.0"
+    "node": "20.x"
   },
   "keywords": [],
   "author": "",
