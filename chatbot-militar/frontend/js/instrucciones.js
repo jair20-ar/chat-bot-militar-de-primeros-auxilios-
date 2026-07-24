@@ -455,6 +455,10 @@ function restartProtocol() {
 
 function exitProtocol() {
     closeEndModal();
-    window.location.href = 'index.html';
+    if (localStorage.getItem('medicoData')) {
+        window.location.href = 'panel.html';
+    } else {
+        window.location.href = 'index.html';
+    }
 }
 

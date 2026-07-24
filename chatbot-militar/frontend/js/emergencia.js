@@ -1,6 +1,31 @@
 let stepCount = 1;
 let editingId = null;
 
+function compressImage(base64Url, maxWidth, quality) {
+    return new Promise((resolve) => {
+        if (!base64Url || !base64Url.startsWith('data:image')) {
+            resolve(base64Url);
+            return;
+        }
+        const img = new Image();
+        img.onload = () => {
+            let w = img.width;
+            let h = img.height;
+            if (w > maxWidth) {
+                h = Math.round(h * maxWidth / w);
+                w = maxWidth;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => resolve(base64Url);
+        img.src = base64Url;
+    });
+}
+
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -337,14 +362,19 @@ function resetSaveBtn(btnSave) {
     btnSave.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>GUARDAR INSTRUCCIÓN`;
 }
 
-function sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, descripcion, pasos, btnSave) {
+async function sendInstructionToServer(titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, descripcion, pasos, btnSave) {
     const method = editingId ? 'PUT' : 'POST';
     const url = editingId ? `${API_URL}/api/instrucciones/${editingId}` : `${API_URL}/api/instrucciones`;
+
+    const compressedPasos = await Promise.all(pasos.map(async (p) => ({
+        ...p,
+        imagen: p.imagen ? await compressImage(p.imagen, 800, 0.6) : p.imagen
+    })));
 
     fetch(url, {
         method,
         headers: getAuthHeaders(),
-        body: JSON.stringify({ titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, descripcion, pasos })
+        body: JSON.stringify({ titulo, categoria, severidad, parte_cuerpo, tiempo_estimado, descripcion, pasos: compressedPasos })
     })
     .then(res => res.json())
     .then(data => {

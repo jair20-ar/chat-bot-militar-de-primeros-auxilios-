@@ -57,8 +57,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(bodyParser.json({ limit: '1mb' }));
-app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 // Rate limiting: login (5 intentos/minuto)
 const loginLimiter = rateLimit({
