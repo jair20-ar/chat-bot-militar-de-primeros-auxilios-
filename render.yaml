@@ -4,11 +4,13 @@ services:
     runtime: node
     rootDir: chatbot-militar/backend
     buildCommand: npm install
-    startCommand: node --max-old-space-size=180 server.js
+    startCommand: node --max-old-space-size=512 server.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
         value: 18.19.0
+      - key: FRONTEND_URL
+        value: https://chat-bot-militar-de-primeros-auxilios.onrender.com
       - key: DATABASE_URL
         fromDatabase:
           name: chatbot-militar-db
